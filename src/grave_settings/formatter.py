@@ -165,6 +165,9 @@ class Formatter(IFormatter):
     TYPES = PRIMITIVES | SPECIAL
     ATTRIBUTE_TYPES = Union[str, Never]
 
+    def convert_route_to_reference_string(self, route: Route) -> str:
+        return '.'.join(str(x) for x in route.key_path)
+
     def __init__(self, settings: FormatterSettings = None):
         if settings is None:
             settings = FormatterSettings()
@@ -214,7 +217,8 @@ class Formatter(IFormatter):
                 return obj
             else:
                 if self.auto_preserve_references:
-                    obj = route.check_in_object(obj, '.'.join(route.key_path))
+                    obj = route.check_in_object(obj, self.convert_route_to_reference_string)
+                    tobj = obj.__class__
                 if tobj in self.special:
                     return self.serialization_handler.handle(tobj, route, instance=obj, **kwargs)
                 else:
