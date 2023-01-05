@@ -50,7 +50,7 @@ class JsonSerializationHandler(OrderedHandler):
 
     def handle_PreservedReference(self, key: PreservedReference, route: Route, *args, **kwargs):
         return {
-            'ref': key.obj_ref
+            'ref': key.ref
         }
 
     def handle_Iterable(self, key: Iterable, route: Route, *args, **kwargs):

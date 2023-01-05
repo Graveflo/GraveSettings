@@ -53,8 +53,7 @@ class ConversionManager:
             ver = out_version
         return state_obj
 
-    def update_to_current(self, json_obj, p_version_key=P_VERSION) -> dict:
-        version_info = json_obj[p_version_key]
+    def update_to_current(self, json_obj, version_info) -> dict:
         for class_str, version in version_info.items():
             this_class = load_type(class_str)
             if not version == this_class.VERSION:

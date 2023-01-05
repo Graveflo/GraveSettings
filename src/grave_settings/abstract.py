@@ -11,62 +11,71 @@ from ram_util.utilities import OrderedHandler
 
 from observer_hooks import notify, notify_copy_super
 from grave_settings.conversion_manager import ConversionManager
+from grave_settings.fmt_util import Route
 from grave_settings.validation import SettingsValidator
 
 _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
 
 
-
-
 class Serializable(ABC):
     __slots__ = tuple()
 
+    @classmethod
+    def check_in_serialization_route(cls, route: Route):
+        pass
+
+    @classmethod
+    def check_in_deserialization_route(cls, route: Route):
+        pass
+
     def to_dict(self, **kwargs) -> dict:
-        zgen = ((i,getattr(self, i)) for i in dir(self))
+        zgen = ((i, getattr(self, i)) for i in dir(self))
         return dict(i for i in zgen if not (callable(i[1]) or i[0].startswith('__')))
 
     def from_dict(self, state_obj: dict, **kwargs):
-        for k,v in state_obj.items():
+        for k, v in state_obj.items():
             setattr(self, k, v)
-
 
 
 class VersionedSerializable(Serializable):
     VERSION = None
     __slots__ = '_conversion_completed',
 
-    def get_version(self):
-        return self.VERSION
+    @classmethod
+    def get_version(cls):
+        return cls.VERSION
 
-    def get_versioning_endpoint(self) -> Type[Self]:
-        return VersionedSerializable
-
-    def get_conversion_manager(self) -> ConversionManager:
+    @classmethod
+    def get_conversion_manager(cls) -> ConversionManager:
         cm = ConversionManager()
-        cm.converted.subscribe(self.conversion_manager_converted)
+        cm.converted.subscribe(cls.conversion_manager_converted)
         return cm
 
-    def conversion_manager_converted(self, state_obj: dict, class_str: str, ver: str, target_ver: str=None):
+    @classmethod
+    def conversion_manager_converted(cls, state_obj: dict, class_str: str, ver: str, target_ver: str = None):
         pass
+
+    @classmethod
+    def version_mismatch(cls, state_obj: dict, old_version: str, **kwargs) -> dict:
+        cm = cls.get_conversion_manager()
+        new_state_obj = cm.update_to_current(state_obj)
+        is_convert = new_state_obj is not state_obj
+        if is_convert:
+            cls.conversion_completed(state_obj, new_state_obj)
+        return new_state_obj
+
+    @classmethod
+    def get_versioning_endpoint(cls) -> Type[Self]:
+        return VersionedSerializable
 
     @notify()
     def conversion_completed(self, old_ver: dict, new_ver: dict):
         pass
 
-    def version_mismatch(self, state_obj: dict, old_version: str, **kwargs) -> dict:
-        cm = self.get_conversion_manager()
-        new_state_obj = cm.update_to_current(state_obj)
-        is_convert = new_state_obj is not state_obj
-        if is_convert:
-            self.conversion_completed(state_obj, new_state_obj)
-        return new_state_obj
-
-
 
 def make_kill_converter(cls: Type[VersionedSerializable]) -> Callable[[dict], dict]:
     return lambda _: cls().to_dict(explicit=True)
-
 
 
 class IASettings(VersionedSerializable, MutableMapping):
@@ -132,12 +141,6 @@ class IASettings(VersionedSerializable, MutableMapping):
     def get_partial_state(self, **kwargs) -> dict:
         return dict(self.generate_key_value_pairs(**kwargs))
 
-    def get_serialization_handler(self) -> OrderedHandler | None:
-        return None
-
-    def get_deserialization_handler(self) -> OrderedHandler | None:
-        return None
-
     def conversion_manager_settings_updated(self, state_obj: dict, class_str: str, ver: str, target_ver: str=None):
         self.invalidate()
 
@@ -147,9 +150,6 @@ class IASettings(VersionedSerializable, MutableMapping):
 
     def get_validator(self) -> SettingsValidator | None:
         pass
-
-    def needs_write(self) -> bool:
-        return self.changes_made
 
     def __hash__(self):  # override this if you want to support value based equality
         return hash(id(self))

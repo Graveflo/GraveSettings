@@ -84,14 +84,10 @@ class SlotSettings(IASettings):
             found_slot_rems = False
 
             slrm = set()
-            # slots = set()
             for tt in generate_hierarchy_to_base(SlotSettings, cls):
                 if hasattr(tt, '_slot_rems') and tt._slot_rems is not None:
                     found_slot_rems = True
                     slrm.update(tt._slot_rems)
-                #    slots.update(tt._slot_rems)
-                # if hasattr(tt, '__slots__'):
-                #    slots.update(tt.__slots__)
 
             if found_slot_rems:
                 cls._slot_rems = tuple(slrm)
@@ -114,9 +110,9 @@ class SlotSettings(IASettings):
             rems = self._slot_rems
         return self.get_settings_keys_base_slots().difference(rems)
 
-    def update(self, mapping_obj: Mapping[_KT, _VT], **kwargs: _VT):
+    def safe_update(self, mapping_obj: Mapping[_KT, _VT], **kwargs: _VT):
         try:
-            super(SlotSettings, self).update(mapping_obj, **kwargs)
+            return super(SlotSettings, self).update(mapping_obj, **kwargs)
         except AttributeError:
             valid_attrs = self.get_settings_keys()
 
@@ -128,14 +124,15 @@ class SlotSettings(IASettings):
             for k, v in kwargs.items():
                 if k in valid_attrs:
                     new_dict[k] = v
-            super(SlotSettings, self).update(new_dict)
+            return super(SlotSettings, self).update(new_dict)
 
     def __contains__(self, item):
         return hasattr(self, item)
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key, value):  # TODO: This is very inefficient but without it unexpected things can happen
         super(SlotSettings, self).__setattr__(key, value)
-        self.invalidate()
+        if key in self.get_settings_keys():
+            self.invalidate()
 
     def __setitem__(self, key, value):
         it_t = type(key)
