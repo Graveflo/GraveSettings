@@ -61,9 +61,17 @@ class KeySerializableDict:
     def __init__(self, wrapped_dict: dict):
         self.wrapped_dict = wrapped_dict
 
+    def to_dict(self) -> dict:
+        return {
+            'kvps': list(x for x in self.wrapped_dict.items())
+        }
+
+    def from_dict(self, obj: dict):
+        self.wrapped_dict = dict(x for x in obj['kvps'])
+
 
 class PreservedReference(object):
-    __slots__ = 'obj', 'ref'
+    __slots__ = 'obj', 'ref', '__weakref__'
 
     def __init__(self, obj: None | object = None, ref=None):
         if ref is None:
@@ -74,7 +82,7 @@ class PreservedReference(object):
     def __hash__(self):
         return hash(id(self.obj))
 
-    def detonate(self):
+    def detonate(self, *args, **kwargs):
         raise PreservedReferenceNotDissolvedError()
 
 
@@ -90,9 +98,7 @@ class Route:
         self._finalize_frame = HardRefEventHandler()
         if finalize_handler is None:  # The very first frame shares event handler with finalize_frame
             finalize_handler = self._finalize_frame
-        self.key_path = []
         self.obj_type_str = None  # can be set by the handler to change the type string
-        self.id_cache = {}
         self.handler: OrderedHandler = handler
         self.frame_semantics = None
         self.semantics = None
@@ -119,20 +125,10 @@ class Route:
     def new(self, finalize_event: EventHandler) -> Self:
         return self.__class__(self.handler, finalize_handler=finalize_event)
 
-    def branch(self, obj=None, path=None):
-        r = self.branch_skip(self.key_path, obj=obj, path=path)
+    def branch(self):
+        r = self.new(self._finalize)  # we want to maintain a handle to the root frame's finalize EventHandler
         if self.semantics is not None:
             r.semantics = self.semantics.copy()
-        return r
-
-    def branch_skip(self, key_path: list, obj=None, path=None):
-        r = self.new(self._finalize)
-        r.id_cache = self.id_cache
-        r.key_path = key_path
-        if obj is not None:
-            self.obj_type_str = format_class_str(obj.__class__)
-        if path is not None:
-            r.key_path.append(path)
         return r
 
     @notify(no_origin=True, pass_ref=True)
@@ -152,22 +148,6 @@ class Route:
     def set_obj_class_str(self, class_str: str):
         self.obj_type_str = class_str
 
-    def check_in_object(self, obj: T, path_func: Callable[[Self], str]) -> PreservedReference | T:
-        object_id = id(obj)
-        if object_id in self.id_cache:
-            return PreservedReference(obj=obj, ref=self.id_cache[object_id])
-        else:
-            self.id_cache[object_id] = path_func(self)
-            return obj
-
-    def check_out_object(self, obj: T, path_func: Callable[[Self], str]) -> T | object:
-        if isinstance(obj, PreservedReference):
-            if obj.ref in self.id_cache:
-                return self.id_cache[obj.ref]
-        else:
-            self.id_cache[path_func(self)] = obj
-        return obj
-
     def set_handler(self, handler: OrderedHandler, merge: bool=True, update_order=False):
         if merge and self.handler is not None and self.handler is not handler:
             handler.update(self.handler, update_order=update_order)
@@ -178,5 +158,3 @@ class Route:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.finalize_frame()
-        if len(self.key_path) > 0:
-            self.key_path.pop(-1)

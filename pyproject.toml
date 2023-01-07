@@ -1,7 +1,8 @@
 [build-system]
 requires = [
 "setuptools",
-"wheel",
-"json"
+"wheel"
 ]
 build-backend="setuptools.build_meta"
+[project]
+dependencies = []

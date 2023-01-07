@@ -9,6 +9,8 @@ from typing import Callable, Type
 from dataclasses import field, dataclass
 from ram_util.modules import format_class_str, load_type
 from observer_hooks import notify, EventHandler
+from ram_util.utilities import generate_type_hierarchy_to_base
+
 from grave_settings import P_VERSION
 
 
@@ -31,12 +33,28 @@ class ConversionManager:
     def __init__(self):
         # mapping of version to tuple of conversion function and output version
         self.converters: dict[tuple[str, str], tuple[Callable, str]] = {}
+        self.converted = EventHandler()
+
+    @classmethod
+    def get_version_object(cls, t_obj: Type | object):
+        versioning_info = {}
+        if hasattr(t_obj, 'get_versioning_endpoint'):
+            end_point = t_obj.get_versioning_endpoint()
+        else:
+            end_point = object
+        if type(t_obj) != Type:
+            t_obj = t_obj.__class__
+        for clt in generate_type_hierarchy_to_base(end_point, t_obj):
+            if hasattr(clt, 'VERSION'):
+                if clt.VERSION is not None:
+                    versioning_info[format_class_str(clt)] = clt.VERSION
+        if versioning_info:
+            return versioning_info
 
     def add_converter(self, target_ver, target_class: Type | str, conversion_func, out_ver):
         if type(target_class) is not str:
             target_class = format_class_str(target_class)
         self.converters[(target_class, target_ver)] = (conversion_func, out_ver)
-        self.converted = EventHandler()
 
     def try_convert(self, state_obj: dict, class_str: str, ver: str, target_ver: str | None=None):
         version_map = state_obj[P_VERSION]
@@ -54,6 +72,8 @@ class ConversionManager:
         return state_obj
 
     def update_to_current(self, json_obj, version_info) -> dict:
+        if version_info is None:
+            return json_obj
         for class_str, version in version_info.items():
             this_class = load_type(class_str)
             if not version == this_class.VERSION:
