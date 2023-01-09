@@ -11,20 +11,17 @@ from ram_util.modules import format_class_str, load_type
 from observer_hooks import notify, EventHandler
 from ram_util.utilities import generate_type_hierarchy_to_base
 
-from grave_settings import P_VERSION
-
 
 class ConversionError(Exception):
     pass
 
 
 def basic_converter(json_obj: dict, mapping: dict, new_ver: str) -> dict:
-    new_json_obj = {P_VERSION: new_ver}
+    new_json_obj = {}
     for k, v in mapping.items():
         if k in json_obj:
             new_json_obj[mapping[k]] = json_obj[k]
     return new_json_obj
-
 
 
 class ConversionManager:
@@ -57,7 +54,6 @@ class ConversionManager:
         self.converters[(target_class, target_ver)] = (conversion_func, out_ver)
 
     def try_convert(self, state_obj: dict, class_str: str, ver: str, target_ver: str | None=None):
-        version_map = state_obj[P_VERSION]
         search_key = (class_str, ver)
         while (ver != target_ver) and (search_key in self.converters):
             try:
@@ -67,7 +63,6 @@ class ConversionManager:
             if (new_object := convert_func(state_obj)) is not None:
                 state_obj = new_object
                 self.converted.emit(state_obj, class_str, ver, target_ver=out_version)
-            version_map[class_str] = out_version
             ver = out_version
         return state_obj
 

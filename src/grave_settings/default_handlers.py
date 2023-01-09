@@ -17,13 +17,13 @@ from grave_settings.abstract import Serializable, IASettings
 from grave_settings.fmt_util import Route, KeySerializableDict, PreservedReference
 
 
-class NotJsonSerializableException(Exception):
+class NotSerializableException(Exception):
     pass
 
 
-class JsonSerializationHandler(OrderedHandler):
+class SerializationHandler(OrderedHandler):
     def init_handler(self):
-        super(JsonSerializationHandler, self).init_handler()
+        super(SerializationHandler, self).init_handler()
         self.add_handlers({  # This only works because dictionaries preserve order! Be careful order matters here
             Type: self.handle_type,
             NoneType: self.handle_NoneType,
@@ -105,12 +105,12 @@ class JsonSerializationHandler(OrderedHandler):
 
 
 
-class JsonDeSerializationHandler(OrderedHandler):
+class DeSerializationHandler(OrderedHandler):
     def __init__(self, *args, **kwargs):
-        super(JsonDeSerializationHandler, self).__init__(*args, **kwargs)
+        super(DeSerializationHandler, self).__init__(*args, **kwargs)
 
     def init_handler(self):
-        super(JsonDeSerializationHandler, self).init_handler()
+        super(DeSerializationHandler, self).init_handler()
         self.add_handlers({
             Type: self.handle_type,
             NoneType: self.handle_NoneType,

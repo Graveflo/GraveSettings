@@ -12,7 +12,7 @@ from ram_util.utilities import OrderedHandler
 
 from grave_settings.abstract import Serializable
 from grave_settings.base import SlotSettings
-from grave_settings.default_handlers import JsonSerializationHandler, JsonDeSerializationHandler
+from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
 from grave_settings.fmt_util import Route
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import AutoPreserveReferences
@@ -41,10 +41,10 @@ class Dummy(SlotSettings):
 
 class Scenarios(TestCase):
     def get_serialization_handler(self) -> OrderedHandler:
-        return JsonSerializationHandler()
+        return SerializationHandler()
 
     def get_deserialization_handler(self) -> OrderedHandler:
-        return JsonDeSerializationHandler()
+        return DeSerializationHandler()
 
     def get_route(self, handler: OrderedHandler) -> Route:
         return Route(handler)

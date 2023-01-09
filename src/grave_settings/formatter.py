@@ -5,52 +5,96 @@
 @author: ☙ Ryan McConnell ❧
 """
 import re
-from functools import singledispatchmethod
+from abc import ABC, abstractmethod
+from io import IOBase
 from types import NoneType
 from typing import Any, get_args, Union, Never, Type
 
-from observer_hooks.block_events import BlockSideEffects
 from ram_util.modules import format_class_str, load_type
 
-from ram_util.utilities import MroHandler
+from ram_util.utilities import MroHandler, OrderedHandler
 
-from grave_settings import P_TYPE, P_ID, P_VERSION
 from grave_settings.abstract import VersionedSerializable
-from grave_settings.fmt_util import Route, KeySerializableDict, IFormatter, T_S, PreservedReference
+from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
+from grave_settings.fmt_util import Route, KeySerializableDict, PreservedReference, T_S
 from grave_settings.semantics import *
-
-JSON_PRIMITIVES = int | float | str | bool | NoneType
-JSON_TYPES = dict | list | JSON_PRIMITIVES
-
-#
-# def deserialize_object_json(state_object: JSON_TYPES, route: Route, **kwargs) -> Any:
-#     with route:
-#         if type(state_object) == dict:
-#             if P_TYPE in state_object:
-#                 ret = route.handler.handle(state_object, **kwargs)
-#             else:
-#                 objects_last = {}
-#                 stateless_first = {}
-#                 for k, v in state_object.items():
-#                     if type(v) == dict and 'type' in v:
-#                         objects_last[k] = v
-#                     else:
-#                         stateless_first[k] = v
-#                 return_vec = {k: deserialize_object_json(v, **kwargs) for k, v in stateless_first.items()}
-#                 ret = return_vec | {k: deserialize_object_json(v, **kwargs) for k, v in objects_last.items()}
-#         else:
-#             if type(state_object) == list:
-#                 return [deserialize_object_json(x, **kwargs) for x in state_object]
-#             else:
-#                 return state_object
-#
+from grave_settings.semantics import Semantic
 
 
 class FormatterSettings:
-    def __init__(self, str_id=P_ID, version_id=P_VERSION, class_id=P_TYPE):
+    def __init__(self, str_id='__id__', version_id='__version__', class_id='__class__'):
         self.str_id = str_id
         self.version_id = version_id
         self.class_id = class_id
+
+
+class IFormatter(ABC):
+    def to_buffer(self, data, _io: IOBase, encoding=None, route: Route = None):
+        if route is None:
+            route = self.get_default_serialization_route()
+        obj = self.serialized_obj_to_buffer(self.serialize(data, route))
+        if encoding is not None:
+            obj = obj.encode(encoding)
+        _io.write(obj)
+
+    def write_to_file(self, settings, path: str, encoding=None, route: Route = None):
+        if encoding is None:
+            f = open(path, 'w')
+        else:
+            f = open(path, 'wb')
+        with f:
+            # noinspection PyTypeChecker
+            self.to_buffer(settings, f, encoding=encoding, route=route)
+
+    def from_buffer(self, _io: IOBase, encoding=None, route: Route = None):
+        if route is None:
+            route = self.get_default_deserialization_route()
+        data = _io.read()
+        if encoding is not None:
+            data = data.decode(encoding)
+        data = self.buffer_to_obj(data)
+        return self.deserialize(data, route)
+
+    def read_from_file(self, path: str, encoding=None, route=None):
+        if encoding is None:
+            f = open(path, 'r')
+        else:
+            f = open(path, 'rb')
+        with f:
+            # noinspection PyTypeChecker
+            return self.from_buffer(f, encoding=encoding, route=route)
+
+    def serialized_obj_to_buffer(self, ser_obj):
+        pass
+
+    def buffer_to_obj(self, buffer):
+        pass
+
+    def get_default_serialization_route(self) -> Route:
+        return Route(SerializationHandler())
+
+    def get_default_deserialization_route(self) -> Route:
+        return Route(DeSerializationHandler())
+
+    @abstractmethod
+    def serialize(self, obj: Any, route: Route, **kwargs):
+        pass
+
+    @abstractmethod
+    def deserialize(self, obj, route: Route, **kwargs):
+        pass
+
+    @abstractmethod
+    def supports_symantec(self, semantic_class: Type[Semantic]) -> bool:
+        pass
+
+    @abstractmethod
+    def register_symantec(self, symantec: Semantic):
+        pass
+
+    @abstractmethod
+    def get_semantic(self, semantic_class: Type[T_S]) -> T_S:
+        pass
 
 
 class Formatter(IFormatter):
@@ -89,7 +133,9 @@ class Formatter(IFormatter):
             AutoKeySerializableDict: AutoKeySerializableDict(True),
             AutoPreserveReferences: AutoPreserveReferences(True),
             DetonateDanglingPreservedReferences: DetonateDanglingPreservedReferences(True),
-            ResolvePreservedReferences: ResolvePreservedReferences(True)
+            ResolvePreservedReferences: ResolvePreservedReferences(True),
+            PreserveSerializableKeyOrdering: PreserveSerializableKeyOrdering(False),
+            SerializeNoneVersionInfo: SerializeNoneVersionInfo(False)
         }
 
     def supports_symantec(self, semantic_class: Type[Semantic]) -> bool:
@@ -104,12 +150,12 @@ class Formatter(IFormatter):
     def get_semantic(self, semantic_class: Type[T_S]) -> T_S:
         return self.semantics[semantic_class]
 
-    def convert_path_to_str(self) -> str:
+    def path_to_str(self) -> str:
         parts = (str(part) if type(part) == int else f'"{part.translate(self.ROUTE_PATH_TRANSLATION)}"'
                  for part in self.key_path)
         return '.'.join(parts)
 
-    def convert_str_to_path(self, reference: str) -> list:
+    def str_to_path(self, reference: str) -> list:
         return list(p[1:-1] if p.startswith('"') and p.endswith('"') else int(p)
                     for p in self.ROUTE_PATH_REGEX.findall(reference))
 
@@ -118,7 +164,7 @@ class Formatter(IFormatter):
         if object_id in self.id_cache:
             return PreservedReference(obj=obj, ref=self.id_cache[object_id])
         else:
-            self.id_cache[object_id] = self.convert_path_to_str()
+            self.id_cache[object_id] = self.path_to_str()
             return obj
 
     def get_route_semantic(self, route: Route, t_semantic: Type[T_S]) -> T_S:
@@ -127,9 +173,9 @@ class Formatter(IFormatter):
         else:
             return self.get_semantic(t_semantic)
 
-    def check_for_circular_reference(self, path: list | str) -> bool:
+    def is_circular_reference(self, path: list | str) -> bool:
         if type(path) is str:
-            path = self.convert_str_to_path(path)
+            path = self.str_to_path(path)
         if len(path) > len(self.key_path):
             return False
         for pf, rp in zip(self.key_path, path):
@@ -139,7 +185,7 @@ class Formatter(IFormatter):
 
     def get_part_from_path(self, obj: TYPES, path: list | str) -> TYPES:
         if type(path) is str:
-            path = self.convert_str_to_path(path)
+            path = self.str_to_path(path)
         for key in path:
             obj = obj[key]
         return obj
@@ -184,11 +230,13 @@ class Formatter(IFormatter):
                     ro = {self.settings.class_id: format_class_str(tobj)}
                     if isinstance(obj, VersionedSerializable):
                         version_info = obj.get_conversion_manager().get_version_object(obj)
-                        version_info_route = route.branch()
-                        version_info_route.register_semantic(AutoPreserveReferences(False))
-                        ro[self.settings.version_id] = self.serialize(version_info, version_info_route)
-                    new_route = route.branch()
-                    ro.update(self.serialize(route.handler.handle(obj, new_route, **kwargs), new_route))
+                        if self.get_route_semantic(route, SerializeNoneVersionInfo) or version_info is not None:
+                            version_info_route = route.branch()
+                            version_info_route.register_semantic(AutoPreserveReferences(False))
+                            ro[self.settings.version_id] = self.serialize(version_info, version_info_route)
+                    if hasattr(obj, 'check_in_serialization_route'):
+                        obj.check_in_serialization_route(route)
+                    ro.update(self.serialize(route.handler.handle(obj, route, **kwargs), route))
                     return ro
 
     def handle_deserialize_list(self, instance: list, nest, route: Route, **kwargs):
@@ -214,8 +262,7 @@ class Formatter(IFormatter):
             else:
                 self.key_path.append(k)
                 path_route = route.branch()
-                with BlockSideEffects(path_route.finalize_frame):  # finalization only happens after an object is made
-                    instance[k] = self.deserialize(v, path_route, **kwargs)
+                instance[k] = self.deserialize(v, path_route, **kwargs)
                 self.key_path.pop(-1)
 
         if class_id is not None:
@@ -244,8 +291,7 @@ class Formatter(IFormatter):
                 if isinstance(ro, PreservedReference):
                     resolve_preserved = self.get_route_semantic(route, ResolvePreservedReferences)
                     detonate = self.get_route_semantic(route, DetonateDanglingPreservedReferences)
-                    if (not resolve_preserved) or \
-                        self.check_for_circular_reference((key_path := self.convert_str_to_path(ro.ref))):
+                    if (not resolve_preserved) or self.is_circular_reference((key_path := self.str_to_path(ro.ref))):
                         if detonate:
                             route.finalize.subscribe(ro.detonate)
                     else:
@@ -254,7 +300,7 @@ class Formatter(IFormatter):
                         if detonate:
                             route.finalize_frame.subscribe(ro.detonate)
                         if key_path is None:
-                            key_path = self.convert_str_to_path(ro.ref)
+                            key_path = self.str_to_path(ro.ref)
                         section_parent = self.get_part_from_path(self.root_object, key_path[:-1])
                         section_key = key_path[-1]
                         section = section_parent[section_key]
@@ -266,13 +312,13 @@ class Formatter(IFormatter):
                         route = route.branch()
                         ro = self.deserialize(section, route, **kwargs)
                         self.key_path = preserve_key_path
-                        npo = PreservedReference(obj=ro, ref=self.convert_path_to_str())
+                        npo = PreservedReference(obj=ro, ref=self.path_to_str())
                         self.id_cache[npo.ref] = ro
                         section_parent[section_key] = npo
                         if detonate:
                             route.finalize.subscribe(npo.detonate)
                 else:
-                    self.id_cache[self.convert_path_to_str()] = ro
+                    self.id_cache[self.path_to_str()] = ro
                 return ro
             elif isinstance(obj, PreservedReference):
                 return obj.obj
@@ -285,5 +331,3 @@ class Formatter(IFormatter):
         self.id_cache = {}
 
 
-class JsonFormatter(Formatter):
-    pass

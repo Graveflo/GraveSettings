@@ -10,6 +10,9 @@ from ram_util.utilities import generate_hierarchy_to_base, unwrap_slots_to_base,
 from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable
 
 
+# TODO: init_settings should only run if we are instantiating like normal (not file load)
+
+
 class Settings(IASettings):
     __slots__ = 'sd',
 
@@ -82,6 +85,8 @@ class SlotSettings(IASettings):
     def __new__(cls, *args, **kwargs):
         if cls not in rem_slot_fixed:
             found_slot_rems = False
+
+            # TODO: instead of methods these could be cached
 
             slrm = set()
             for tt in generate_hierarchy_to_base(SlotSettings, cls):

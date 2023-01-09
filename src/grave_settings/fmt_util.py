@@ -4,55 +4,19 @@
 
 @author: ☙ Ryan McConnell ❧
 """
-from abc import ABC, abstractmethod
-from io import IOBase
-from typing import Self, Callable, Any, Collection, Type, TypeVar
+from typing import Self, Type, TypeVar
 
 from observer_hooks import notify, EventHandler, HardRefEventHandler
-from ram_util.modules import format_class_str
-from ram_util.utilities import OrderedHandler, T
+from ram_util.utilities import OrderedHandler
 
 from grave_settings.semantics import Semantic
-
-
-class PreservedReferenceNotDissolvedError(Exception):
-    pass
 
 
 T_S = TypeVar('T_S', bound=Semantic)
 
 
-class IFormatter(ABC):
-    #def __init__(self):
-    #    self.semantics: Collection[Semantic] = set()
-
-    def write_to_buffer(self, settings, _io: IOBase, encoding=None):
-        pass
-
-    def write_to_file(self, settings, path: str):
-        with open(path, 'w') as f:
-            # noinspection PyTypeChecker
-            self.write_to_buffer(settings, f)
-
-    @abstractmethod
-    def serialize(self, obj: Any, route: 'Route', **kwargs):
-        pass
-
-    @abstractmethod
-    def deserialize(self, obj, route: 'Route', **kwargs):
-        pass
-
-    @abstractmethod
-    def supports_symantec(self, semantic_class: Type[Semantic]) -> bool:
-        pass
-
-    @abstractmethod
-    def register_symantec(self, symantec: Semantic):
-        pass
-
-    @abstractmethod
-    def get_semantic(self, semantic_class: Type[T_S]) -> T_S:
-        pass
+class PreservedReferenceNotDissolvedError(Exception):
+    pass
 
 
 class KeySerializableDict:
@@ -158,3 +122,4 @@ class Route:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.finalize_frame()
+

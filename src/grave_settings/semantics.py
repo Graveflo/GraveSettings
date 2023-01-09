@@ -36,6 +36,21 @@ class PreserveDictionaryOrdering(Semantic[bool]):
     pass
 
 
+class PreserveSerializableKeyOrdering(Semantic[bool]):
+    '''
+    Similar to PreserveDictionaryOrdering but for serializable objects. This includes auto-serialized objects.
+    '''
+    pass
+
+
+class SerializeNoneVersionInfo(Semantic[bool]):
+    '''
+    If this is False then versioned objects that have null version information will not serialize their version
+    information. The result is a cleaner file, but it is not always the case that null version information is the same
+    as being unversioned
+    '''
+    pass
+
 class AutoKeySerializableDict(Semantic[bool]):
     '''
     Automatically scan dictionary objects to ensure their keys are serializable as native format keys. If not they
@@ -48,7 +63,7 @@ class Indentation(Semantic[int]):
     '''
     Specified indentation formatting if applicable
     '''
-    def __init__(self, val: T):
+    def __init__(self, val: int):
         super().__init__(val)
 
 
@@ -78,14 +93,6 @@ class DetonateDanglingPreservedReferences(Semantic[bool]):
     pass
 
 
-class PreScanPreservedReferences(Semantic[bool]):
-    '''
-    Load the entire object tree before scanning for preserved references. This is a method of deserialization that
-    avoids temporarily assigning PreservedReference objects to live objects
-    '''
-    pass
-
-
 class ResolvePreservedReferences(Semantic[bool]):
     '''
     Preserved References are resolved by the formatter and never given to the object. This may be slower. but
@@ -95,4 +102,5 @@ class ResolvePreservedReferences(Semantic[bool]):
     '''
     pass
 
-# TODO: add a semantic that restrics loading types for cyber security resons
+
+# TODO: add a semantic that restrics loading types for cyber security resons (maybe wait until validator is done?)

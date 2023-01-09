@@ -40,7 +40,7 @@ class Serializable(ABC):
 
 class VersionedSerializable(Serializable):
     VERSION = None
-    __slots__ = '_conversion_completed',
+    __slots__ = tuple()
 
     @classmethod
     def get_version(cls):
@@ -69,7 +69,6 @@ class VersionedSerializable(Serializable):
     def get_versioning_endpoint(cls) -> Type[Self]:
         return VersionedSerializable
 
-    @notify()
     def conversion_completed(self, old_ver: dict, new_ver: dict):
         pass
 
@@ -79,7 +78,7 @@ def make_kill_converter(cls: Type[VersionedSerializable]) -> Callable[[dict], di
 
 
 class IASettings(VersionedSerializable, MutableMapping):
-    __slots__ = 'parent', '_invalidate'
+    __slots__ = 'parent', '_invalidate', '_conversion_completed'
 
     def __init__(self, *args, **kwargs):
         self.parent: IASettings | None = None
@@ -144,7 +143,7 @@ class IASettings(VersionedSerializable, MutableMapping):
     def conversion_manager_settings_updated(self, state_obj: dict, class_str: str, ver: str, target_ver: str=None):
         self.invalidate()
 
-    @notify_copy_super()
+    @notify()
     def conversion_completed(self, old_ver: dict, new_ver: dict):
         self.invalidate()
 
@@ -153,5 +152,4 @@ class IASettings(VersionedSerializable, MutableMapping):
 
     def __hash__(self):  # override this if you want to support value based equality
         return hash(id(self))
-
 
