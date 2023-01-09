@@ -46,9 +46,6 @@ class PreservedReference(object):
     def __hash__(self):
         return hash(id(self.obj))
 
-    def detonate(self, *args, **kwargs):
-        raise PreservedReferenceNotDissolvedError()
-
 
 class ConfigFileReference:
     def __init__(self, config):
@@ -59,9 +56,8 @@ class Route:
     #__slots__ = 'key_path', 'logical_path', 'id_cache', 'handler', '_finalize'
 
     def __init__(self, handler, finalize_handler: EventHandler = None):
-        self._finalize_frame = HardRefEventHandler()
-        if finalize_handler is None:  # The very first frame shares event handler with finalize_frame
-            finalize_handler = self._finalize_frame
+        if finalize_handler is None:
+            finalize_handler = HardRefEventHandler()
         self.obj_type_str = None  # can be set by the handler to change the type string
         self.handler: OrderedHandler = handler
         self.frame_semantics = None
@@ -90,36 +86,19 @@ class Route:
         return self.__class__(self.handler, finalize_handler=finalize_event)
 
     def branch(self):
-        r = self.new(self._finalize)  # we want to maintain a handle to the root frame's finalize EventHandler
+        r = self.new(self.finalize)  # we want to maintain a handle to the root frame's finalize EventHandler
         if self.semantics is not None:
             r.semantics = self.semantics.copy()
         return r
 
-    @notify(no_origin=True, pass_ref=True)
-    def finalize_frame(self):
-        '''
-        This even fires after the current frame has popped
-        '''
-        pass
-
-    @notify(no_origin=True, pass_ref=True)
-    def finalize(self):
-        '''
-        This even only fires after the root frame has been popped
-        '''
+    @notify(no_origin=True, pass_ref=False)
+    def finalize(self, id_cache: dict):
         pass
 
     def set_obj_class_str(self, class_str: str):
         self.obj_type_str = class_str
 
-    def set_handler(self, handler: OrderedHandler, merge: bool=True, update_order=False):
+    def set_handler(self, handler: OrderedHandler, merge: bool = True, update_order=False):
         if merge and self.handler is not None and self.handler is not handler:
             handler.update(self.handler, update_order=update_order)
         self.handler = handler
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.finalize_frame()
-

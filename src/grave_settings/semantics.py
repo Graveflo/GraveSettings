@@ -103,4 +103,7 @@ class ResolvePreservedReferences(Semantic[bool]):
     pass
 
 
+class NotifyFinalizedMethodName(Semantic[str]):
+    pass
+
 # TODO: add a semantic that restrics loading types for cyber security resons (maybe wait until validator is done?)

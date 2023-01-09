@@ -179,10 +179,10 @@ class SlotSettings(IASettings):
         return len(self.get_settings_keys())
 
     def generate_key_value_pairs(self) -> Generator[tuple[object, object], None, None]:
-        yield from self.get_partial_state().items()
+        return ((s, self[s]) for s in self.get_settings_keys())
 
     def to_dict(self, **kwargs) -> dict:
-        return {s: self[s] for s in self.get_settings_keys()}
+        return dict(self.generate_key_value_pairs())
 
     def __str__(self):
         return ext_str_slots(self, base=self.get_versioning_endpoint())

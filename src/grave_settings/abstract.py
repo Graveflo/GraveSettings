@@ -11,7 +11,8 @@ from ram_util.utilities import OrderedHandler
 
 from observer_hooks import notify, notify_copy_super
 from grave_settings.conversion_manager import ConversionManager
-from grave_settings.fmt_util import Route
+from grave_settings.fmt_util import Route, PreservedReference
+from grave_settings.semantics import NotifyFinalizedMethodName
 from grave_settings.validation import SettingsValidator
 
 _KT = TypeVar('_KT')
@@ -19,7 +20,7 @@ _VT = TypeVar('_VT')
 
 
 class Serializable(ABC):
-    __slots__ = tuple()
+    __slots__ = '__weakref__',
 
     @classmethod
     def check_in_serialization_route(cls, route: Route):
@@ -27,6 +28,8 @@ class Serializable(ABC):
 
     @classmethod
     def check_in_deserialization_route(cls, route: Route):
+        # Uncomment this to get the limited auto circular reference resolution
+        # route.register_frame_semantic(NotifyFinalizedMethodName('finalize'))
         pass
 
     def to_dict(self, **kwargs) -> dict:
@@ -36,6 +39,13 @@ class Serializable(ABC):
     def from_dict(self, state_obj: dict, **kwargs):
         for k, v in state_obj.items():
             setattr(self, k, v)
+
+    def finalize(self, id_map: dict):  # This is pretty inefficient. Override it
+        for key in dir(self):
+            v = getattr(self, key)
+            if isinstance(v, PreservedReference):
+                if v.ref in id_map:
+                    setattr(self, key, id_map[v.ref])
 
 
 class VersionedSerializable(Serializable):
@@ -106,6 +116,12 @@ class IASettings(VersionedSerializable, MutableMapping):
         for k, v in kwargs.items():
             self[k] = v
 
+    def finalize(self, id_map: dict):
+        for key, v in self.generate_key_value_pairs():
+            if isinstance(v, PreservedReference):
+                if v.ref in id_map:
+                    self[key] = id_map[v.ref]
+
     @abstractmethod
     def __contains__(self, item):
         pass
@@ -136,9 +152,6 @@ class IASettings(VersionedSerializable, MutableMapping):
     @abstractmethod
     def generate_key_value_pairs(self, **kwargs) -> Generator[tuple[object, object], None, None]:
         pass
-
-    def get_partial_state(self, **kwargs) -> dict:
-        return dict(self.generate_key_value_pairs(**kwargs))
 
     def conversion_manager_settings_updated(self, state_obj: dict, class_str: str, ver: str, target_ver: str=None):
         self.invalidate()

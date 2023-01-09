@@ -15,7 +15,7 @@ from grave_settings.base import SlotSettings
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
 from grave_settings.fmt_util import Route
 from grave_settings.formatter import Formatter
-from grave_settings.semantics import AutoPreserveReferences
+from grave_settings.semantics import AutoPreserveReferences, SerializeNoneVersionInfo, NotifyFinalizedMethodName
 
 
 class AssertsSerializable(Serializable):
@@ -31,9 +31,26 @@ class Dummy(SlotSettings):
         self.a = a
         self.b = b
 
-    def assert_object_equiv(self, tc: TestCase, other: Self):
-        tc.assertEqual(self.a, other.a)
-        tc.assertEqual(self.b, other.b)
+    @classmethod
+    def check_in_deserialization_route(cls, route: Route):
+        route.register_frame_semantic(NotifyFinalizedMethodName('finalize'))
+
+    def assert_object_equiv(self, tc: TestCase, other: Self, circle=None):
+        if circle is None:
+            circle = set()
+        circle.add(self)
+        if isinstance(other.a, Dummy):
+            tc.assertIsInstance(self.a, Dummy)
+            if self.a not in circle:
+                self.a.assert_object_equiv(tc, other.a, circle=circle)
+        else:
+            tc.assertEqual(self.a, other.a)
+        if isinstance(other.b, Dummy):
+            tc.assertIsInstance(self.b, Dummy)
+            if self.b not in circle:
+                self.b.assert_object_equiv(tc, other.b, circle=circle)
+        else:
+            tc.assertEqual(self.b, other.b)
 
     def get_settings_keys_base_slots(self):  # Keep order consistent
         return self.__slots__
@@ -113,13 +130,14 @@ class Scenarios(TestCase):
         re_made_object = formatter.deserialize(ser_obj, deser_route)
         return re_made_object
 
+
 class TestSerialization(Scenarios):
     def test_basic(self):
         formatter = Formatter()
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         obj = formatter.serialize(self.get_basic(), route)
         self.assertDictEqual(obj, {
-            formatter.settings.version_id: None,
             formatter.settings.class_id: 'integrated_tests.Dummy',
             'a': 90,
             'b': 'this is a string'
@@ -138,15 +156,14 @@ class TestSerialization(Scenarios):
 
     def test_nested_in_attribute(self):
         formatter = Formatter()
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         dummy = self.get_basic(a=90, b='this is a string')
         obj = self.get_basic(a=dummy, b=99)
         ser_obj = formatter.serialize(obj, route)
         self.assertDictEqual(ser_obj, {
-            formatter.settings.version_id: None,
             formatter.settings.class_id: 'integrated_tests.Dummy',
             'a': {
-                formatter.settings.version_id: None,
                 formatter.settings.class_id: 'integrated_tests.Dummy',
                 'a': 90,
                 'b': 'this is a string'
@@ -156,6 +173,7 @@ class TestSerialization(Scenarios):
 
     def test_nested_in_list(self):
         formatter = Formatter()
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         lis = [
             self.get_basic(a=90, b='this'),
@@ -164,15 +182,12 @@ class TestSerialization(Scenarios):
         obj = self.get_basic(a=lis, b=99)
         ser_obj = formatter.serialize(obj, route)
         self.assertDictEqual(ser_obj, {
-            formatter.settings.version_id: None,
             formatter.settings.class_id: 'integrated_tests.Dummy',
             'a': [{
-                formatter.settings.version_id: None,
                 formatter.settings.class_id: 'integrated_tests.Dummy',
                 'a': 90,
                 'b': 'this'
             }, {
-                formatter.settings.version_id: None,
                 formatter.settings.class_id: 'integrated_tests.Dummy',
                 'a': 0,
                 'b': False
@@ -183,15 +198,14 @@ class TestSerialization(Scenarios):
     def test_duplicate_in_attribute(self):
         formatter = Formatter()
         formatter.register_symantec(AutoPreserveReferences(True))
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         dummy = self.get_basic(a=90, b='this is a string')
         obj = self.get_basic(a=dummy, b=dummy)
         ser_obj = formatter.serialize(obj, route)
         self.assertDictEqual(ser_obj, {
-            formatter.settings.version_id: None,
             formatter.settings.class_id: 'integrated_tests.Dummy',
             'a': {
-                formatter.settings.version_id: None,
                 formatter.settings.class_id: 'integrated_tests.Dummy',
                 'a': 90,
                 'b': 'this is a string'
@@ -205,23 +219,85 @@ class TestSerialization(Scenarios):
     def test_layered_duplicate(self):
         formatter = Formatter()
         formatter.register_symantec(AutoPreserveReferences(True))
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         dummy = self.get_basic(a=90, b='this is a string')
         dummy2 = self.get_basic(a=dummy, b=None)
         dummy3 = self.get_basic(a=dummy2, b=dummy)
         ser_obj = formatter.serialize(dummy3, route)
-        #print(json.dumps(ser_obj, indent=4))
+
         self.assertDictEqual(ser_obj, {
-            formatter.settings.version_id: None,
             formatter.settings.class_id: 'integrated_tests.Dummy',
             'a': {
-                formatter.settings.version_id: None,
                 formatter.settings.class_id: 'integrated_tests.Dummy',
                 'a': {
-                    formatter.settings.version_id: None,
                     formatter.settings.class_id: 'integrated_tests.Dummy',
                     'a': 90,
                     'b': 'this is a string'
+                },
+                'b': None
+            },
+            'b': {
+                formatter.settings.class_id: 'grave_settings.fmt_util.PreservedReference',
+                'ref': '"a"."a"'
+            }
+        }, msg=str(json.dumps(ser_obj, indent=4)))
+
+    def test_circular_reference(self):
+        formatter = Formatter()
+        formatter.register_symantec(AutoPreserveReferences(True))
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
+        route = self.get_route(self.get_serialization_handler())
+        dummy = self.get_basic(a=90, b='this is a string')
+        dummy2 = self.get_basic(a=dummy, b=None)
+        dummy3 = self.get_basic(a=dummy2, b=dummy)
+        dummy.b = dummy2
+
+        ser_obj = formatter.serialize(dummy3, route)
+
+        self.assertDictEqual(ser_obj, {
+            formatter.settings.class_id: 'integrated_tests.Dummy',
+            'a': {
+                formatter.settings.class_id: 'integrated_tests.Dummy',
+                'a': {
+                    formatter.settings.class_id: 'integrated_tests.Dummy',
+                    'a': 90,
+                    'b': {
+                        formatter.settings.class_id: 'grave_settings.fmt_util.PreservedReference',
+                        'ref': '"a"'
+                    }
+                },
+                'b': None
+            },
+            'b': {
+                formatter.settings.class_id: 'grave_settings.fmt_util.PreservedReference',
+                'ref': '"a"."a"'
+            }
+        }, msg=str(json.dumps(ser_obj, indent=4)))
+
+    def test_circular_reference_beginning(self):
+        formatter = Formatter()
+        formatter.register_symantec(AutoPreserveReferences(True))
+        formatter.register_symantec(SerializeNoneVersionInfo(False))
+        route = self.get_route(self.get_serialization_handler())
+        dummy = self.get_basic(a=90, b='this is a string')
+        dummy2 = self.get_basic(a=dummy, b=None)
+        dummy3 = self.get_basic(a=dummy2, b=dummy)
+        dummy.b = dummy3
+
+        ser_obj = formatter.serialize(dummy3, route)
+
+        self.assertDictEqual(ser_obj, {
+            formatter.settings.class_id: 'integrated_tests.Dummy',
+            'a': {
+                formatter.settings.class_id: 'integrated_tests.Dummy',
+                'a': {
+                    formatter.settings.class_id: 'integrated_tests.Dummy',
+                    'a': 90,
+                    'b': {
+                        formatter.settings.class_id: 'grave_settings.fmt_util.PreservedReference',
+                        'ref': ''
+                    }
                 },
                 'b': None
             },
@@ -273,6 +349,23 @@ class TestRoundTrip(Scenarios):
         dummy3 = self.get_basic(a=dummy2, b=dummy)
         remade = self.assert_obj_roundtrip(dummy3)
         self.assertIs(remade.a.a[1], remade.b)
+
+    def test_circular_reference(self):
+        dummy = self.get_basic(a=90, b='this is a string')
+        dummy2 = self.get_basic(a=dummy, b=None)
+        dummy3 = self.get_basic(a=dummy2, b=dummy)
+        dummy.b = dummy2
+        remade = self.assert_obj_roundtrip(dummy3)
+        self.assertIs(remade.a.a.b, remade.a)
+
+    def test_circular_reference_beginning(self):
+        dummy = self.get_basic(a=90, b='this is a string')
+        dummy2 = self.get_basic(a=dummy, b=None)
+        dummy3 = self.get_basic(a=dummy2, b=dummy)
+        dummy.b = dummy3
+        remade = self.assert_obj_roundtrip(dummy3)
+        self.assertIs(remade.a.a.b, remade)
+
 
 class TestDeSerialization(Scenarios):
     def test_look_ahead_preserved_reference(self):
