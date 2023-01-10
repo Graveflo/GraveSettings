@@ -8,26 +8,21 @@ import re
 from abc import ABC, abstractmethod
 from io import IOBase
 from types import NoneType
-from typing import Any, get_args, Union, Never, Type, Self
+from typing import Any, get_args, Union, Never, Self
 from weakref import WeakSet
 
-from ram_util.modules import format_class_str, load_type
+from ram_util.modules import load_type
 
-from ram_util.utilities import MroHandler, OrderedHandler
+from ram_util.utilities import MroHandler
 
 from grave_settings.abstract import VersionedSerializable
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
-from grave_settings.fmt_util import Route, KeySerializableDict, PreservedReference, T_S, \
-    PreservedReferenceNotDissolvedError
+from grave_settings.fmt_util import Route, T_S, \
+    FormatterSettings
+from grave_settings.serializtion_helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDictNumbered, \
+    PreservedReference, KeySerializableDict
 from grave_settings.semantics import *
 from grave_settings.semantics import Semantic
-
-
-class FormatterSettings:
-    def __init__(self, str_id='__id__', version_id='__version__', class_id='__class__'):
-        self.str_id = str_id
-        self.version_id = version_id
-        self.class_id = class_id
 
 
 class FormatterFrame:
@@ -43,7 +38,7 @@ class FormatterFrame:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.key_path.pop(-1)
 
-    def __call__(self, path: str):
+    def __call__(self, path):
         self.key_path.append(path)
         return self
 
@@ -105,40 +100,42 @@ class IFormatter(ABC):
         pass
 
     @abstractmethod
-    def supports_symantec(self, semantic_class: Type[Semantic]) -> bool:
+    def supports_semantic(self, semantic_class: Type[Semantic]) -> bool:
         pass
 
     @abstractmethod
-    def register_symantec(self, symantec: Semantic):
+    def add_semantic(self, symantec: Semantic):
         pass
 
     @abstractmethod
     def get_semantic(self, semantic_class: Type[T_S]) -> T_S:
         pass
 
+    @abstractmethod
+    def remove_semantic(self, semantic_class: Type[Semantic] | Semantic):
+        pass
+
+    @abstractmethod
+    def has_semantic(self, semantic_class: Type[Semantic] | Semantic) -> bool:
+        pass
+
 
 class Formatter(IFormatter):
-    PRIMITIVES = int | float | str | bool | NoneType
-    SPECIAL = dict | list
-    TYPES = PRIMITIVES | SPECIAL
-    ATTRIBUTE_TYPES = Union[str, Never]
-    ROUTE_PATH_TRANSLATION = str.maketrans({
-        '\\': '\\\\',
-        '.': r'\.',
-        '"': r'\"'
-    })
-    ROUTE_PATH_REGEX = re.compile(r'(?:[^\."]|"(?:\\.|[^"])*")+')
+    FORMAT_SETTINGS = FormatterSettings()
+    TYPES = FORMAT_SETTINGS.type_primitives | FORMAT_SETTINGS.type_special
 
     def __init__(self, settings: FormatterSettings = None):
         if settings is None:
-            settings = FormatterSettings()
+            settings = self.FORMAT_SETTINGS.copy()
         self.settings = settings
-        self.primitives = set(get_args(self.PRIMITIVES))
-        self.special = set(get_args(self.SPECIAL))
-        self.attribute = set(get_args(self.ATTRIBUTE_TYPES))
+        self.primitives = set(get_args(self.settings.type_primitives))
+        self.special = set(get_args(self.settings.type_special))
+        self.attribute = set(get_args(self.settings.type_attribute))
+
         self.serialization_handler = MroHandler()
         self.frame = FormatterFrame()
         self.id_cache = {}
+        self.id_lifecycle_objects = []
         self.root_object = None
         self.preserved_refs = WeakSet()
         self.serialization_handler.add_handlers_by_annotated_callable(
@@ -151,7 +148,7 @@ class Formatter(IFormatter):
             self.handle_deserialize_dict
         )
         self.semantics: dict[Type[T_S], T_S] = {
-            AutoKeySerializableDict: AutoKeySerializableDict(True),
+            AutoKeySerializableDictType: AutoKeySerializableDictType(KeySerializableDict),
             AutoPreserveReferences: AutoPreserveReferences(True),
             DetonateDanglingPreservedReferences: DetonateDanglingPreservedReferences(True),
             ResolvePreservedReferences: ResolvePreservedReferences(True),
@@ -159,33 +156,44 @@ class Formatter(IFormatter):
             SerializeNoneVersionInfo: SerializeNoneVersionInfo(False)
         }
 
-    def supports_symantec(self, semantic_class: Type[Semantic]) -> bool:
+    def supports_semantic(self, semantic_class: Type[Semantic]) -> bool:
         return semantic_class in {
-            AutoKeySerializableDict,
+            AutoKeySerializableDictType,
             AutoPreserveReferences
         }
 
-    def register_symantec(self, symantec: Semantic):
+    def add_semantic(self, symantec: Semantic):
         self.semantics[symantec.__class__] = symantec
 
-    def get_semantic(self, semantic_class: Type[T_S]) -> T_S:
-        return self.semantics[semantic_class]
+    def get_semantic(self, semantic_class: Type[T_S]) -> T_S | None:
+        if semantic_class in self.semantics:
+            return self.semantics[semantic_class]
 
-    def path_to_str(self) -> str:
-        parts = (str(part) if type(part) == int else f'"{part.translate(self.ROUTE_PATH_TRANSLATION)}"'
-                 for part in self.frame.key_path)
-        return '.'.join(parts)
+    def remove_semantic(self, semantic_class: Type[Semantic] | Semantic):
+        remove_semantic_from_dict(semantic_class, self.semantics)
 
-    def str_to_path(self, reference: str) -> list:
-        return list(p[1:-1] if p.startswith('"') and p.endswith('"') else int(p)
-                    for p in self.ROUTE_PATH_REGEX.findall(reference))
+    def has_semantic(self, semantic_class: Type[Semantic] | Semantic) -> bool:
+        if isinstance(semantic_class, Semantic):
+            return self.get_semantic(semantic_class.__class__) == semantic_class
+        else:
+            return semantic_class in self.semantics
+
+    def path_to_str(self):
+        return self.settings.path_to_str(self.frame.key_path)
+
+    def str_to_path(self):
+        return self.settings.str_to_path()
 
     def check_in_object(self, obj: T) -> PreservedReference | T:
         object_id = id(obj)
+
         if object_id in self.id_cache:
+            #print(f'obj: {object_id} <--> {self.id_cache[object_id]}, {self.path_to_str()}')  # TODO: remove this or set it straight
             return PreservedReference(obj=obj, ref=self.id_cache[object_id])
         else:
             self.id_cache[object_id] = self.path_to_str()
+            self.id_lifecycle_objects.append(obj)
+            #print(f'obj: {object_id} -> {self.path_to_str()}, {obj}')  # TODO: remove this or set it straight
             return obj
 
     def get_route_semantic(self, route: Route, t_semantic: Type[T_S]) -> T_S:
@@ -194,9 +202,9 @@ class Formatter(IFormatter):
         else:
             return self.get_semantic(t_semantic)
 
-    def is_circular_reference(self, path: list | str) -> bool:
+    def is_circular_ref(self, path: list | str) -> bool:
         if type(path) is str:
-            path = self.str_to_path(path)
+            path = self.settings.str_to_path(path)
         if len(path) > len(self.frame.key_path):
             return False
         for pf, rp in zip(self.frame.key_path, path):
@@ -206,58 +214,66 @@ class Formatter(IFormatter):
 
     def get_part_from_path(self, obj: TYPES, path: list | str) -> TYPES:
         if type(path) is str:
-            path = self.str_to_path(path)
+            path = self.settings.str_to_path(path)
         for key in path:
             obj = obj[key]
         return obj
 
     def handle_serialize_list(self, instance: list, nest, route: Route, **kwargs):
-        lis: list[Any] = [None] * len(instance)  # Type hint is just to suppress annoying linting engine
+        #lis: list[Any] = [None] * len(instance)  # Type hint is just to suppress annoying linting engine
+        # Not doing this in-place will kill the lifecycle of sub-objects and leave their ids open
         for i in range(len(instance)):
-            self.frame.key_path.append(i)
-            lis[i] = self._serialize(instance[i], route.branch(), **kwargs)
-            self.frame.key_path.pop(-1)
-        return lis
+            with self.frame(i):
+                instance[i] = self._serialize(instance[i], route.branch(), **kwargs)
+        return instance
 
     def handle_serialize_dict(self, instance: dict, nest, route: Route, **kwargs):
-        auto_key_serializable_dict = self.get_route_semantic(route, AutoKeySerializableDict)
+        auto_key_serializable_dict = self.get_route_semantic(route, AutoKeySerializableDictType)
         if auto_key_serializable_dict and any(x.__class__ not in self.attribute for x in instance.keys()):
-            ksd = KeySerializableDict(instance)
+            ksd = auto_key_serializable_dict.val(instance)
             return self._serialize(ksd, route.branch(), **kwargs)
         else:
-            ret = {}
+            # Not doing this in-place will kill the lifecycle of sub-objects and leave their ids open
             for k, v in instance.items():
-                self.frame.key_path.append(k)
-                ret[k] = self._serialize(v, route.branch(), **kwargs)
-                self.frame.key_path.pop(-1)
-            return ret
+                with self.frame(k):
+                    instance[k] = self._serialize(v, route.branch(), **kwargs)
+            return instance
 
     def _serialize(self, obj: Any, route: Route, **kwargs) -> TYPES:
         tobj = obj.__class__
         if tobj in self.primitives:
             return obj
         else:
+            if hasattr(obj, 'check_in_serialization_route'):
+                obj.check_in_serialization_route(route)
             auto_preserve_references = self.get_route_semantic(route, AutoPreserveReferences)
             if auto_preserve_references:
-                obj = self.check_in_object(obj)
-                tobj = obj.__class__
+                p_ref = self.check_in_object(obj)
+                if p_ref is not obj:
+                    route.add_semantic(AutoPreserveReferences(False))
+                    obj = p_ref
+                    tobj = obj.__class__
+
             if tobj in self.special:
                 return self.serialization_handler.handle(tobj, route, instance=obj, **kwargs)
             else:
-                ro = {self.settings.class_id: format_class_str(tobj)}
+                ro = {self.settings.class_id: None}  # keeps placement
                 if isinstance(obj, VersionedSerializable):
                     version_info = obj.get_conversion_manager().get_version_object(obj)
                     if self.get_route_semantic(route, SerializeNoneVersionInfo) or version_info is not None:
                         version_info_route = route.branch()
-                        version_info_route.register_semantic(AutoPreserveReferences(False))
+                        version_info_route.add_semantic(AutoPreserveReferences(False))
                         ro[self.settings.version_id] = self._serialize(version_info, version_info_route)
-                if hasattr(obj, 'check_in_serialization_route'):
-                    obj.check_in_serialization_route(route)
-                ro.update(self._serialize(route.handler.handle(obj, route, **kwargs), route))
+                ser_obj = route.handler.handle(obj, route, **kwargs)
+                ser_obj_route = route.branch()
+                ser_obj_route.add_frame_semantic(AutoPreserveReferences(False))  # keeps the temp obj from preserving
+                ro.update(self._serialize(ser_obj, ser_obj_route))
+                ro[self.settings.class_id] = route.obj_type_str
                 return ro
 
     def serialize(self, obj: Any, route: Route, **kwargs):
         self.root_object = obj
+        route.formatter_settings = self.settings
         ret = self._serialize(obj, route, **kwargs)
         self.finalize(route)
         return ret
@@ -265,9 +281,8 @@ class Formatter(IFormatter):
     def handle_deserialize_list(self, instance: list, nest, route: Route, **kwargs):
         for i in range(len(instance)):
             cv = instance[i]
-            self.frame.key_path.append(i)
-            instance[i] = cv if type(cv) in self.primitives else self._deserialize(cv, route.branch(), **kwargs)
-            self.frame.key_path.pop(-1)
+            with self.frame(i):
+                instance[i] = cv if type(cv) in self.primitives else self._deserialize(cv, route.branch(), **kwargs)
         return instance
 
     def handle_deserialize_dict(self, instance: dict, nest, route: Route, **kwargs):
@@ -283,10 +298,9 @@ class Formatter(IFormatter):
             if type(v) in self.primitives:
                 instance[k] = v
             else:
-                self.frame.key_path.append(k)
-                path_route = route.branch()
-                instance[k] = self._deserialize(v, path_route, **kwargs)
-                self.frame.key_path.pop(-1)
+                with self.frame(k):
+                    path_route = route.branch()
+                    instance[k] = self._deserialize(v, path_route, **kwargs)
 
         if class_id is not None:
             type_obj = load_type(class_id)
@@ -313,14 +327,14 @@ class Formatter(IFormatter):
             if isinstance(ro, PreservedReference):
                 resolve_preserved = self.get_route_semantic(route, ResolvePreservedReferences)
                 detonate = self.get_route_semantic(route, DetonateDanglingPreservedReferences)
-                if (not resolve_preserved) or self.is_circular_reference((key_path := self.str_to_path(ro.ref))):
+                if (not resolve_preserved) or self.is_circular_ref((key_path := self.settings.str_to_path(ro.ref))):
                     if detonate:
                         self.preserved_refs.add(ro)
                 else:
                     if ro.ref in self.id_cache:
                         return self.id_cache[ro.ref]
                     if key_path is None:
-                        key_path = self.str_to_path(ro.ref)
+                        key_path = self.settings.str_to_path(ro.ref)
                     section_parent = self.get_part_from_path(self.root_object, key_path[:-1])
                     section_key = key_path[-1]
                     section = section_parent[section_key]
@@ -351,12 +365,15 @@ class Formatter(IFormatter):
 
     def deserialize(self, obj: TYPES, route: Route, **kwargs):
         self.root_object = obj
+        route.formatter_settings = self.settings
         ret = self._deserialize(obj, route, **kwargs)
         self.finalize(route)
         return ret
 
     def finalize(self, route: Route):
         route.finalize(self.id_cache)
+        route.clear()
+        self.id_lifecycle_objects.clear()
         self.frame = FormatterFrame()
         self.root_object = None
         self.id_cache = {}

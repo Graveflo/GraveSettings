@@ -11,7 +11,8 @@ from ram_util.utilities import OrderedHandler
 
 from observer_hooks import notify, notify_copy_super
 from grave_settings.conversion_manager import ConversionManager
-from grave_settings.fmt_util import Route, PreservedReference
+from grave_settings.fmt_util import Route
+
 from grave_settings.semantics import NotifyFinalizedMethodName
 from grave_settings.validation import SettingsValidator
 
@@ -19,7 +20,7 @@ _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
 
 
-class Serializable(ABC):
+class Serializable:
     __slots__ = '__weakref__',
 
     @classmethod
@@ -32,15 +33,17 @@ class Serializable(ABC):
         # route.register_frame_semantic(NotifyFinalizedMethodName('finalize'))
         pass
 
-    def to_dict(self, **kwargs) -> dict:
+    def to_dict(self, route: Route, **kwargs) -> dict:
         zgen = ((i, getattr(self, i)) for i in dir(self))
         return dict(i for i in zgen if not (callable(i[1]) or i[0].startswith('__')))
 
-    def from_dict(self, state_obj: dict, **kwargs):
+    def from_dict(self, state_obj: dict, route: Route, **kwargs):
         for k, v in state_obj.items():
             setattr(self, k, v)
 
     def finalize(self, id_map: dict):  # This is pretty inefficient. Override it
+        from grave_settings.serializtion_helper_objects import PreservedReference
+
         for key in dir(self):
             v = getattr(self, key)
             if isinstance(v, PreservedReference):
@@ -118,6 +121,8 @@ class IASettings(VersionedSerializable, MutableMapping):
             self[k] = v
 
     def finalize(self, id_map: dict):
+        from grave_settings.serializtion_helper_objects import PreservedReference
+
         for key, v in self.generate_key_value_pairs():
             if isinstance(v, PreservedReference):
                 if v.ref in id_map:

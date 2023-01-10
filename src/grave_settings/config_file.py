@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import Self, Any
 
 from grave_settings.abstract import IASettings
-from grave_settings.default_formatters import JsonFormatter, TomlFormatter
+from grave_settings.formatters.toml import TomlFormatter
+from grave_settings.formatters.json import JsonFormatter
 from grave_settings.formatter import Formatter
 
 
@@ -77,13 +78,13 @@ class ConfigFile:
         if path.exists() and (not path.is_file()):
             raise ValueError(f'File path is invalid: {path}')
 
-    def save(self, path: Path=None, formatter: None | Formatter=None, force=False, validate_path=True):
+    def save(self, path: Path = None, formatter: None | Formatter = None, force=True, validate_path=True):
         if self.read_only:
             raise ValueError('Saving in read-only mode')
         if path is None:
             path = self.file_path
             vf = self.changes_made
-        elif (not force) and self.changes_made:
+        elif (not force) and self.changes_made and hasattr(self.data, 'invalidate'):
             return
         else:
             vf = False
@@ -106,9 +107,11 @@ class ConfigFile:
         if formatter is None:
             raise ValueError('No formatter supplied')
         self.data = formatter.read_from_file(str(path))
+        self.changes_made = False
 
     def __enter__(self) -> Self:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.save()
+        if not self.read_only:
+            self.save()

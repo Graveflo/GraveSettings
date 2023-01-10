@@ -14,7 +14,8 @@ from collections.abc import Iterable
 from ram_util.modules import format_class_str, load_type
 from ram_util.utilities import OrderedHandler
 from grave_settings.abstract import Serializable, IASettings
-from grave_settings.fmt_util import Route, KeySerializableDict, PreservedReference
+from grave_settings.fmt_util import Route
+from grave_settings.serializtion_helper_objects import KeySerializableDict, PreservedReference
 
 
 class NotSerializableException(Exception):
@@ -31,7 +32,7 @@ class SerializationHandler(OrderedHandler):
             Mapping: self.handle_Mapping,
             FunctionType: self.handle_function_type,
             PreservedReference: self.handle_PreservedReference,
-            KeySerializableDict: self.handle_KeySerializableDict,
+            #KeySerializableDict: self.handle_KeySerializableDict,
             Serializable: self.handle_serializable,
             date: self.handle_date,
             datetime: self.handle_datetime,
@@ -50,13 +51,15 @@ class SerializationHandler(OrderedHandler):
         }
 
     def handle_Iterable(self, key: Iterable, route: Route, *args, **kwargs):
-        return list(key)
+        return {
+            'state': list(key)
+        }
 
     def handle_Mapping(self, key: Mapping, route: Route, *args, **kwargs):
         return {k: key[k] for k in key}
 
     def handle_KeySerializableDict(self, key: KeySerializableDict, route: Route, *args, **kwargs):
-        return key.to_dict()
+        return key.to_dict(route)
 
     def handle_type(self, key: Type, route: Route, *args, **kwargs):
         return {
@@ -74,7 +77,7 @@ class SerializationHandler(OrderedHandler):
         return dict()
 
     def handle_serializable(self, key: Serializable, route: Route, *args, **kwargs):
-        return key.to_dict(**kwargs)
+        return key.to_dict(route, **kwargs)
 
     def handle_datetime(self, key: datetime, route: Route, *args, **kwargs):
         return {
@@ -96,13 +99,12 @@ class SerializationHandler(OrderedHandler):
         if hasattr(key, 'to_dict'):
             return self.handle_serializable(key, route, **kwargs)
         else:
-            return Serializable.to_dict(key, **kwargs)
+            return Serializable.to_dict(key, route, **kwargs)
 
     # noinspection PyMethodOverriding
     def handle(self, key, route: Route, *args, **kwargs):
         route.obj_type_str = format_class_str(key.__class__)
         return super().handle(key, route, *args, **kwargs)
-
 
 
 class DeSerializationHandler(OrderedHandler):
@@ -117,9 +119,9 @@ class DeSerializationHandler(OrderedHandler):
             tuple: self.handle_tuple,
             set: self.handle_set,
             PreservedReference: self.handle_PreservedReference,
-            KeySerializableDict: self.handle_KeySerializableDict,
             FunctionType: self.handle_type,
             Serializable: self.handle_serializable,
+            KeySerializableDict: self.handle_KeySerializableDict,
             date: self.handle_date,
             datetime: self.handle_datetime,
             timedelta: self.handle_timedelta,
@@ -137,7 +139,7 @@ class DeSerializationHandler(OrderedHandler):
 
     def handle_KeySerializableDict(self, t_object: Type[KeySerializableDict], json_obj: dict, route: Route, **kwargs):
         ksd = t_object(None)
-        ksd.from_dict(json_obj)
+        ksd.from_dict(json_obj, route)
         return ksd.wrapped_dict
 
     def handle_tuple(self, t_object: Type[tuple], json_obj: dict, route: Route, **kwargs):
@@ -151,7 +153,7 @@ class DeSerializationHandler(OrderedHandler):
 
     def handle_serializable(self, t_object: Type[Serializable], json_obj: dict, route: Route, **kwargs) -> Serializable:
         settings_obj = t_object()
-        settings_obj.from_dict(json_obj, **kwargs)
+        settings_obj.from_dict(json_obj, route, **kwargs)
         return settings_obj
 
     def handle_datetime(self, t_object: Type[datetime], json_obj: dict, route: Route, **kwargs) -> datetime:
@@ -171,10 +173,10 @@ class DeSerializationHandler(OrderedHandler):
     def default_handler(self, t_object: Type, json_obj: dict, route: Route, **kwargs):
         if hasattr(t_object, 'from_dict'):
             # noinspection PyTypeChecker
-            return self.handle_serializable(t_object, json_obj, **kwargs)  # this is duck typed
+            return self.handle_serializable(t_object, json_obj, route, **kwargs)  # this is duck typed
         else:
             settings_obj = t_object()
-            Serializable.from_dict(settings_obj, json_obj)
+            Serializable.from_dict(settings_obj, json_obj, route)
             return settings_obj
 
     def handle_node(self, key, *args, **kwargs):

@@ -1,4 +1,5 @@
-from typing import Generic
+from functools import singledispatch
+from typing import Generic, Type
 
 from ram_util.utilities import T
 
@@ -29,6 +30,20 @@ class Semantic(Generic[T]):
         return hash(hash(self.__class__) + hash(self.val))
 
 
+@singledispatch
+def remove_semantic_from_dict(semantic: Type[Semantic], dict_obj: dict[Type[Semantic], Semantic]):
+    if semantic in dict_obj:
+        dict_obj.pop(semantic)
+
+
+@remove_semantic_from_dict.register
+def _(semantic: Semantic, dict_obj: dict[Type[Semantic], Semantic]):
+    smc = semantic.__class__
+    if smc in dict_obj:
+        if dict_obj[smc].val == semantic.val:
+            dict_obj.pop(smc)
+
+
 class PreserveDictionaryOrdering(Semantic[bool]):
     '''
     Keep the ordering of dictionary objects consistent between the format and the python object hierarchy
@@ -51,10 +66,10 @@ class SerializeNoneVersionInfo(Semantic[bool]):
     '''
     pass
 
-class AutoKeySerializableDict(Semantic[bool]):
+class AutoKeySerializableDictType(Semantic[Type]):
     '''
     Automatically scan dictionary objects to ensure their keys are serializable as native format keys. If not they
-    are converted to KeySerializableDict objects (represented as an array of tuples (key, value))
+    are replaced by a wrapper type whose factory is supplied to this semantic's constructor
     '''
     pass
 

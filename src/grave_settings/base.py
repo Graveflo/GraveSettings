@@ -9,6 +9,7 @@ from typing import Mapping, Generator, Type
 from ordered_set import OrderedSet
 from ram_util.utilities import generate_hierarchy_to_base, unwrap_slots_to_base, ext_str_slots
 from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable
+from grave_settings.fmt_util import Route
 
 
 class Settings(IASettings):
@@ -66,7 +67,7 @@ class Settings(IASettings):
     def generate_key_value_pairs(self, **kwargs) -> Generator[tuple[object, object], None, None]:
         yield from self.sd.items()
 
-    def to_dict(self, **kwargs) -> dict:
+    def to_dict(self, route: Route, **kwargs) -> dict:
         return self.sd.copy()
 
 
@@ -105,7 +106,8 @@ class SlotSettings(IASettings):
         try:
             object.__getattribute__(cls, 'SETTINGS_KEYS')
         except AttributeError:
-            cls.SETTINGS_KEYS = cls.assemble_settings_keys_from_base(cls)
+            # this whole process is inefficient, but it only happens once so, eh
+            cls.SETTINGS_KEYS = OrderedSet(cls.assemble_settings_keys_from_base(cls))
         super().__init__()
 
     @staticmethod
@@ -168,7 +170,7 @@ class SlotSettings(IASettings):
     def __contains__(self, item):
         return hasattr(self, item)
 
-    def __setattr__(self, key, value):  # TODO: This is very inefficient but without it unexpected things can happen
+    def __setattr__(self, key, value):
         super(SlotSettings, self).__setattr__(key, value)
         if key in self.get_settings_keys():
             self.invalidate()
@@ -212,7 +214,7 @@ class SlotSettings(IASettings):
     def generate_key_value_pairs(self) -> Generator[tuple[object, object], None, None]:
         return ((s, self[s]) for s in self.get_settings_keys())
 
-    def to_dict(self, **kwargs) -> dict:
+    def to_dict(self, route: Route, **kwargs) -> dict:
         return dict(self.generate_key_value_pairs())
 
     def __str__(self):
