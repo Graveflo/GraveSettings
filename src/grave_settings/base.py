@@ -6,11 +6,9 @@
 """
 from typing import Mapping, Generator, Type
 
+from ordered_set import OrderedSet
 from ram_util.utilities import generate_hierarchy_to_base, unwrap_slots_to_base, ext_str_slots
 from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable
-
-
-# TODO: init_settings should only run if we are instantiating like normal (not file load)
 
 
 class Settings(IASettings):
@@ -18,9 +16,7 @@ class Settings(IASettings):
 
     def __init__(self, *args, initialize_settings=True, **kwargs):
         self.sd = {}
-        if initialize_settings:
-            self.init_settings()
-        super(Settings, self).__init__(*args, **kwargs)
+        super(Settings, self).__init__(*args, initialize_settings=initialize_settings, **kwargs)
 
     def get_versioning_endpoint(self) -> Type[VersionedSerializable]:
         return Settings
@@ -74,37 +70,69 @@ class Settings(IASettings):
         return self.sd.copy()
 
 
-rem_slot_fixed = set()
+#rem_slot_fixed = set()
 
 
 class SlotSettings(IASettings):
     _slot_rems = None
-    __slots__ = 'get_settings_keys',
+    __slots__ = tuple()
+    SETTINGS_KEYS = None
 
-    @classmethod
-    def __new__(cls, *args, **kwargs):
-        if cls not in rem_slot_fixed:
-            found_slot_rems = False
+    # @classmethod
+    # def __new__(cls, *args, **kwargs):
+    #     if cls not in rem_slot_fixed:
+    #         found_slot_rems = False
+    #
+    #         # TODO: instead of methods these could be cached
+    #
+    #         slrm = set()
+    #         for tt in generate_hierarchy_to_base(SlotSettings, cls):
+    #             if hasattr(tt, '_slot_rems') and tt._slot_rems is not None:
+    #                 found_slot_rems = True
+    #                 slrm.update(tt._slot_rems)
+    #
+    #         if found_slot_rems:
+    #             cls._slot_rems = tuple(slrm)
+    #             cls.get_settings_keys = cls.get_settings_keys_rems
+    #         else:
+    #             cls.get_settings_keys = cls.get_settings_keys_base_slots
+    #         rem_slot_fixed.add(cls)
+    #
+    #    return super(SlotSettings, cls).__new__(cls)
 
-            # TODO: instead of methods these could be cached
+    def __init__(self):
+        cls = self.__class__
+        try:
+            object.__getattribute__(cls, 'SETTINGS_KEYS')
+        except AttributeError:
+            cls.SETTINGS_KEYS = cls.assemble_settings_keys_from_base(cls)
+        super().__init__()
 
-            slrm = set()
-            for tt in generate_hierarchy_to_base(SlotSettings, cls):
-                if hasattr(tt, '_slot_rems') and tt._slot_rems is not None:
-                    found_slot_rems = True
-                    slrm.update(tt._slot_rems)
-
-            if found_slot_rems:
-                cls._slot_rems = tuple(slrm)
-                cls.get_settings_keys = cls.get_settings_keys_rems
-            else:
-                cls.get_settings_keys = cls.get_settings_keys_base_slots
-            rem_slot_fixed.add(cls)
-
-        return super(SlotSettings, cls).__new__(cls)
-
-    def __init__(self, *args, **kwargs):
-        super(SlotSettings, self).__init__(*args, **kwargs)
+    @staticmethod
+    def assemble_settings_keys_from_base(cls: Type) -> tuple:
+        try:
+            ret = object.__getattribute__(cls, 'SETTINGS_KEYS')
+            if ret is not None:  # cached
+                return ret
+        except AttributeError:
+            pass
+        keys = OrderedSet()
+        try:
+            keys.update(object.__getattribute__(cls, '__slots__'))
+        except AttributeError:
+            pass
+        for tt in cls.__bases__:
+            if hasattr(tt, 'assemble_settings_keys_from_base'):
+                ins = OrderedSet(tt.assemble_settings_keys_from_base(tt))
+                ins.update(keys)
+                keys = ins
+        try:
+            _slot_rems = object.__getattribute__(cls, '_slot_rems')
+            if _slot_rems is not None:
+                return tuple(k for k in keys if k not in _slot_rems)
+        except AttributeError:
+            pass
+        return tuple(keys)
 
     def get_versioning_endpoint(self) -> Type[VersionedSerializable]:
         return SlotSettings
@@ -114,6 +142,12 @@ class SlotSettings(IASettings):
         if rems is None:
             rems = self._slot_rems
         return self.get_settings_keys_base_slots().difference(rems)
+
+    def get_settings_keys_base_slots(self) -> set:
+        return unwrap_slots_to_base(SlotSettings, self.__class__)
+
+    def get_settings_keys(self):
+        return self.SETTINGS_KEYS
 
     def safe_update(self, mapping_obj: Mapping[_KT, _VT], **kwargs: _VT):
         try:
@@ -168,9 +202,6 @@ class SlotSettings(IASettings):
 
     def __delitem__(self, itm):
         raise ValueError('Cannot delete member of MemberVariableSettings')
-
-    def get_settings_keys_base_slots(self) -> set:
-        return unwrap_slots_to_base(SlotSettings, self.__class__)
 
     def __iter__(self):
         return iter(self.get_settings_keys())

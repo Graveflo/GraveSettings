@@ -90,9 +90,10 @@ def make_kill_converter(cls: Type[VersionedSerializable]) -> Callable[[dict], di
 class IASettings(VersionedSerializable, MutableMapping):
     __slots__ = 'parent', '_invalidate', '_conversion_completed'
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, initialize_settings=True, **kwargs):
         self.parent: IASettings | None = None
-        self.init_settings(**kwargs)
+        if initialize_settings:
+            self.init_settings(**kwargs)
 
     def init_settings(self, **kwargs) -> None:
         pass
