@@ -97,7 +97,7 @@ class ConfigFile:
         formatter.write_to_file(self.data, str(self.file_path))
         self.changes_made = vf
 
-    def load(self, path: Path=None, formatter: None | Formatter=None, validate_path=True):
+    def load(self, path: Path = None, formatter: None | Formatter = None, validate_path=True):
         if path is None:
             path = self.file_path
         if validate_path:

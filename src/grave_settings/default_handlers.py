@@ -13,9 +13,8 @@ from collections.abc import Iterable
 
 from ram_util.modules import format_class_str, load_type
 from ram_util.utilities import OrderedHandler
-from grave_settings.abstract import Serializable, IASettings
-from grave_settings.fmt_util import Route
-from grave_settings.serializtion_helper_objects import KeySerializableDict, PreservedReference
+from grave_settings.abstract import Serializable, Route
+from grave_settings.helper_objects import KeySerializableDict, PreservedReference
 
 
 class NotSerializableException(Exception):
@@ -32,7 +31,6 @@ class SerializationHandler(OrderedHandler):
             Mapping: self.handle_Mapping,
             FunctionType: self.handle_function_type,
             PreservedReference: self.handle_PreservedReference,
-            #KeySerializableDict: self.handle_KeySerializableDict,
             Serializable: self.handle_serializable,
             date: self.handle_date,
             datetime: self.handle_datetime,
@@ -52,14 +50,11 @@ class SerializationHandler(OrderedHandler):
 
     def handle_Iterable(self, key: Iterable, route: Route, *args, **kwargs):
         return {
-            'state': list(key)
+            'state': route.formatter_settings.temporary(list(key))
         }
 
     def handle_Mapping(self, key: Mapping, route: Route, *args, **kwargs):
         return {k: key[k] for k in key}
-
-    def handle_KeySerializableDict(self, key: KeySerializableDict, route: Route, *args, **kwargs):
-        return key.to_dict(route)
 
     def handle_type(self, key: Type, route: Route, *args, **kwargs):
         return {
@@ -80,18 +75,21 @@ class SerializationHandler(OrderedHandler):
         return key.to_dict(route, **kwargs)
 
     def handle_datetime(self, key: datetime, route: Route, *args, **kwargs):
+        t = route.formatter_settings.temporary
         return {
-            'state': [key.year, key.month, key.day, key.hour, key.minute, key.second, key.microsecond]
+            'state': t([key.year, key.month, key.day, key.hour, key.minute, key.second, key.microsecond])
         }
 
     def handle_date(self, key: date, route: Route, *args, **kwargs):
+        t = route.formatter_settings.temporary
         return {
-            'state': [key.year, key.month, key.day]
+            'state': t([key.year, key.month, key.day])
         }
 
     def handle_timedelta(self, key: timedelta, route: Route, *args, **kwargs):
+        t = route.formatter_settings.temporary
         return {
-            'state': [key.days, key.seconds, key.microseconds]
+            'state': t([key.days, key.seconds, key.microseconds])
         }
 
     # noinspection PyMethodOverriding
@@ -104,7 +102,7 @@ class SerializationHandler(OrderedHandler):
     # noinspection PyMethodOverriding
     def handle(self, key, route: Route, *args, **kwargs):
         route.obj_type_str = format_class_str(key.__class__)
-        return super().handle(key, route, *args, **kwargs)
+        return route.formatter_settings.temporary(super().handle(key, route, *args, **kwargs))
 
 
 class DeSerializationHandler(OrderedHandler):

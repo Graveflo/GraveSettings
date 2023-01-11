@@ -5,20 +5,16 @@
 @author: ☙ Ryan McConnell ❧
 """
 import json
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from enum import Enum, auto
 from typing import Self, Any
 from unittest import TestCase, main
 
 from ram_util.modules import format_class_str
-from ram_util.utilities import OrderedHandler
-
-from grave_settings.serializtion_helper_objects import PreservedReference
+from grave_settings.helper_objects import PreservedReference
 from integration_tests_base import Dummy, IntegrationTestCaseBase
 from grave_settings.abstract import Serializable
 from grave_settings.base import SlotSettings
-from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
-from grave_settings.fmt_util import Route
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 
@@ -51,7 +47,6 @@ class SomeSerializable(Serializable):
         return True
 
 
-
 class PyObjectTest:
     def __init__(self):
         self.time = datetime.now()
@@ -68,6 +63,7 @@ class PyObjectTest:
 class DefaultHandlerObj(Dummy):
     __slots__ = ('type_keys', 'some_dict', 'literal_type', 'tuple', 'datetime', 'some_enum', 'serializable',
                  'pyobject')
+
     def __init__(self):
         super().__init__()
         self.type_keys = {
@@ -298,10 +294,8 @@ class TestSerialization(Scenarios):
         }, msg=str(json.dumps(ser_obj, indent=4)))
 
     def test_circular_reference_beginning(self):
-        formatter = Formatter()
-        formatter.add_semantic(AutoPreserveReferences(True))
-        formatter.add_semantic(SerializeNoneVersionInfo(False))
-        route = self.get_route(self.get_serialization_handler())
+        formatter = self.get_formatter(serialization=True)
+        route = self.get_route(serialization=True)
         dummy = self.get_basic(a=90, b='this is a string')
         dummy2 = self.get_basic(a=dummy, b=None)
         dummy3 = self.get_basic(a=dummy2, b=dummy)
@@ -328,6 +322,18 @@ class TestSerialization(Scenarios):
                 'ref': '"a"."a"'
             }
         }, msg=str(json.dumps(ser_obj, indent=4)))
+
+    def test_serialization_doesnt_damage_obj_state(self):
+        dummy = Dummy(a=[Dummy(), Dummy()], b={
+                    date(year=2022, month=1, day=1): Dummy()
+                })
+        formatter = self.get_formatter(serialization=True)
+        route = self.get_route(serialization=True)
+        formatter.serialize(dummy, route)
+        self.assertIs(type(dummy.a[0]), Dummy)
+        self.assertIs(type(dummy.a[1]), Dummy)
+        self.assertIn(date(year=2022, month=1, day=1), dummy.b)
+        self.assertIs(type(dummy.b[date(year=2022, month=1, day=1)]), Dummy)
 
 
 class TestRoundTrip(Scenarios):

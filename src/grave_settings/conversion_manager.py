@@ -6,9 +6,8 @@
 """
 from typing import Callable, Type
 
-from dataclasses import field, dataclass
 from ram_util.modules import format_class_str, load_type
-from observer_hooks import notify, EventHandler
+from observer_hooks import EventHandler
 from ram_util.utilities import generate_type_hierarchy_to_base
 
 

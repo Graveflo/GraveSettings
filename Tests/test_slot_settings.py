@@ -53,7 +53,7 @@ class TestSlotSettingsSettingsKeysResolution(TestCase):
             __slots__ = 'a', 'b'
 
         keys = self.get_tuple(Set)
-        self.assertTupleEqual(keys, ('b', ))
+        self.assertSequenceEqual(keys, ('b', ))
 
         # 2 layer
         class Foo(SlotSettings):

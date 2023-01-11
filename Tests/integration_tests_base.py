@@ -6,7 +6,7 @@ from ram_util.utilities import OrderedHandler
 
 from grave_settings.base import SlotSettings
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
-from grave_settings.fmt_util import Route
+from grave_settings.default_route import DefaultRoute, Route
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 from grave_settings.semantics import NotifyFinalizedMethodName
@@ -65,12 +65,13 @@ class IntegrationTestCaseBase(TestCase):
             handler = self.get_serialization_handler()
         else:
             handler = self.get_deserialization_handler()
-        return Route(handler)
+        return DefaultRoute(handler)
 
     def register_default_semantics(self, formatter, serialization=True):
         formatter.add_semantic(AutoPreserveReferences(True))
         formatter.add_semantic(ResolvePreservedReferences(True))
         formatter.add_semantic(DetonateDanglingPreservedReferences(True))
+        formatter.add_semantic(SerializeNoneVersionInfo(False))
 
     def get_ser_obj(self, formatter, obj, route):
         return formatter.serialize(obj, route)

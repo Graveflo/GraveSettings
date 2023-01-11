@@ -1,10 +1,6 @@
 from unittest import TestCase
 
-from ram_util.utilities import OrderedHandler
-
-
-from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
-from grave_settings.fmt_util import Route
+from grave_settings.abstract import Route
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 

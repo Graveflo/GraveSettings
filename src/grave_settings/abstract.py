@@ -9,15 +9,66 @@ from typing import TypeVar, MutableMapping, Type, Mapping, Callable, Self, Gener
 
 from ram_util.utilities import OrderedHandler
 
-from observer_hooks import notify, notify_copy_super
+from observer_hooks import notify, EventHandler, HardRefEventHandler
 from grave_settings.conversion_manager import ConversionManager
-from grave_settings.fmt_util import Route
+from grave_settings.formatter_settings import FormatterSettings
 
-from grave_settings.semantics import NotifyFinalizedMethodName
+from grave_settings.semantics import Semantic, T_S
 from grave_settings.validation import SettingsValidator
 
 _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
+
+
+class Route(ABC):
+    def __init__(self, handler, finalize_handler: EventHandler = None):
+        if finalize_handler is None:
+            finalize_handler = HardRefEventHandler()
+        self.obj_type_str = None  # can be set by the handler to change the type string
+        self.handler: OrderedHandler = handler
+        self._finalize = finalize_handler
+        self.formatter_settings: FormatterSettings | None = None
+
+    def clear(self):
+        self.finalize.clear_side_effects()
+        self.obj_type_str = None
+        self.formatter_settings = None
+
+    @abstractmethod
+    def add_frame_semantic(self, semantic: Semantic):
+        pass
+
+    @abstractmethod
+    def add_semantic(self, semantic: Semantic):
+        pass
+
+    @abstractmethod
+    def remove_frame_semantic(self, semantic: Type[Semantic] | Semantic):
+        pass
+
+    @abstractmethod
+    def remove_semantic(self, semantic: Type[Semantic] | Semantic):
+        pass
+
+    @abstractmethod
+    def get_semantic(self, t_semantic: Type[T_S]) -> T_S | None:
+        pass
+
+    @abstractmethod
+    def branch(self):
+        pass
+
+    @notify(no_origin=True, pass_ref=False)
+    def finalize(self, id_cache: dict):
+        pass
+
+    def set_obj_class_str(self, class_str: str):
+        self.obj_type_str = class_str
+
+    def set_handler(self, handler: OrderedHandler, merge: bool = True, update_order=False):
+        if merge and self.handler is not None and self.handler is not handler:
+            handler.update(self.handler, update_order=update_order)
+        self.handler = handler
 
 
 class Serializable:
@@ -42,7 +93,7 @@ class Serializable:
             setattr(self, k, v)
 
     def finalize(self, id_map: dict):  # This is pretty inefficient. Override it
-        from grave_settings.serializtion_helper_objects import PreservedReference
+        from grave_settings.helper_objects import PreservedReference
 
         for key in dir(self):
             v = getattr(self, key)
@@ -121,7 +172,7 @@ class IASettings(VersionedSerializable, MutableMapping):
             self[k] = v
 
     def finalize(self, id_map: dict):
-        from grave_settings.serializtion_helper_objects import PreservedReference
+        from grave_settings.helper_objects import PreservedReference
 
         for key, v in self.generate_key_value_pairs():
             if isinstance(v, PreservedReference):

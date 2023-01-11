@@ -1,5 +1,5 @@
 from functools import singledispatch
-from typing import Generic, Type
+from typing import Generic, Type, TypeVar
 
 from ram_util.utilities import T
 
@@ -122,3 +122,4 @@ class NotifyFinalizedMethodName(Semantic[str]):
     pass
 
 # TODO: add a semantic that restrics loading types for cyber security resons (maybe wait until validator is done?)
+T_S = TypeVar('T_S', bound=Semantic)

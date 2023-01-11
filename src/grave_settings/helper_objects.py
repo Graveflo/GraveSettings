@@ -1,5 +1,4 @@
-from grave_settings.abstract import Serializable
-from grave_settings.fmt_util import Route
+from grave_settings.abstract import Serializable, Route
 
 
 class PreservedReferenceNotDissolvedError(Exception):
@@ -13,8 +12,9 @@ class KeySerializableDict(Serializable):
         self.wrapped_dict = wrapped_dict
 
     def to_dict(self, route: Route, **kwargs) -> dict:
+        t = route.formatter_settings.temporary
         return {
-            'kvps': list(x for x in self.wrapped_dict.items())
+            'kvps': t([t(x) for x in self.wrapped_dict.items()])
         }
 
     def from_dict(self, obj: dict, route: Route, **kwargs):
@@ -25,8 +25,9 @@ class KeySerializableDictKvpList(KeySerializableDict):
     __slots__ = tuple()
 
     def to_dict(self, route: Route, **kwargs) -> dict:
+        t = route.formatter_settings.temporary
         return {
-            'state': [{'key': k, 'value': v} for k, v in self.wrapped_dict.items()]
+            'state': t([t({'key': k, 'value': v}) for k, v in self.wrapped_dict.items()])
             }
 
     def from_dict(self, obj: dict, route: Route, **kwargs):
@@ -56,3 +57,5 @@ class PreservedReference(object):
 
     def __hash__(self):
         return hash(id(self.obj))
+
+

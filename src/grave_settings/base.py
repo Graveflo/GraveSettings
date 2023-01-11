@@ -7,9 +7,8 @@
 from typing import Mapping, Generator, Type
 
 from ordered_set import OrderedSet
-from ram_util.utilities import generate_hierarchy_to_base, unwrap_slots_to_base, ext_str_slots
-from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable
-from grave_settings.fmt_util import Route
+from ram_util.utilities import unwrap_slots_to_base, ext_str_slots
+from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable, Route
 
 
 class Settings(IASettings):

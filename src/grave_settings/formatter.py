@@ -7,22 +7,20 @@
 import re
 from abc import ABC, abstractmethod
 from io import IOBase
-from types import NoneType
-from typing import Any, get_args, Union, Never, Self
+from typing import Any, get_args, Self
 from weakref import WeakSet
 
 from ram_util.modules import load_type
 
 from ram_util.utilities import MroHandler
 
-from grave_settings.abstract import VersionedSerializable
+from grave_settings.abstract import VersionedSerializable, Route
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
-from grave_settings.fmt_util import Route, T_S, \
-    FormatterSettings
-from grave_settings.serializtion_helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDictNumbered, \
+from grave_settings.default_route import DefaultRoute
+from grave_settings.helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDictNumbered, \
     PreservedReference, KeySerializableDict
+from grave_settings.formatter_settings import FormatterSettings, Temporary
 from grave_settings.semantics import *
-from grave_settings.semantics import Semantic
 
 
 class FormatterFrame:
@@ -44,16 +42,16 @@ class FormatterFrame:
 
 
 class IFormatter(ABC):
-    def to_buffer(self, data, _io: IOBase, encoding=None, route: Route = None):
+    def to_buffer(self, data, _io: IOBase, encoding='utf-8', route: Route = None):
         if route is None:
             route = self.get_default_serialization_route()
         obj = self.serialized_obj_to_buffer(self.serialize(data, route))
-        if encoding is not None:
+        if encoding is not None and encoding != 'utf-8':
             obj = obj.encode(encoding)
         _io.write(obj)
 
-    def write_to_file(self, settings, path: str, encoding=None, route: Route = None):
-        if encoding is None:
+    def write_to_file(self, settings, path: str, encoding='utf-8', route: Route = None):
+        if encoding == 'utf-8':
             f = open(path, 'w')
         else:
             f = open(path, 'wb')
@@ -61,17 +59,17 @@ class IFormatter(ABC):
             # noinspection PyTypeChecker
             self.to_buffer(settings, f, encoding=encoding, route=route)
 
-    def from_buffer(self, _io: IOBase, encoding=None, route: Route = None):
+    def from_buffer(self, _io: IOBase, encoding='utf-8', route: Route = None):
         if route is None:
             route = self.get_default_deserialization_route()
         data = _io.read()
-        if encoding is not None:
+        if encoding is not None and encoding != 'utf-8':
             data = data.decode(encoding)
         data = self.buffer_to_obj(data)
         return self.deserialize(data, route)
 
-    def read_from_file(self, path: str, encoding=None, route=None):
-        if encoding is None:
+    def read_from_file(self, path: str, encoding='utf-8', route=None):
+        if encoding == 'utf-8':
             f = open(path, 'r')
         else:
             f = open(path, 'rb')
@@ -86,10 +84,10 @@ class IFormatter(ABC):
         pass
 
     def get_default_serialization_route(self) -> Route:
-        return Route(SerializationHandler())
+        return DefaultRoute(SerializationHandler())
 
     def get_default_deserialization_route(self) -> Route:
-        return Route(DeSerializationHandler())
+        return DefaultRoute(DeSerializationHandler())
 
     @abstractmethod
     def serialize(self, obj: Any, route: Route, **kwargs):
@@ -139,8 +137,9 @@ class Formatter(IFormatter):
         self.root_object = None
         self.preserved_refs = WeakSet()
         self.serialization_handler.add_handlers_by_annotated_callable(
-            self.handle_serialize_list,
-            self.handle_serialize_dict
+            self.handle_user_list,
+            self.handle_user_dict,
+            self.handle_temporary
         )
         self.deserialization_handler = MroHandler()
         self.deserialization_handler.add_handlers_by_annotated_callable(
@@ -181,19 +180,17 @@ class Formatter(IFormatter):
     def path_to_str(self):
         return self.settings.path_to_str(self.frame.key_path)
 
-    def str_to_path(self):
-        return self.settings.str_to_path()
+    def str_to_path(self, path_str: str):
+        return self.settings.str_to_path(path_str)
 
     def check_in_object(self, obj: T) -> PreservedReference | T:
         object_id = id(obj)
 
         if object_id in self.id_cache:
-            #print(f'obj: {object_id} <--> {self.id_cache[object_id]}, {self.path_to_str()}')  # TODO: remove this or set it straight
             return PreservedReference(obj=obj, ref=self.id_cache[object_id])
         else:
             self.id_cache[object_id] = self.path_to_str()
             self.id_lifecycle_objects.append(obj)
-            #print(f'obj: {object_id} -> {self.path_to_str()}, {obj}')  # TODO: remove this or set it straight
             return obj
 
     def get_route_semantic(self, route: Route, t_semantic: Type[T_S]) -> T_S:
@@ -219,44 +216,66 @@ class Formatter(IFormatter):
             obj = obj[key]
         return obj
 
-    def handle_serialize_list(self, instance: list, nest, route: Route, **kwargs):
-        #lis: list[Any] = [None] * len(instance)  # Type hint is just to suppress annoying linting engine
-        # Not doing this in-place will kill the lifecycle of sub-objects and leave their ids open
+    def handle_serialize_list_in_place(self, instance: list, route: Route, **kwargs):
         for i in range(len(instance)):
             with self.frame(i):
                 instance[i] = self._serialize(instance[i], route.branch(), **kwargs)
         return instance
 
-    def handle_serialize_dict(self, instance: dict, nest, route: Route, **kwargs):
+    def handle_serialize_dict_in_place(self, instance: dict, route: Route, **kwargs):
         auto_key_serializable_dict = self.get_route_semantic(route, AutoKeySerializableDictType)
         if auto_key_serializable_dict and any(x.__class__ not in self.attribute for x in instance.keys()):
             ksd = auto_key_serializable_dict.val(instance)
-            return self._serialize(ksd, route.branch(), **kwargs)
+            ksd_route = route.branch()
+            ksd_route.add_frame_semantic(AutoPreserveReferences(False))
+            return self._serialize(ksd, ksd_route, **kwargs)
         else:
-            # Not doing this in-place will kill the lifecycle of sub-objects and leave their ids open
             for k, v in instance.items():
                 with self.frame(k):
                     instance[k] = self._serialize(v, route.branch(), **kwargs)
             return instance
+
+    def handle_user_list(self, instance: list, nest, route: Route, **kwargs):
+        p_ref = self.check_in_object(instance)
+        if p_ref is not instance:
+            route.add_semantic(AutoPreserveReferences(False))
+            return self._serialize(p_ref, route, **kwargs)
+        else:
+            return self.handle_serialize_list_in_place(instance.copy(), route, **kwargs)
+
+    def handle_user_dict(self, instance: dict, nest, route: Route, **kwargs):
+        p_ref = self.check_in_object(instance)
+        if p_ref is not instance:
+            route.add_semantic(AutoPreserveReferences(False))
+            return self._serialize(p_ref, route, **kwargs)
+        else:
+            return self.handle_serialize_dict_in_place(instance.copy(), route, **kwargs)
+
+    def handle_temporary(self, instance: Temporary, nest, route: Route, **kwargs):
+        tv = instance.val
+        if type(tv) is list:
+            return self.handle_serialize_list_in_place(tv, route, **kwargs)
+        elif type(tv) is dict:
+            return self.handle_serialize_dict_in_place(tv, route, **kwargs)
+        else:
+            route.add_frame_semantic(AutoPreserveReferences(False))
+            return self._serialize(tv, route, **kwargs)
 
     def _serialize(self, obj: Any, route: Route, **kwargs) -> TYPES:
         tobj = obj.__class__
         if tobj in self.primitives:
             return obj
         else:
-            if hasattr(obj, 'check_in_serialization_route'):
-                obj.check_in_serialization_route(route)
-            auto_preserve_references = self.get_route_semantic(route, AutoPreserveReferences)
-            if auto_preserve_references:
-                p_ref = self.check_in_object(obj)
-                if p_ref is not obj:
-                    route.add_semantic(AutoPreserveReferences(False))
-                    obj = p_ref
-                    tobj = obj.__class__
-
             if tobj in self.special:
                 return self.serialization_handler.handle(tobj, route, instance=obj, **kwargs)
             else:
+                if hasattr(obj, 'check_in_serialization_route'):
+                    obj.check_in_serialization_route(route)
+                auto_preserve_references = self.get_route_semantic(route, AutoPreserveReferences)
+                if auto_preserve_references:
+                    p_ref = self.check_in_object(obj)
+                    if p_ref is not obj:
+                        obj = p_ref  # serialize the preserved reference instead
                 ro = {self.settings.class_id: None}  # keeps placement
                 if isinstance(obj, VersionedSerializable):
                     version_info = obj.get_conversion_manager().get_version_object(obj)
@@ -266,7 +285,6 @@ class Formatter(IFormatter):
                         ro[self.settings.version_id] = self._serialize(version_info, version_info_route)
                 ser_obj = route.handler.handle(obj, route, **kwargs)
                 ser_obj_route = route.branch()
-                ser_obj_route.add_frame_semantic(AutoPreserveReferences(False))  # keeps the temp obj from preserving
                 ro.update(self._serialize(ser_obj, ser_obj_route))
                 ro[self.settings.class_id] = route.obj_type_str
                 return ro
