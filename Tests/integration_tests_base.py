@@ -2,14 +2,21 @@ import json
 from typing import Self
 from unittest import TestCase
 
-from ram_util.utilities import OrderedHandler
-
+from grave_settings.handlers import OrderedHandler
 from grave_settings.base import SlotSettings
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
 from grave_settings.default_route import DefaultRoute, Route
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 from grave_settings.semantics import NotifyFinalizedMethodName
+
+
+class EmptyFormatter(Formatter):
+    def serialized_obj_to_buffer(self, ser_obj) -> str | bytes:
+        raise Exception()
+
+    def buffer_to_obj(self, buffer: str | bytes):
+        raise Exception()
 
 
 class Dummy(SlotSettings):
@@ -50,7 +57,7 @@ class Dummy(SlotSettings):
 
 class IntegrationTestCaseBase(TestCase):
     def get_formatter(self, serialization=True) -> Formatter:
-        f = Formatter()
+        f = EmptyFormatter()
         self.register_default_semantics(f, serialization=serialization)
         return f
 

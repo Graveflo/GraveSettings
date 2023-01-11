@@ -12,7 +12,7 @@ from types import FunctionType
 from collections.abc import Iterable
 
 from ram_util.modules import format_class_str, load_type
-from ram_util.utilities import OrderedHandler
+from grave_settings.handlers import OrderedHandler
 from grave_settings.abstract import Serializable, Route
 from grave_settings.helper_objects import KeySerializableDict, PreservedReference
 

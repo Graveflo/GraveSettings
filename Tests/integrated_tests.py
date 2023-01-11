@@ -151,7 +151,7 @@ class Scenarios(IntegrationTestCaseBase):
 
 class TestSerialization(Scenarios):
     def test_basic(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         formatter.add_semantic(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         obj = formatter.serialize(self.get_basic(), route)
@@ -162,7 +162,7 @@ class TestSerialization(Scenarios):
         })
 
     def test_basic_versioned(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         route = self.get_route(self.get_serialization_handler())
         obj = formatter.serialize(self.get_basic_versioned(version='1.0'), route)
         self.assertDictEqual(obj, {
@@ -173,7 +173,7 @@ class TestSerialization(Scenarios):
         })
 
     def test_nested_in_attribute(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         formatter.add_semantic(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         dummy = self.get_basic(a=90, b='this is a string')
@@ -190,7 +190,7 @@ class TestSerialization(Scenarios):
         })
 
     def test_nested_in_list(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         formatter.add_semantic(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
         lis = [
@@ -214,7 +214,7 @@ class TestSerialization(Scenarios):
         })
 
     def test_duplicate_in_attribute(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         formatter.add_semantic(AutoPreserveReferences(True))
         formatter.add_semantic(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
@@ -235,7 +235,7 @@ class TestSerialization(Scenarios):
         })
 
     def test_layered_duplicate(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         formatter.add_semantic(AutoPreserveReferences(True))
         formatter.add_semantic(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
@@ -262,7 +262,7 @@ class TestSerialization(Scenarios):
         }, msg=str(json.dumps(ser_obj, indent=4)))
 
     def test_circular_reference(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=True)
         formatter.add_semantic(AutoPreserveReferences(True))
         formatter.add_semantic(SerializeNoneVersionInfo(False))
         route = self.get_route(self.get_serialization_handler())
@@ -401,7 +401,7 @@ class TestRoundTrip(Scenarios):
 
 class TestDeSerialization(Scenarios):
     def test_look_ahead_preserved_reference(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=False)
         deser_obj = {
             formatter.settings.version_id: None,
             formatter.settings.class_id: format_class_str(Dummy),
@@ -425,7 +425,7 @@ class TestDeSerialization(Scenarios):
         self.assertIs(obj.a.a, obj.b)
 
     def test_look_ahead_preserved_reference_in_list(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=False)
         deser_obj = {
             formatter.settings.version_id: None,
             formatter.settings.class_id: format_class_str(Dummy),
@@ -449,7 +449,7 @@ class TestDeSerialization(Scenarios):
         self.assertIs(obj.a.a, obj.b[1])
 
     def test_look_ahead_preserved_reference_point_to_list(self):
-        formatter = Formatter()
+        formatter = self.get_formatter(serialization=False)
         deser_obj = {
             formatter.settings.version_id: None,
             formatter.settings.class_id: format_class_str(Dummy),

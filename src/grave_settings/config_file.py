@@ -8,12 +8,15 @@ import os
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Self, Any, Type
 
-from grave_settings.abstract import IASettings
+from ram_util.modules import format_class_str
+
+from grave_settings.abstract import IASettings, Route
 from grave_settings.formatters.toml import TomlFormatter
 from grave_settings.formatters.json import JsonFormatter
 from grave_settings.formatter import Formatter
+from grave_settings.semantics import ClassStringPassFunction
 
 
 class ConfigFile:
@@ -22,8 +25,8 @@ class ConfigFile:
         'toml': TomlFormatter()
     }
 
-    def __init__(self, file_path: Path, data: IASettings | Any, formatter: None | Formatter | str = None,
-                 auto_save=False, read_only=False):
+    def __init__(self, file_path: Path, data: IASettings | Any | Type | None = None,
+                 formatter: None | Formatter | str = None, auto_save=False, read_only=False):
         if type(formatter) == str:
             formatter = self.FORMATTER_STR_DICT[formatter]
         self.file_path = file_path.resolve().absolute()
@@ -73,8 +76,11 @@ class ConfigFile:
         if must_exist:
             if not path.exists():
                 raise ValueError(f'Path does not exist: {path}')
-        if path.exists() and (not os.access(path, os.W_OK)):
+        if path.exists() and (not os.access(path, os.R_OK)):
             raise ValueError(f'Do not have permission to write to: {path}')
+        if not self.read_only:
+            if path.exists() and (not os.access(path, os.W_OK)):
+                raise ValueError(f'Do not have permission to write to: {path}')
         if path.exists() and (not path.is_file()):
             raise ValueError(f'File path is invalid: {path}')
 
@@ -106,10 +112,28 @@ class ConfigFile:
             formatter = self.formatter
         if formatter is None:
             raise ValueError('No formatter supplied')
-        self.data = formatter.read_from_file(str(path))
+        route = formatter.get_deserialization_route()
+        self.check_in_deserialization_route(route)
+        self.data = formatter.read_from_file(str(path), route=route)
         self.changes_made = False
 
+    def check_in_deserialization_route(self, route: Route):
+        if isinstance(self.data, Type):
+            route.add_frame_semantic(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
+
+    def instantiate_data(self):
+        return self.data()
+
     def __enter__(self) -> Self:
+        try:
+            self.validate_file_path(self.file_path, must_exist=True)
+            load = True
+        except ValueError:
+            load = False
+        if load:
+            self.load(validate_path=False)
+        elif isinstance(self.data, Type):
+            self.data = self.instantiate_data()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):

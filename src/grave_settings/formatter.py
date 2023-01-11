@@ -12,11 +12,10 @@ from weakref import WeakSet
 
 from ram_util.modules import load_type
 
-from ram_util.utilities import MroHandler
-
 from grave_settings.abstract import VersionedSerializable, Route
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
 from grave_settings.default_route import DefaultRoute
+from grave_settings.handlers import MroHandler, OrderedHandler
 from grave_settings.helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDictNumbered, \
     PreservedReference, KeySerializableDict
 from grave_settings.formatter_settings import FormatterSettings, Temporary
@@ -27,7 +26,7 @@ class FormatterFrame:
     def __init__(self):
         self.key_path = []
 
-    def copy(self, obj: Self):
+    def update(self, obj: Self):
         self.key_path = obj.key_path.copy()
 
     def __enter__(self):
@@ -43,12 +42,10 @@ class FormatterFrame:
 
 class IFormatter(ABC):
     def to_buffer(self, data, _io: IOBase, encoding='utf-8', route: Route = None):
-        if route is None:
-            route = self.get_default_serialization_route()
-        obj = self.serialized_obj_to_buffer(self.serialize(data, route))
+        buffer = self.dumps(data, route=route)
         if encoding is not None and encoding != 'utf-8':
-            obj = obj.encode(encoding)
-        _io.write(obj)
+            buffer = buffer.encode(encoding)
+        _io.write(buffer)
 
     def write_to_file(self, settings, path: str, encoding='utf-8', route: Route = None):
         if encoding == 'utf-8':
@@ -60,13 +57,10 @@ class IFormatter(ABC):
             self.to_buffer(settings, f, encoding=encoding, route=route)
 
     def from_buffer(self, _io: IOBase, encoding='utf-8', route: Route = None):
-        if route is None:
-            route = self.get_default_deserialization_route()
         data = _io.read()
         if encoding is not None and encoding != 'utf-8':
             data = data.decode(encoding)
-        data = self.buffer_to_obj(data)
-        return self.deserialize(data, route)
+        return self.loads(data, route=route)
 
     def read_from_file(self, path: str, encoding='utf-8', route=None):
         if encoding == 'utf-8':
@@ -77,17 +71,35 @@ class IFormatter(ABC):
             # noinspection PyTypeChecker
             return self.from_buffer(f, encoding=encoding, route=route)
 
-    def serialized_obj_to_buffer(self, ser_obj):
+    @abstractmethod
+    def serialized_obj_to_buffer(self, ser_obj) -> str | bytes:
         pass
 
-    def buffer_to_obj(self, buffer):
+    @abstractmethod
+    def buffer_to_obj(self, buffer: str | bytes):
         pass
 
-    def get_default_serialization_route(self) -> Route:
-        return DefaultRoute(SerializationHandler())
+    def get_serialization_handler(self) -> OrderedHandler:
+        return SerializationHandler()
 
-    def get_default_deserialization_route(self) -> Route:
-        return DefaultRoute(DeSerializationHandler())
+    def get_deserialization_handler(self) -> OrderedHandler:
+        return DeSerializationHandler()
+
+    def get_serialization_route(self) -> Route:
+        return DefaultRoute(self.get_serialization_handler())
+
+    def get_deserialization_route(self) -> Route:
+        return DefaultRoute(self.get_deserialization_handler())
+
+    def dumps(self, obj: Any, route=None) -> str | bytes:
+        if route is None:
+            route = self.get_serialization_route()
+        return self.serialized_obj_to_buffer(self.serialize(obj, route))
+
+    def loads(self, buffer, route=None):
+        if route is None:
+            route = self.get_deserialization_route()
+        return self.deserialize(self.buffer_to_obj(buffer), route)
 
     @abstractmethod
     def serialize(self, obj: Any, route: Route, **kwargs):
@@ -118,7 +130,7 @@ class IFormatter(ABC):
         pass
 
 
-class Formatter(IFormatter):
+class Formatter(IFormatter, ABC):
     FORMAT_SETTINGS = FormatterSettings()
     TYPES = FORMAT_SETTINGS.type_primitives | FORMAT_SETTINGS.type_special
 
@@ -158,13 +170,20 @@ class Formatter(IFormatter):
     def supports_semantic(self, semantic_class: Type[Semantic]) -> bool:
         return semantic_class in {
             AutoKeySerializableDictType,
-            AutoPreserveReferences
+            AutoPreserveReferences,
+            DetonateDanglingPreservedReferences,
+            ResolvePreservedReferences,
+            PreserveSerializableKeyOrdering,
+            SerializeNoneVersionInfo,
+            NotifyFinalizedMethodName,
+            DoNotAllowImportingModules,
+            ClassStringPassFunction
         }
 
-    def add_semantic(self, symantec: Semantic):
-        self.semantics[symantec.__class__] = symantec
+    def add_semantic(self, semantic: Semantic):
+        add_semantic(semantic, self.semantics)
 
-    def get_semantic(self, semantic_class: Type[T_S]) -> T_S | None:
+    def get_semantic(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
         if semantic_class in self.semantics:
             return self.semantics[semantic_class]
 
@@ -193,7 +212,7 @@ class Formatter(IFormatter):
             self.id_lifecycle_objects.append(obj)
             return obj
 
-    def get_route_semantic(self, route: Route, t_semantic: Type[T_S]) -> T_S:
+    def get_route_semantic(self, route: Route, t_semantic: Type[T_S]) -> T_S | list[T_S] | None:
         if (v := route.get_semantic(t_semantic)) is not None:
             return v
         else:
@@ -296,6 +315,26 @@ class Formatter(IFormatter):
         self.finalize(route)
         return ret
 
+    def load_type(self, route: Route, class_str: str) -> Type:
+        allow_imports = not bool(self.get_route_semantic(route, DoNotAllowImportingModules))
+        validation = self.get_route_semantic(route, ClassStringPassFunction)
+        if validation:
+            for validation_call in validation:
+                if not validation_call.val(class_str):
+                    raise SecurityException()
+        return load_type(class_str, do_import=allow_imports)
+
+    def run_semantics_through_path(self, route: Route, key_path: list) -> Route:
+        start = self.root_object
+        for key in key_path:
+            if type(start) == dict and self.settings.class_id in start:
+                _class = self.load_type(route, start[self.settings.class_id])
+                if hasattr(_class, 'check_in_deserialization_route'):
+                    _class.check_in_deserialization_route(route)
+                    route = route.branch()
+            start = start[key]
+        return route
+
     def handle_deserialize_list(self, instance: list, nest, route: Route, **kwargs):
         for i in range(len(instance)):
             cv = instance[i]
@@ -306,8 +345,13 @@ class Formatter(IFormatter):
     def handle_deserialize_dict(self, instance: dict, nest, route: Route, **kwargs):
         version_info = None
         class_id = None
+        type_obj = None
         if self.settings.class_id in instance:
             class_id = instance.pop(self.settings.class_id)
+            type_obj = self.load_type(route, class_id)
+            if hasattr(type_obj, 'check_in_deserialization_route'):
+                type_obj.check_in_deserialization_route(route)
+
             if self.settings.version_id in instance:
                 version_obj = instance.pop(self.settings.version_id)
                 version_info = self._deserialize(version_obj, route.branch())
@@ -321,13 +365,10 @@ class Formatter(IFormatter):
                     instance[k] = self._deserialize(v, path_route, **kwargs)
 
         if class_id is not None:
-            type_obj = load_type(class_id)
             if version_info is not None and hasattr(type_obj, 'get_conversion_manager'):
                 conversion_manager = type_obj.get_conversion_manager()
                 instance = conversion_manager.update_to_current(instance, version_info)
 
-            if hasattr(type_obj, 'check_in_deserialization_route'):
-                type_obj.check_in_deserialization_route(route)
             ret = route.handler.handle(type_obj, instance, route, **kwargs)
             if method_name := route.get_semantic(NotifyFinalizedMethodName):
                 route.finalize.subscribe(getattr(ret, method_name.val))
@@ -358,15 +399,15 @@ class Formatter(IFormatter):
                     section = section_parent[section_key]
 
                     preserve_frame = self.frame
-                    self.key_path = FormatterFrame()
-                    self.key_path.copy(preserve_frame)
-                    self.key_path = key_path
+                    self.frame = FormatterFrame()
+                    self.frame.key_path = key_path
 
-                    # TODO: Whats missing here is the semantics from higher level objects since we skip them
                     route = route.branch()
+                    route.clear_branch()
+                    route = self.run_semantics_through_path(route, key_path[:-1])
                     ro = self._deserialize(section, route, **kwargs)
 
-                    self.frame.copy(preserve_frame)
+                    self.frame.update(preserve_frame)
 
                     npo = PreservedReference(obj=ro, ref=self.path_to_str())
                     self.id_cache[npo.ref] = ro

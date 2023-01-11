@@ -2,7 +2,7 @@ from io import IOBase
 
 import bson
 
-from grave_settings.fmt_util import Route
+from grave_settings.abstract import Route
 from grave_settings.formatter import Formatter
 
 

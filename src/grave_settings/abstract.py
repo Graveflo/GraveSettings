@@ -7,12 +7,11 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, MutableMapping, Type, Mapping, Callable, Self, Generator
 
-from ram_util.utilities import OrderedHandler
-
 from observer_hooks import notify, EventHandler, HardRefEventHandler
+
+from grave_settings.handlers import OrderedHandler
 from grave_settings.conversion_manager import ConversionManager
 from grave_settings.formatter_settings import FormatterSettings
-
 from grave_settings.semantics import Semantic, T_S
 from grave_settings.validation import SettingsValidator
 
@@ -21,6 +20,8 @@ _VT = TypeVar('_VT')
 
 
 class Route(ABC):
+    __slots__ = 'obj_type_str', 'handler', '_finalize', 'formatter_settings'
+
     def __init__(self, handler, finalize_handler: EventHandler = None):
         if finalize_handler is None:
             finalize_handler = HardRefEventHandler()
@@ -31,8 +32,11 @@ class Route(ABC):
 
     def clear(self):
         self.finalize.clear_side_effects()
-        self.obj_type_str = None
         self.formatter_settings = None
+        self.clear_branch()
+
+    def clear_branch(self):
+        self.obj_type_str = None
 
     @abstractmethod
     def add_frame_semantic(self, semantic: Semantic):
@@ -92,7 +96,7 @@ class Serializable:
         for k, v in state_obj.items():
             setattr(self, k, v)
 
-    def finalize(self, id_map: dict):  # This is pretty inefficient. Override it
+    def finalize(self, id_map: dict) -> None:  # This is pretty inefficient. Override it
         from grave_settings.helper_objects import PreservedReference
 
         for key in dir(self):

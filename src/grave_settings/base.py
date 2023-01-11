@@ -83,7 +83,6 @@ class SlotSettings(IASettings):
     #     if cls not in rem_slot_fixed:
     #         found_slot_rems = False
     #
-    #         # TODO: instead of methods these could be cached
     #
     #         slrm = set()
     #         for tt in generate_hierarchy_to_base(SlotSettings, cls):

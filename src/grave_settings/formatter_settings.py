@@ -6,6 +6,8 @@ from ram_util.utilities import T
 
 
 class Temporary:
+    __slots__ = 'val',
+
     def __init__(self, val: T):
         self.val = val
 

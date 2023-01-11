@@ -9,11 +9,11 @@ from typing import Self, Type
 from observer_hooks import EventHandler
 from grave_settings.abstract import Route
 from grave_settings.formatter_settings import FormatterSettings
-from grave_settings.semantics import Semantic, remove_semantic_from_dict, T_S
+from grave_settings.semantics import Semantic, remove_semantic_from_dict, T_S, add_semantic
 
 
 class DefaultRoute(Route):
-    #__slots__ = 'key_path', 'logical_path', 'id_cache', 'handler', '_finalize'
+    __slots__ = 'frame_semantics', 'semantics', 'formatter_settings'
 
     def __init__(self, handler, finalize_handler: EventHandler = None):
         super().__init__(handler, finalize_handler=finalize_handler)
@@ -21,20 +21,20 @@ class DefaultRoute(Route):
         self.semantics = None
         self.formatter_settings: FormatterSettings | None = None
 
-    def clear(self):
-        super().clear()
+    def clear_branch(self):
+        super().clear_branch()
         self.semantics = None
         self.frame_semantics = None
 
     def add_frame_semantic(self, semantic: Semantic):
         if self.frame_semantics is None:
             self.frame_semantics = {}
-        self.frame_semantics[semantic.__class__] = semantic
+        add_semantic(semantic, self.frame_semantics)
 
     def add_semantic(self, semantic: Semantic):
         if self.semantics is None:
             self.semantics = {}
-        self.semantics[semantic.__class__] = semantic
+        add_semantic(semantic, self.semantics)
 
     def remove_frame_semantic(self, semantic: Type[Semantic] | Semantic):
         remove_semantic_from_dict(semantic, self.frame_semantics)

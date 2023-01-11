@@ -14,5 +14,5 @@ class JsonFormatter(Formatter):
             indent = indent.val
         return json.dumps(ser_obj, indent=indent)
 
-    def buffer_to_obj(self, buffer):
+    def buffer_to_obj(self, buffer: str):
         return json.loads(buffer)
