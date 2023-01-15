@@ -12,7 +12,8 @@ from typing import Self, Any, Type
 
 from ram_util.modules import format_class_str
 
-from grave_settings.abstract import IASettings, Route
+from grave_settings.abstract import IASettings
+from grave_settings.framestackcontext import FrameStackContext
 from grave_settings.formatters.toml import TomlFormatter
 from grave_settings.formatters.json import JsonFormatter
 from grave_settings.formatter import Formatter
@@ -112,12 +113,12 @@ class ConfigFile:
             formatter = self.formatter
         if formatter is None:
             raise ValueError('No formatter supplied')
-        route = formatter.get_deserialization_route()
+        route = formatter.get_deserialization_frame_context()
         self.check_in_deserialization_route(route)
         self.data = formatter.read_from_file(str(path), route=route)
         self.changes_made = False
 
-    def check_in_deserialization_route(self, route: Route):
+    def check_in_deserialization_route(self, route: FrameStackContext):
         if isinstance(self.data, Type):
             route.add_frame_semantic(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
 

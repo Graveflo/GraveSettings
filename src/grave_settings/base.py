@@ -8,7 +8,8 @@ from typing import Mapping, Generator, Type
 
 from ordered_set import OrderedSet
 from ram_util.utilities import unwrap_slots_to_base, ext_str_slots
-from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable, Route
+from grave_settings.abstract import IASettings, _KT, _VT, VersionedSerializable
+from grave_settings.formatter_settings import FormatterContext
 
 
 class Settings(IASettings):
@@ -66,7 +67,7 @@ class Settings(IASettings):
     def generate_key_value_pairs(self, **kwargs) -> Generator[tuple[object, object], None, None]:
         yield from self.sd.items()
 
-    def to_dict(self, route: Route, **kwargs) -> dict:
+    def to_dict(self, context: FormatterContext, **kwargs) -> dict:
         return self.sd.copy()
 
 
@@ -212,7 +213,7 @@ class SlotSettings(IASettings):
     def generate_key_value_pairs(self) -> Generator[tuple[object, object], None, None]:
         return ((s, self[s]) for s in self.get_settings_keys())
 
-    def to_dict(self, route: Route, **kwargs) -> dict:
+    def to_dict(self, context: FormatterContext, **kwargs) -> dict:
         return dict(self.generate_key_value_pairs())
 
     def __str__(self):

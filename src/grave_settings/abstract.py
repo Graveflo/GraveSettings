@@ -4,106 +4,45 @@
 
 @author: ☙ Ryan McConnell ❧
 """
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import TypeVar, MutableMapping, Type, Mapping, Callable, Self, Generator
 
-from observer_hooks import notify, EventHandler, HardRefEventHandler
+from observer_hooks import notify
 
-from grave_settings.handlers import OrderedHandler
 from grave_settings.conversion_manager import ConversionManager
-from grave_settings.formatter_settings import FormatterSettings
-from grave_settings.semantics import Semantic, T_S
+from grave_settings.formatter_settings import FormatterContext, PreservedReference
 from grave_settings.validation import SettingsValidator
 
 _KT = TypeVar('_KT')
 _VT = TypeVar('_VT')
 
 
-class Route(ABC):
-    __slots__ = 'obj_type_str', 'handler', '_finalize', 'formatter_settings'
-
-    def __init__(self, handler, finalize_handler: EventHandler = None):
-        if finalize_handler is None:
-            finalize_handler = HardRefEventHandler()
-        self.obj_type_str = None  # can be set by the handler to change the type string
-        self.handler: OrderedHandler = handler
-        self._finalize = finalize_handler
-        self.formatter_settings: FormatterSettings | None = None
-
-    def clear(self):
-        self.finalize.clear_side_effects()
-        self.formatter_settings = None
-        self.clear_branch()
-
-    def clear_branch(self):
-        self.obj_type_str = None
-
-    @abstractmethod
-    def add_frame_semantic(self, semantic: Semantic):
-        pass
-
-    @abstractmethod
-    def add_semantic(self, semantic: Semantic):
-        pass
-
-    @abstractmethod
-    def remove_frame_semantic(self, semantic: Type[Semantic] | Semantic):
-        pass
-
-    @abstractmethod
-    def remove_semantic(self, semantic: Type[Semantic] | Semantic):
-        pass
-
-    @abstractmethod
-    def get_semantic(self, t_semantic: Type[T_S]) -> T_S | None:
-        pass
-
-    @abstractmethod
-    def branch(self):
-        pass
-
-    @notify(no_origin=True, pass_ref=False)
-    def finalize(self, id_cache: dict):
-        pass
-
-    def set_obj_class_str(self, class_str: str):
-        self.obj_type_str = class_str
-
-    def set_handler(self, handler: OrderedHandler, merge: bool = True, update_order=False):
-        if merge and self.handler is not None and self.handler is not handler:
-            handler.update(self.handler, update_order=update_order)
-        self.handler = handler
-
-
 class Serializable:
     __slots__ = '__weakref__',
 
     @classmethod
-    def check_in_serialization_route(cls, route: Route):
+    def check_in_serialization_context(cls, context: FormatterContext):
         pass
 
     @classmethod
-    def check_in_deserialization_route(cls, route: Route):
+    def check_in_deserialization_context(cls, context: FormatterContext):
         # Uncomment this to get the limited auto circular reference resolution
-        # route.register_frame_semantic(NotifyFinalizedMethodName('finalize'))
+        # context.register_frame_semantic(NotifyFinalizedMethodName('finalize'))
         pass
 
-    def to_dict(self, route: Route, **kwargs) -> dict:
+    def to_dict(self, context: FormatterContext, **kwargs) -> dict:
         zgen = ((i, getattr(self, i)) for i in dir(self))
         return dict(i for i in zgen if not (callable(i[1]) or i[0].startswith('__')))
 
-    def from_dict(self, state_obj: dict, route: Route, **kwargs):
+    def from_dict(self, state_obj: dict, context: FormatterContext, **kwargs):
         for k, v in state_obj.items():
             setattr(self, k, v)
 
-    def finalize(self, id_map: dict) -> None:  # This is pretty inefficient. Override it
-        from grave_settings.helper_objects import PreservedReference
-
+    def finalize(self, frame: FormatterContext) -> None:  # This is pretty inefficient. Override it
         for key in dir(self):
             v = getattr(self, key)
             if isinstance(v, PreservedReference):
-                if v.ref in id_map:
-                    setattr(self, key, id_map[v.ref])
+                setattr(self, key, frame.find(v))
 
 
 class VersionedSerializable(Serializable):
@@ -175,13 +114,10 @@ class IASettings(VersionedSerializable, MutableMapping):
         for k, v in kwargs.items():
             self[k] = v
 
-    def finalize(self, id_map: dict):
-        from grave_settings.helper_objects import PreservedReference
-
+    def finalize(self, frame: FormatterContext):
         for key, v in self.generate_key_value_pairs():
             if isinstance(v, PreservedReference):
-                if v.ref in id_map:
-                    self[key] = id_map[v.ref]
+                self[key] = frame.find(v)
 
     @abstractmethod
     def __contains__(self, item):

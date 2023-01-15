@@ -1,5 +1,7 @@
+from _weakref import ref
+from weakref import WeakKeyDictionary, ReferenceType
 from functools import singledispatch
-from typing import Generic, Type, TypeVar, Callable
+from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Collection, Self
 
 from ram_util.utilities import T
 
@@ -17,10 +19,13 @@ class SecurityException(Exception):
 
 
 class Semantic(Generic[T]):
-    VALUE_OVERWRITES = True
+    COLLECTION: None | Collection = None
 
     def __init__(self, value: T):
         self.val = value
+
+    def add_collection(self, collection):
+        collection.add(self)
 
     def __bool__(self):
         return bool(self.val)
@@ -36,37 +41,135 @@ class Semantic(Generic[T]):
         return hash(hash(self.__class__) + hash(self.val))
 
 
-@singledispatch
-def remove_semantic_from_dict(semantic: Type[Semantic], dict_obj: dict[Type[Semantic], Semantic]):
-    if semantic in dict_obj:
-        dict_obj.pop(semantic)
+T_S = TypeVar('T_S', bound=Semantic)
 
 
-@remove_semantic_from_dict.register
-def _(semantic: Semantic, dict_obj: dict[Type[Semantic], Semantic | list[Semantic]]):
-    smc = semantic.__class__
-    if smc in dict_obj:
-        if smc.VALUE_OVERWRITES:
-            if dict_obj[smc].val == semantic.val:
-                dict_obj.pop(smc)
+class Semantics:
+    def __init__(self, semantics: dict[Type[T_S], T_S] = None):
+        if semantics is None:
+            semantics = {}
+        self.semantics = semantics
+        self.parent: None | Semantics = None
+
+    def update(self, semantics: 'Semantics'):
+        self.semantics.update(semantics.semantics)
+
+    def add_semantic(self, semantic: Semantic):
+        dict_obj = self.semantics
+        if semantic.COLLECTION is None:
+            dict_obj[semantic.__class__] = semantic
         else:
-            semantics = dict_obj[smc]
-            idxs = list(i for i, ins in enumerate(semantics) if ins.val == semantic.val)
-            if len(semantics) == len(idxs):
-                return remove_semantic_from_dict(smc, dict_obj)
-            for idx in reversed(idxs):
-                semantics.pop(idx)
+            smc = semantic.__class__
+            if smc in dict_obj:
+                dict_obj[smc].append(semantic)
+            else:
+                dict_obj[smc] = {semantic}
 
+    def __getitem__(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
+        if self.parent is None:
+            return self.get_semantic(semantic_class)
+        else:
+            if (ps := self.parent.get_semantic(semantic_class)) is not None:
+                if semantic_class.COLLECTION is None:
+                    return ps
+                else:
+                    if s := self.get_semantic(semantic_class):
+                        return s | ps  # order matters for overwrite
+                    else:
+                        return ps
+            return self.get_semantic(semantic_class)
+    
+    def get_semantic(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
+        if semantic_class in self.semantics:
+            return self.semantics[semantic_class]
 
-def add_semantic(semantic: Semantic, dict_obj: dict[Type[Semantic]]):
-    if semantic.VALUE_OVERWRITES:
-        dict_obj[semantic.__class__] = semantic
-    else:
+    def __delitem__(self, key: Type[T_S]):
+        self.pop(key)
+
+    def pop(self, key: Type[T_S]):
+        return self.semantics.pop(key)
+
+    def remove_semantic(self, semantic: Semantic):
         smc = semantic.__class__
+        dict_obj = self.semantics
+
         if smc in dict_obj:
-            dict_obj[smc].append(semantic)
+            if smc.COLLECTION is None:
+                if dict_obj[smc].val == semantic.val:
+                    del self[smc]
+            else:
+                semantics = dict_obj[smc]
+                items = tuple(ins for ins in semantics if ins.val == semantic.val)
+                if len(semantics) == len(items):
+                    del self[smc]
+                for item in reversed(items):
+                    semantics.pop(item)
+
+    def __contains__(self, item: Type[Semantic] | Semantic) -> bool:
+        if self.parent is not None:
+            if item in self.parent:
+                return True
+        if isinstance(item, Semantic):
+            return self[item.__class__] == item
         else:
-            dict_obj[smc] = [semantic]
+            return item in self.semantics
+
+    def copy(self) -> Self:
+        sems = self.__class__(semantics=self.semantics.copy())
+        return sems
+
+
+class SemanticContext(Semantics):
+    def __init__(self, semantics: Semantics):
+        super().__init__(semantics=semantics.semantics.copy())
+        self.stack = []
+
+    def add_frame_semantic(self, semantic: Semantic):
+        if self.parent is None:
+            self.parent = Semantics()
+        self.parent.add_semantic(semantic)
+
+    def remove_frame_semantic(self, semantic: Semantic):
+        if self.parent is not None:
+            self.parent.remove_semantic(semantic)
+
+    def add_semantic(self, semantic: Semantic):
+        if self.semantics is None:
+            self.semantics = {}
+        return super().add_semantic(semantic)
+    
+    def get_semantic(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
+        if self.semantics is None:
+            return None
+        return super().get_semantic(semantic_class)
+
+    def __getitem__(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
+        if self.semantics is None:
+            if self.parent is None:
+                return None
+            return self.parent[semantic_class]
+        return super().__getitem__(semantic_class)
+
+    def remove_semantic(self, semantic: Type[Semantic] | Semantic):
+        if self.semantics is None:
+            return
+        self.remove_frame_semantic(semantic)
+
+    def context_push(self):
+        self.stack.append(self.semantics.copy())
+        self.stack.append(self.parent)
+        self.parent = None
+
+    def context_pop(self):
+        self.parent = self.stack.pop(-1)
+        self.semantics = self.stack.pop(-1)
+
+    def __enter__(self):
+        self.context_push()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.context_pop()
 
 
 class PreserveDictionaryOrdering(Semantic[bool]):
@@ -79,6 +182,13 @@ class PreserveDictionaryOrdering(Semantic[bool]):
 class PreserveSerializableKeyOrdering(Semantic[bool]):
     """
     Similar to PreserveDictionaryOrdering but for serializable objects. This includes auto-serialized objects.
+    """
+    pass
+
+
+class OverrideClassString(Semantic[str]):
+    """
+    The default class string is overriden by a custom value when serializing
     """
     pass
 
@@ -108,18 +218,18 @@ class Indentation(Semantic[int]):
         super().__init__(val)
 
 
-class MultiWrite(Semantic[bool]):
-    """
-    This will write/ read the config file in chunks, lines or subsections in order to preserve memory. Otherwise, the
-    formatter may serialize or deserialize the entire object tree in one go.
-    """
-    pass
-
-
 class AutoPreserveReferences(Semantic[bool]):
     """
     The formatter will keep track of objects that are referenced more than once in the object hierarchy and automatically
     convert subsequent instanced of the same object to a PreservedReference
+    """
+    pass
+
+
+class EnforceReferenceLifecycle(Semantic[bool]):
+    """
+    Ensures that an object id that is used to cache an object for PreservedReferences is not re-used by the interpreter
+    by maintaining a reference to all objects cached for the duration of the operation.
     """
     pass
 
@@ -138,7 +248,7 @@ class ResolvePreservedReferences(Semantic[bool]):
     Preserved References are resolved by the formatter and never given to the object. This may be slower. but
     it ensures that the object will never have a property set that is of type PreservedReference. When this is not
     present the formatter should not resolve the preserved references. Objects can resolve them by subscribing to the
-    Route objects
+    context objects
     """
     pass
 
@@ -170,8 +280,9 @@ class ClassStringPassFunction(Semantic[Callable[[str], bool]]):
     returns false the class/module will not be imported, executed or instantiated and instead a SecurityException will
     be raised.
     """
-    VALUE_OVERWRITES = False
+    Collection = set
+
+
+class KeySemanticsTemplate(Semantic[dict[Any, Iterable[Semantic]]]):
     pass
 
-
-T_S = TypeVar('T_S', bound=Semantic)

@@ -1,16 +1,16 @@
 from unittest import TestCase
 
-from grave_settings.abstract import Route
+from grave_settings.framestackcontext import FrameStackContext
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 
-from integration_tests_base import IntegrationTestCaseBase, Dummy
+from integration_tests_base import IntegrationTestCaseBase, Dummy, EmptyFormatter
 
 
 class TestFormatter(TestCase):
     def test_path_formatting(self):
-        formatter = Formatter()
-        path = formatter.settings.str_to_path("")
+        formatter = EmptyFormatter()
+        path = formatter.spec.str_to_path("")
         self.assertIs(type(path), list)
         self.assertListEqual(path, [])
 
@@ -23,8 +23,8 @@ class TestSemantics(IntegrationTestCaseBase):
     def test_class_can_disallow_preserved_refs(self):
         class NonSerializableDummy(Dummy):
             @classmethod
-            def check_in_serialization_route(cls, route: Route):
-                route.add_frame_semantic(AutoPreserveReferences(False))
+            def check_in_serialization_context(cls, context: FrameStackContext):
+                context.add_frame_semantic(AutoPreserveReferences(False))
         globals()['NonSerializableDummy'] = NonSerializableDummy
         try:
             inner_dummy = NonSerializableDummy()

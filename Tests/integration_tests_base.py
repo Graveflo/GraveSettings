@@ -5,7 +5,7 @@ from unittest import TestCase
 from grave_settings.handlers import OrderedHandler
 from grave_settings.base import SlotSettings
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
-from grave_settings.default_route import DefaultRoute, Route
+from grave_settings.framestackcontext import FrameStackContext
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 from grave_settings.semantics import NotifyFinalizedMethodName
@@ -28,7 +28,7 @@ class Dummy(SlotSettings):
         self.b = b
 
     @classmethod
-    def check_in_deserialization_route(cls, route: Route):
+    def check_in_deserialization_context(cls, route: FrameStackContext):
         route.add_frame_semantic(NotifyFinalizedMethodName('finalize'))
 
     def assert_attr_equiv(self, tc: TestCase, self_val, other_val, circle=None):
@@ -58,7 +58,6 @@ class Dummy(SlotSettings):
 class IntegrationTestCaseBase(TestCase):
     def get_formatter(self, serialization=True) -> Formatter:
         f = EmptyFormatter()
-        self.register_default_semantics(f, serialization=serialization)
         return f
 
     def get_serialization_handler(self) -> OrderedHandler:
@@ -67,26 +66,12 @@ class IntegrationTestCaseBase(TestCase):
     def get_deserialization_handler(self) -> OrderedHandler:
         return DeSerializationHandler()
 
-    def get_route(self, serialization=True) -> Route:
-        if serialization:
-            handler = self.get_serialization_handler()
-        else:
-            handler = self.get_deserialization_handler()
-        return DefaultRoute(handler)
-
-    def register_default_semantics(self, formatter, serialization=True):
-        formatter.add_semantic(AutoPreserveReferences(True))
-        formatter.add_semantic(ResolvePreservedReferences(True))
-        formatter.add_semantic(DetonateDanglingPreservedReferences(True))
-        formatter.add_semantic(SerializeNoneVersionInfo(False))
-
-    def get_ser_obj(self, formatter, obj, route):
-        return formatter.serialize(obj, route)
+    def get_ser_obj(self, formatter, obj):
+        return formatter.serialize(obj)
 
     def assert_obj_roundtrip(self, obj, test_equiv=True):
         formatter = self.get_formatter(serialization=True)
-        route = self.get_route(serialization=True)
-        ser_obj = self.get_ser_obj(formatter, obj, route)
+        ser_obj = self.get_ser_obj(formatter, obj)
         #print(json.dumps(ser_obj, indent=4))
         re_made_object = self.deser_ser_obj(ser_obj)
         #print(re_made_object)
@@ -97,10 +82,9 @@ class IntegrationTestCaseBase(TestCase):
 
     def deser_ser_obj(self, ser_obj):
         formatter = self.get_formatter(serialization=False)
-        deser_route = self.get_route(serialization=False)
-        re_made_object = self.formatter_deser(formatter, deser_route, ser_obj)
+        re_made_object = self.formatter_deser(formatter, ser_obj)
         return re_made_object
 
-    def formatter_deser(self, formatter, route, ser_obj):
-        return formatter.deserialize(ser_obj, route)
+    def formatter_deser(self, formatter, ser_obj):
+        return formatter.deserialize(ser_obj)
 

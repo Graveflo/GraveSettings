@@ -1,5 +1,6 @@
+from functools import singledispatchmethod
 from types import MethodType
-from typing import Mapping, Iterable, Type, Callable
+from typing import Mapping, Iterable, Type, Callable, Self
 
 from ordered_set import OrderedSet
 from ram_util.modules import T
@@ -26,12 +27,17 @@ class Handler(object):
         self.type_bank = {}
         # CAREFUL: initialize is called in the constructor here
         self.init_handler()
-        self._default_handler = lambda x, *y, **z: self.default_handler(x, *y, **z)
 
     def init_handler(self):
         pass
 
-    def update(self, handler: 'Handler'):
+    def add_handlers_by_annotated_callable(self, *callables):
+        self.add_handlers((get_first_parameter_type_hint(c), c) for c in callables)
+
+    def add_handlers(self, handlers: Mapping | Iterable):
+        self.type_bank.update(handlers)
+
+    def update(self, handler: Self):
         self.type_bank.update(handler.type_bank)
 
     def add_handler(self, target_type, func_format):
@@ -61,7 +67,7 @@ class Handler(object):
         try:
             ret = self.handle_node(key, *args, **kwargs)
         except HandlerNotFound:
-            ret = self._default_handler(key, *args, **kwargs)
+            ret = self.default_handler(key, *args, **kwargs)
         return ret
 
     def default_handler(self, key, *args, **kwargs):
@@ -96,14 +102,8 @@ class OrderedHandler(Handler):
             func_format = MethodType(func_format, self)
         self.type_bank[target_type] = func_format
 
-    def add_handlers(self, handlers: Mapping | Iterable):
-        self.type_bank.update(handlers)
-
     def set_default_handler(self, target_type, func_format):
         self.type_defaults[target_type] = func_format
-
-    def add_handlers_by_annotated_callable(self, *callables):
-        self.add_handlers((get_first_parameter_type_hint(c), c) for c in callables)
 
     def get_key_func(self, key_type: Type):
         if key_type in self.type_defaults:
@@ -122,6 +122,7 @@ class OrderedHandler(Handler):
         f = self.get_key_func(key.__class__)
         return f(key, *args, **kwargs)
 
+
 MHS = Callable[[object, T, ...], T]
 
 
@@ -131,7 +132,7 @@ class MroHandler(Handler):
         self.type_bank: dict[Type, MHS] = {}
         self.cache: dict[Type, tuple[MHS]] = {}
 
-    def update(self, handler: 'Handler'):
+    def update(self, handler: Handler):
         super(MroHandler, self).update(handler)
         self.cache = {}
 
@@ -145,9 +146,6 @@ class MroHandler(Handler):
     def add_handlers(self, handlers: Mapping | Iterable):
         self.type_bank.update(handlers)
 
-    def add_handlers_by_annotated_callable(self, *callables):
-        self.add_handlers((get_first_parameter_type_hint(c),c) for c in callables)
-
     def get_ordered_handlers(self, key):
         if key in self.cache:
             return self.cache[key]
@@ -158,24 +156,20 @@ class MroHandler(Handler):
             self.cache[key] = bs
             return bs
 
-    def handle(self, key: Type | object, *args, instance=None, nest=None, **kwargs):
-        if not isinstance(key, type):
-            if instance is None:
-                instance = key
-            key = key.__class__
+    def handle(self, instance, *args, **kwargs):
+        return self.handle_custom(instance.__class__, instance, None,  *args, **kwargs)
 
+    def handle_custom(self, key: type, instance, nest, *args, **kwargs):
         for f in self.get_ordered_handlers(key):
             p_nest = f(instance, nest, *args, **kwargs)
-            if p_nest is not None:
+            if p_nest is not None:  # dont overwrite Nones
                 nest = p_nest
-
         return nest
 
     def handles_object(self, test_obj) -> bool:
         hsrs = self.get_ordered_handlers(test_obj.__class__)
         if len(hsrs) == 1 and hsrs == (self._default_handler,):
             return False
-
         return True
 
 
