@@ -1,4 +1,3 @@
-from functools import singledispatchmethod
 from types import MethodType
 from typing import Mapping, Iterable, Type, Callable, Self
 

@@ -126,9 +126,7 @@ class Serializer(Processor):
         self.handler.add_handlers_by_annotated_callable(
             self.handle_serialize_default,
             self.handle_user_list,
-            self.handle_user_dict,
-            self.handle_noref,
-            self.handle_temporary
+            self.handle_user_dict
         )
 
     def check_in_object(self, obj: T) -> PreservedReference | T:
@@ -232,6 +230,8 @@ class Serializer(Processor):
                 return self.handler.handle(obj, **kwargs)
             elif issubclass(tobj, Temporary):
                 return self.handle_temporary(obj, **kwargs)
+            elif issubclass(tobj, NoRef):
+                return self.handle_noref(obj, **kwargs)
             else:
                 return self.handle_serialize_default(obj, **kwargs)
 

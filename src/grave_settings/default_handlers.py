@@ -7,9 +7,8 @@
 from types import NoneType
 from datetime import timedelta, datetime, date
 from enum import Enum
-from typing import Type, Mapping
+from typing import Mapping
 from types import FunctionType
-from collections.abc import Iterable
 
 from ram_util.modules import format_class_str, load_type, T
 

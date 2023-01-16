@@ -10,7 +10,7 @@ from enum import Enum, auto
 from unittest import TestCase, main
 
 from ram_util.modules import format_class_str
-from grave_settings.formatter_settings import PreservedReference
+from grave_settings.formatter_settings import PreservedReference, Temporary, NoRef
 from integration_tests_base import Dummy, IntegrationTestCaseBase
 from grave_settings.abstract import Serializable
 from grave_settings.base import SlotSettings
@@ -323,6 +323,35 @@ class TestSerialization(Scenarios):
         self.assertIs(type(dummy.a[1]), Dummy)
         self.assertIn(date(year=2022, month=1, day=1), dummy.b)
         self.assertIs(type(dummy.b[date(year=2022, month=1, day=1)]), Dummy)
+
+    def test_temporary(self):
+        formatter = self.get_formatter(serialization=True)
+        dummy_ref = [Dummy(a=1, b=1), Dummy(a=2, b=2)]
+        dummy = Dummy(a=Temporary(dummy_ref), b=Temporary(dummy_ref))
+        result = formatter.serialize(dummy)
+        self.assertEqual(result['a'], result['b'])
+        self.assertIs(result['b'][0], dummy_ref[0])
+        self.assertEqual(dummy_ref[0][formatter.spec.class_id], format_class_str(Dummy))
+
+    def test_noref(self):
+        formatter = self.get_formatter(serialization=True)
+        dummy_ref = Dummy(a=1, b=1)
+        dummy = Dummy(a=NoRef(dummy_ref), b=NoRef(dummy_ref))
+        result = formatter.serialize(dummy)
+        self.assertEqual(result['a'], result['b'])
+        self.assertEqual(result['b'][formatter.spec.class_id], format_class_str(Dummy))
+        self.assertEqual(result['a'][formatter.spec.class_id], format_class_str(Dummy))
+
+        formatter = self.get_formatter(serialization=True)
+        dummy_ref = Dummy(a=1, b=1)
+        dummy = {
+            'a': NoRef(dummy_ref),
+            'b': NoRef(dummy_ref)
+        }
+        result = formatter.serialize(dummy)
+        self.assertEqual(result['a'], result['b'])
+        self.assertEqual(result['b'][formatter.spec.class_id], format_class_str(Dummy))
+        self.assertEqual(result['a'][formatter.spec.class_id], format_class_str(Dummy))
 
 
 class TestRoundTrip(Scenarios):

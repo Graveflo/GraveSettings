@@ -1,7 +1,4 @@
-from _weakref import ref
-from weakref import WeakKeyDictionary, ReferenceType
-from functools import singledispatch
-from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Collection, Self
+from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self
 
 from ram_util.utilities import T
 
@@ -19,13 +16,25 @@ class SecurityException(Exception):
 
 
 class Semantic(Generic[T]):
-    COLLECTION: None | Collection = None
+    COLLECTION: Type[set] | None = None
+    C_T = TypeVar('C_T', bound=COLLECTION)
 
     def __init__(self, value: T):
         self.val = value
 
-    def add_collection(self, collection):
+    def collection_add(self, collection):
         collection.add(self)
+
+    def collection_remove(self, collection):
+        collection.remove(self)
+
+    @staticmethod
+    def collection_copy(collection) -> C_T:
+        return collection.copy()
+
+    @staticmethod
+    def collection_concatenate(first: C_T, second: C_T):
+        return first | second
 
     def __bool__(self):
         return bool(self.val)
@@ -45,7 +54,7 @@ T_S = TypeVar('T_S', bound=Semantic)
 
 
 class Semantics:
-    def __init__(self, semantics: dict[Type[T_S], T_S] = None):
+    def __init__(self, semantics: dict[Type[T_S], T_S | set[T_S]] = None):
         if semantics is None:
             semantics = {}
         self.semantics = semantics
@@ -61,9 +70,11 @@ class Semantics:
         else:
             smc = semantic.__class__
             if smc in dict_obj:
-                dict_obj[smc].append(semantic)
+                semantic.collection_add(dict_obj[smc])
             else:
-                dict_obj[smc] = {semantic}
+                collect = smc.COLLECTION()
+                semantic.collection_add(collect)
+                dict_obj[smc] = collect
 
     def __getitem__(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
         if self.parent is None:
@@ -74,7 +85,7 @@ class Semantics:
                     return ps
                 else:
                     if s := self.get_semantic(semantic_class):
-                        return s | ps  # order matters for overwrite
+                        return semantic_class.collection_concatenate(ps, s)  # order matters for overwrite
                     else:
                         return ps
             return self.get_semantic(semantic_class)
@@ -103,14 +114,19 @@ class Semantics:
                 if len(semantics) == len(items):
                     del self[smc]
                 for item in reversed(items):
-                    semantics.pop(item)
+                    item.collection_remove(semantics)
 
     def __contains__(self, item: Type[Semantic] | Semantic) -> bool:
         if self.parent is not None:
             if item in self.parent:
                 return True
         if isinstance(item, Semantic):
-            return self[item.__class__] == item
+            if item.COLLECTION is None:
+                return self[item.__class__] == item
+            else:
+                if (v := self[item.__class__]) is None:
+                    return False
+                return item in v
         else:
             return item in self.semantics
 
@@ -129,9 +145,12 @@ class SemanticContext(Semantics):
             self.parent = Semantics()
         self.parent.add_semantic(semantic)
 
-    def remove_frame_semantic(self, semantic: Semantic):
+    def remove_frame_semantic(self, semantic: Type[Semantic] | Semantic):
         if self.parent is not None:
-            self.parent.remove_semantic(semantic)
+            if type(semantic) is type:
+                self.parent.pop(semantic)
+            else:
+                self.parent.remove_semantic(semantic)
 
     def add_semantic(self, semantic: Semantic):
         if self.semantics is None:
@@ -153,10 +172,17 @@ class SemanticContext(Semantics):
     def remove_semantic(self, semantic: Type[Semantic] | Semantic):
         if self.semantics is None:
             return
-        self.remove_frame_semantic(semantic)
+        super().remove_semantic(semantic)
+
+    def copy_semantics(self):
+        sems = self.semantics.copy()
+        for k, v in sems.items():
+            if k.COLLECTION is not None:
+                sems[k] = k.collection_copy(v)
+        return sems
 
     def context_push(self):
-        self.stack.append(self.semantics.copy())
+        self.stack.append(self.copy_semantics())
         self.stack.append(self.parent)
         self.parent = None
 
@@ -164,7 +190,7 @@ class SemanticContext(Semantics):
         self.parent = self.stack.pop(-1)
         self.semantics = self.stack.pop(-1)
 
-    def __enter__(self):
+    def __enter__(self) -> Self:
         self.context_push()
         return self
 

@@ -57,7 +57,6 @@ class FormatterSpec:
         self.str_id = '__id__'
         self.version_id = '__version__'
         self.class_id = '__class__'
-        self.temporary = Temporary
         self.type_primitives = self.PRIMITIVES
         self.type_special = self.SPECIAL
         self.type_attribute = self.ATTRIBUTE
