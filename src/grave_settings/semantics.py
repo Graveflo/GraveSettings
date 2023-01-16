@@ -198,6 +198,22 @@ class SemanticContext(Semantics):
         self.context_pop()
 
 
+class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
+    """
+    Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
+    happen to share the same name as the built in methods
+    """
+    pass
+
+
+class IgnoreDuckTypingForSubclasses(Semantic[Type]):  # TODO: Implement
+    """
+    Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
+    happen to share the same name as the built in methods
+    """
+    pass
+
+
 class PreserveDictionaryOrdering(Semantic[bool]):
     """
     Keep the ordering of dictionary objects consistent between the format and the python object hierarchy

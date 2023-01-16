@@ -19,9 +19,9 @@ class Settings(IASettings):
         self.sd = {}
         super(Settings, self).__init__(*args, initialize_settings=initialize_settings, **kwargs)
 
-    def get_versioning_endpoint(self) -> Type[VersionedSerializable]:
+    @classmethod
+    def get_versioning_endpoint(cls) -> Type[VersionedSerializable]:
         return Settings
-        # return JsonSerializable # this will change to this class in the future
 
     def update(self, __m: Mapping[_KT, _VT], **kwargs: _VT):
         self.sd.update(__m, **kwargs)
@@ -135,9 +135,9 @@ class SlotSettings(IASettings):
             pass
         return tuple(keys)
 
-    def get_versioning_endpoint(self) -> Type[VersionedSerializable]:
+    @classmethod
+    def get_versioning_endpoint(cls) -> Type[VersionedSerializable]:
         return SlotSettings
-        # return JsonSerializable # This will change to this class in the future
 
     def get_settings_keys_rems(self, rems=None) -> set:
         if rems is None:

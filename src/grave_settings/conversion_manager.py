@@ -6,7 +6,7 @@
 """
 from typing import Callable, Type
 
-from ram_util.modules import format_class_str, load_type
+from ram_util.modules import format_class_str
 from observer_hooks import EventHandler
 from ram_util.utilities import generate_type_hierarchy_to_base
 
@@ -32,18 +32,26 @@ class ConversionManager:
         self.converted = EventHandler()
 
     @classmethod
+    def get_version_info_from_class(cls, clt: Type):
+        v = None
+        if hasattr(clt, 'get_version'):
+            v = clt.get_version()
+        elif hasattr(clt, 'VERSION'):
+            v = clt.VERSION
+        return v
+
+    @classmethod
     def get_version_object(cls, t_obj: Type | object):
         versioning_info = {}
         if hasattr(t_obj, 'get_versioning_endpoint'):
             end_point = t_obj.get_versioning_endpoint()
         else:
             end_point = object
-        if type(t_obj) != Type:
+        if not isinstance(t_obj, type):  # meta-classes force use of isinstance for Type[type] checking
             t_obj = t_obj.__class__
         for clt in generate_type_hierarchy_to_base(end_point, t_obj):
-            if hasattr(clt, 'VERSION'):
-                if clt.VERSION is not None:
-                    versioning_info[format_class_str(clt)] = clt.VERSION
+            if (v := cls.get_version_info_from_class(clt)) is not None:
+                versioning_info[format_class_str(clt)] = v
         if versioning_info:
             return versioning_info
 
@@ -52,28 +60,25 @@ class ConversionManager:
             target_class = format_class_str(target_class)
         self.converters[(target_class, target_ver)] = (conversion_func, out_ver)
 
-    def try_convert(self, state_obj: dict, class_str: str, ver: str, target_ver: str | None=None):
+    def try_convert(self, state_obj: dict, class_str: str, ver: str, target_ver: str):
         search_key = (class_str, ver)
         while (ver != target_ver) and (search_key in self.converters):
             try:
                 convert_func, out_version = self.converters[search_key]
             except KeyError:
-                raise ConversionError
+                raise ConversionError('Settings version info object is not understood')
             if (new_object := convert_func(state_obj)) is not None:
                 state_obj = new_object
                 self.converted.emit(state_obj, class_str, ver, target_ver=out_version)
             ver = out_version
+            search_key = (class_str, ver)
         return state_obj
 
-    def update_to_current(self, json_obj, version_info) -> dict:
+    def update_to_current(self, json_obj, load_type: Callable[[str], Type], version_info) -> dict:
         if version_info is None:
             return json_obj
         for class_str, version in version_info.items():
             this_class = load_type(class_str)
-            if not version == this_class.VERSION:
-                try:
-                    json_obj = self.try_convert(json_obj.copy(), class_str, version, target_ver=this_class.VERSION)
-                except ConversionError:
-                    raise IOError('Settings file version is not understood')
-
+            if not version == (target_ver := self.get_version_info_from_class(this_class)):
+                json_obj = self.try_convert(json_obj.copy(), class_str, version, target_ver)
         return json_obj

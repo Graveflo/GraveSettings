@@ -5,7 +5,7 @@
 @author: ☙ Ryan McConnell ❧
 """
 from abc import abstractmethod
-from typing import TypeVar, MutableMapping, Type, Mapping, Callable, Self, Generator
+from typing import TypeVar, MutableMapping, Type, Mapping, Callable, Self, Generator, Literal
 
 from observer_hooks import notify
 
@@ -54,30 +54,36 @@ class VersionedSerializable(Serializable):
         return cls.VERSION
 
     @classmethod
+    def get_version_object(cls):
+        """
+        It is saf to override this as a instance method
+        """
+        return cls.get_conversion_manager().get_version_object(cls)
+
+    @classmethod
     def get_conversion_manager(cls) -> ConversionManager:
         cm = ConversionManager()
         cm.converted.subscribe(cls.conversion_manager_converted)
         return cm
 
     @classmethod
+    def check_convert_update(cls, state_obj: dict, load_type: Callable[[str], Type],
+                             version_obj: dict) -> dict | Literal[False]:
+        conversion_manager = cls.get_conversion_manager()
+        rst = state_obj
+        instance = conversion_manager.update_to_current(state_obj, load_type, version_obj)
+        if rst is instance:
+            return False
+        else:
+            return instance
+
+    @classmethod
     def conversion_manager_converted(cls, state_obj: dict, class_str: str, ver: str, target_ver: str = None):
         pass
 
     @classmethod
-    def version_mismatch(cls, state_obj: dict, old_version: str, **kwargs) -> dict:
-        cm = cls.get_conversion_manager()
-        new_state_obj = cm.update_to_current(state_obj)
-        is_convert = new_state_obj is not state_obj
-        if is_convert:
-            cls.conversion_completed(state_obj, new_state_obj)
-        return new_state_obj
-
-    @classmethod
     def get_versioning_endpoint(cls) -> Type[Self]:
         return VersionedSerializable
-
-    def conversion_completed(self, old_ver: dict, new_ver: dict):
-        pass
 
 
 def make_kill_converter(cls: Type[VersionedSerializable]) -> Callable[[dict], dict]:
@@ -151,10 +157,6 @@ class IASettings(VersionedSerializable, MutableMapping):
         pass
 
     def conversion_manager_settings_updated(self, state_obj: dict, class_str: str, ver: str, target_ver: str=None):
-        self.invalidate()
-
-    @notify()
-    def conversion_completed(self, old_ver: dict, new_ver: dict):
         self.invalidate()
 
     def get_validator(self) -> SettingsValidator | None:

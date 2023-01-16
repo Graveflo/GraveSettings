@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from io import IOBase
 from weakref import WeakSet
 
+from observer_hooks import notify
 from ram_util.modules import load_type, format_class_str
 
 from grave_settings.abstract import VersionedSerializable
@@ -205,8 +206,8 @@ class Serializer(Processor):
             if p_ref is not instance:
                 instance = p_ref  # serialize the preserved reference instead
         ro = {self.spec.class_id: None}  # keeps placement
-        if isinstance(instance, VersionedSerializable):
-            version_info = instance.get_conversion_manager().get_version_object(instance)
+        if hasattr(instance, 'get_version_object'):
+            version_info = instance.get_version_object()
             if self.semantics[SerializeNoneVersionInfo] or version_info is not None:
                 with self.semantics:
                     self.context.add_semantic(AutoPreserveReferences(False))
@@ -307,10 +308,9 @@ class DeSerializer(Processor):
                     instance[k] = self.deserialize(v, **kwargs)
 
         if class_id is not None:
-            if version_info is not None and hasattr(type_obj, 'get_conversion_manager'):
-                conversion_manager = type_obj.get_conversion_manager()
-                instance = conversion_manager.update_to_current(instance, version_info)
-
+            if version_info is not None and hasattr(type_obj, 'check_convert_update'):
+                if ti := type_obj.check_convert_update(instance, self.load_type, version_info):
+                    instance = ti
             ret = self.context.handler.handle(type_obj, instance, self.context, **kwargs)
             if method_name := self.semantics[NotifyFinalizedMethodName]:
                 self.context.finalize.subscribe(getattr(ret, method_name.val))
@@ -369,6 +369,10 @@ class DeSerializer(Processor):
         self.handler = None
         if len(self.preserved_refs) > 0:
             raise PreservedReferenceNotDissolvedError()
+
+    @notify(no_origin=True)
+    def notify_settings_converted(self, class_type: Type, context: FormatterContext):
+        pass
 
 
 class Formatter(IFormatter, ABC):
