@@ -1,6 +1,6 @@
 from grave_settings.abstract import Serializable
 from grave_settings.formatter_settings import Temporary
-from grave_settings.framestackcontext import FrameStackContext
+from grave_settings.framestack_context import FrameStackContext
 
 
 class PreservedReferenceNotDissolvedError(Exception):

@@ -5,7 +5,7 @@ from unittest import TestCase
 from grave_settings.handlers import OrderedHandler
 from grave_settings.base import SlotSettings
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler
-from grave_settings.framestackcontext import FrameStackContext
+from grave_settings.framestack_context import FrameStackContext
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 from grave_settings.semantics import NotifyFinalizedMethodName

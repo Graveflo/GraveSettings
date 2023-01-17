@@ -6,7 +6,7 @@ from observer_hooks import notify, HardRefEventHandler
 from ram_util.utilities import T
 
 from grave_settings.handlers import OrderedHandler
-from grave_settings.framestackcontext import FrameStackContext
+from grave_settings.framestack_context import FrameStackContext
 from grave_settings.semantics import Semantic
 
 
@@ -118,6 +118,9 @@ class FormatterContext:
     @handler.setter
     def handler(self, handler: OrderedHandler):
         self.semantic_context.set_handler(handler)
+
+    def handle(self, obj):
+        return self.semantic_context.handler.handle(obj, self)
 
     def update(self, obj: Self):
         self.key_path = obj.key_path.copy()

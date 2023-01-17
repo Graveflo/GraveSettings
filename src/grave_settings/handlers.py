@@ -3,7 +3,7 @@ from typing import Mapping, Iterable, Type, Callable, Self
 
 from ordered_set import OrderedSet
 from ram_util.modules import T
-from ram_util.utilities import ext_str_fmt, get_first_parameter_type_hint
+from ram_util.utilities import ext_str_fmt, get_type_hints
 
 
 class HandlerNotFound(Exception):
@@ -30,8 +30,8 @@ class Handler(object):
     def init_handler(self):
         pass
 
-    def add_handlers_by_annotated_callable(self, *callables):
-        self.add_handlers((get_first_parameter_type_hint(c), c) for c in callables)
+    def add_handlers_by_type_hints(self, *callables):
+        self.add_handlers((get_type_hints(c)[0], c) for c in callables)
 
     def add_handlers(self, handlers: Mapping | Iterable):
         self.type_bank.update(handlers)
@@ -56,9 +56,15 @@ class Handler(object):
         except KeyError:
             self.add_handler(target_type, func_format)
 
+    def get_key_func(self, item: Type):
+        try:
+            return self.type_bank[item]
+        except KeyError:
+            raise HandlerNotFound(key=item)
+
     def handle_node(self, key, *args, **kwargs):
         try:
-            return self.type_bank[key][0](key, *args, **kwargs)
+            return self.get_key_func(key)[0](key, *args, **kwargs)
         except KeyError:
             raise HandlerNotFound(key=key, *args, **kwargs)
 
@@ -69,14 +75,21 @@ class Handler(object):
             ret = self.default_handler(key, *args, **kwargs)
         return ret
 
-    def default_handler(self, key, *args, **kwargs):
+    @staticmethod
+    def default_handler(key, *args, **kwargs):
         raise HandlerNotFound(key=key, *args, **kwargs)
+
+    def __contains__(self, item):
+        try:
+            self.get_key_func(item)
+            return True
+        except HandlerNotFound:
+            return False
 
 
 class OrderedHandler(Handler):
     def __init__(self, *args, **kwargs):
-        self.type_defaults = {}  # strict types checked first
-        self.cache = {}  # Strict types checked second
+        self.cache = {}  # types checked second
         # CAREFUL: initialize is called in the constructor here
         super(OrderedHandler, self).__init__(*args, **kwargs)
 
@@ -89,11 +102,8 @@ class OrderedHandler(Handler):
             self.type_bank = {k: v for k, v in self.type_bank.items() if k not in handle_tb}
         self.type_bank.update(handle_tb)
         for _type, _func in handle_tb.items():
-            if update_order and _type in self.type_defaults:
-                self.type_defaults.pop(_type)
             if _type in self.cache:
                 self.cache.pop(_type)
-        self.type_defaults.update(handler.type_defaults)
         self.cache.update(handler.cache)
 
     def add_handler(self, target_type, func_format, bind_as_method=False):
@@ -101,25 +111,41 @@ class OrderedHandler(Handler):
             func_format = MethodType(func_format, self)
         self.type_bank[target_type] = func_format
 
-    def set_default_handler(self, target_type, func_format):
-        self.type_defaults[target_type] = func_format
+    def __contains__(self, item: Type):
+        if item in self.cache:
+            return True
+        else:
+            for t in self.type_bank:
+                if issubclass(item, t):
+                    return True
+        return False
 
     def get_key_func(self, key_type: Type):
-        if key_type in self.type_defaults:
-            return self.type_defaults[key_type]
+        if key_type in self.cache:
+            return self.cache[key_type]
         else:
-            if key_type in self.cache:
-                return self.cache[key_type]
-            else:
-                for t, f in reversed(self.type_bank.items()):
-                    if issubclass(key_type, t):
-                        self.cache[key_type] = f
-                        return f
-                raise HandlerNotFound()
+            for t, f in reversed(self.type_bank.items()):
+                if issubclass(key_type, t):
+                    self.cache[key_type] = f
+                    return f
+            raise HandlerNotFound()
 
     def handle_node(self, key, *args, **kwargs):
         f = self.get_key_func(key.__class__)
         return f(key, *args, **kwargs)
+
+
+class OrderedMethodHandler(OrderedHandler):
+    def add_handlers_by_type_hints(self, *callables: MethodType):
+        self.add_handlers((get_type_hints(c)[0], c.__func__) if isinstance(c, MethodType) else (get_type_hints(c)[1],c) for c in callables)
+
+    def handle_node(self, pass_self, key, *args, **kwargs):
+        f = self.get_key_func(key.__class__)
+        return f(pass_self, key, *args, **kwargs)
+
+    def handle(self, pass_self, instance, *args, **kwargs):
+        return self.handle_node(pass_self, instance, *args, **kwargs)
+
 
 
 MHS = Callable[[object, T, ...], T]
@@ -151,12 +177,21 @@ class MroHandler(Handler):
         else:
             bs = tuple(self.type_bank[tt] for tt in reversed(key.__mro__) if tt in self.type_bank)
             if len(bs) <= 0:
-                bs = (self._default_handler,)
+                bs = (self.default_handler,)
             self.cache[key] = bs
             return bs
 
     def handle(self, instance, *args, **kwargs):
         return self.handle_custom(instance.__class__, instance, None,  *args, **kwargs)
+
+    def __contains__(self, item: Type):
+        if item in self.cache:
+            return True
+        else:
+            for t in self.type_bank:
+                if issubclass(item, t):
+                    return True
+        return False
 
     def handle_custom(self, key: type, instance, nest, *args, **kwargs):
         for f in self.get_ordered_handlers(key):
@@ -165,11 +200,6 @@ class MroHandler(Handler):
                 nest = p_nest
         return nest
 
-    def handles_object(self, test_obj) -> bool:
-        hsrs = self.get_ordered_handlers(test_obj.__class__)
-        if len(hsrs) == 1 and hsrs == (self._default_handler,):
-            return False
-        return True
 
 
 class StackedHandler(Handler):

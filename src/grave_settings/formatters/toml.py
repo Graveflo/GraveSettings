@@ -15,10 +15,10 @@ except ImportError:
 from grave_settings.formatter import Formatter, Serializer
 
 
+
 class TomlFormatter(Formatter):
     FORMAT_SETTINGS = Formatter.FORMAT_SETTINGS.copy()
     FORMAT_SETTINGS.type_primitives = int | float | str | bool
-    FORMAT_SETTINGS.type_special |= None
 
     def serialized_obj_to_buffer(self, ser_obj: dict) -> str:
         return tlw.dumps(ser_obj)
@@ -28,7 +28,7 @@ class TomlFormatter(Formatter):
 
     def get_serializer(self, root_obj, context) -> Serializer:
         serializer = super().get_serializer(root_obj, context)
-        serializer.handler.add_handler(type(None), self.handle_None)
+        serializer.handler.add_handler(type(None), self.__class__.handle_None)
         return serializer
 
     def handle_None(self, none_obj, **kwargs):

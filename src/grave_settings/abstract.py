@@ -91,7 +91,7 @@ def make_kill_converter(cls: Type[VersionedSerializable]) -> Callable[[dict], di
 
 
 class IASettings(VersionedSerializable, MutableMapping):
-    __slots__ = 'parent', '_invalidate', '_conversion_completed'
+    __slots__ = 'parent', '_invalidate', 'file_path'
 
     def __init__(self, *args, initialize_settings=True, **kwargs):
         self.parent: IASettings | None = None
@@ -155,9 +155,6 @@ class IASettings(VersionedSerializable, MutableMapping):
     @abstractmethod
     def generate_key_value_pairs(self, **kwargs) -> Generator[tuple[object, object], None, None]:
         pass
-
-    def conversion_manager_settings_updated(self, state_obj: dict, class_str: str, ver: str, target_ver: str=None):
-        self.invalidate()
 
     def get_validator(self) -> SettingsValidator | None:
         pass

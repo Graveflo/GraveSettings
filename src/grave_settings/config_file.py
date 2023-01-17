@@ -13,7 +13,7 @@ from typing import Self, Any, Type
 from ram_util.modules import format_class_str
 
 from grave_settings.abstract import IASettings
-from grave_settings.framestackcontext import FrameStackContext
+from grave_settings.framestack_context import FrameStackContext
 from grave_settings.formatters.toml import TomlFormatter
 from grave_settings.formatters.json import JsonFormatter
 from grave_settings.formatter import Formatter
@@ -38,6 +38,9 @@ class ConfigFile:
         self.read_only = read_only
         self.sub_configs = {}
 
+    def add_config_dependency(self, other: 'ConfigFile'):
+        self.sub_configs[other.file_path] = other
+
     def backup_settings_file(self):
         if self.file_path.is_file():
             base = self.file_path.parent
@@ -52,26 +55,6 @@ class ConfigFile:
         self.changes_made = True
         if self.auto_save:
             self.save()
-
-    def attach_settings(self, settings: IASettings):
-        settings.invalidate.subscribe(self.settings_invalidated)
-        settings.conversion_completed.subscribe(self.settings_converted)
-
-    def detach_settings(self, settings: IASettings):
-        try:
-            settings.invalidate.unsubscribe(self.settings_invalidated)
-        except KeyError:
-            pass
-        try:
-            settings.conversion_completed.unsubscribe(self.settings_converted)
-        except KeyError:
-            pass
-
-    def set_settings(self, settings: IASettings):
-        if self.data is not None:
-            self.detach_settings(settings)
-        self.data = settings
-        self.attach_settings(settings)
 
     def validate_file_path(self, path: Path, must_exist=False):
         if must_exist:

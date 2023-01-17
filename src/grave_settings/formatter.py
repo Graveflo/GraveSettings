@@ -11,10 +11,9 @@ from weakref import WeakSet
 from observer_hooks import notify
 from ram_util.modules import load_type, format_class_str
 
-from grave_settings.abstract import VersionedSerializable
-from grave_settings.framestackcontext import FrameStackContext
+from grave_settings.framestack_context import FrameStackContext
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
-from grave_settings.handlers import OrderedHandler
+from grave_settings.handlers import OrderedHandler, OrderedMethodHandler
 from grave_settings.helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDict
 from grave_settings.formatter_settings import FormatterSpec, Temporary, FormatterContext, PreservedReference, NoRef
 from grave_settings.semantics import *
@@ -65,17 +64,29 @@ class IFormatter(ABC):
     def get_deserialization_handler(self) -> OrderedHandler:
         return DeSerializationHandler()
 
-    def get_serialization_frame_context(self) -> FrameStackContext:
-        return FrameStackContext(self.get_serialization_handler(), Semantics())
+    def get_serialization_frame_context(self, handler: OrderedHandler = None, semantics: Semantics = None) -> FrameStackContext:
+        if handler is None:
+            handler = self.get_serialization_handler()
+        if semantics is None:
+            semantics = Semantics()
+        else:
+            semantics = semantics.copy()
+        return FrameStackContext(handler, semantics)
 
-    def get_deserialization_frame_context(self) -> FrameStackContext:
-        return FrameStackContext(self.get_deserialization_handler(), Semantics())
+    def get_deserialization_frame_context(self, handler: OrderedHandler=None, semantics: Semantics = None) -> FrameStackContext:
+        if handler is None:
+            handler = self.get_deserialization_handler()
+        if semantics is None:
+            semantics = Semantics()
+        else:
+            semantics = semantics.copy()
+        return FrameStackContext(handler, semantics)
 
-    def get_serialization_context(self) -> FormatterContext:
-        return FormatterContext(self.get_serialization_frame_context())
+    def get_serialization_context(self, handler: OrderedHandler=None, semantics: Semantics = None) -> FormatterContext:
+        return FormatterContext(self.get_serialization_frame_context(handler=handler, semantics=semantics))
 
-    def get_deserialization_context(self) -> FormatterContext:
-        return FormatterContext(self.get_deserialization_frame_context())
+    def get_deserialization_context(self, handler: OrderedHandler=None, semantics: Semantics = None) -> FormatterContext:
+        return FormatterContext(self.get_deserialization_frame_context(handler=handler, semantics=semantics))
 
     def dumps(self, obj: Any) -> str | bytes:
         return self.serialized_obj_to_buffer(self.serialize(obj))
@@ -106,15 +117,30 @@ class Processor:
         self.special = spec.get_special_types()
         self.attribute = spec.get_attribute_types()
 
+    def it_quack(self, t_obj: type):
+        ducks = True
+        if v := self.semantics[IgnoreDuckTypingForType]:
+            ducks = t_obj not in v
+        if not ducks and (v := self.semantics[IgnoreDuckTypingForSubclasses]):
+            ducks = not any(issubclass(t_obj, t.val) for t in v)
+        return ducks
+
+    def process(self, obj, **kwargs):
+        pass
+
     def path_to_str(self):
         return self.spec.path_to_str(self.context.key_path)
 
     def dispose(self):
         self.context.finalize()
         self.semantics.parent = None
-        self.semantics = None
         self.root_obj = None
-        self.context = None
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.dispose()
 
 
 class Serializer(Processor):
@@ -123,12 +149,28 @@ class Serializer(Processor):
         self.root_object = root_object
         self.id_lifecycle_objects = []
 
-        self.handler = OrderedHandler()
-        self.handler.add_handlers_by_annotated_callable(
+        self.handler = OrderedMethodHandler()
+        self.handler.add_handlers_by_type_hints(
             self.handle_serialize_default,
+            self.handle_noref,
+            self.handle_temporary,
             self.handle_user_list,
             self.handle_user_dict
         )
+
+    def supports_semantic(self, semantic_class: Type[Semantic]) -> bool:
+        return semantic_class in {
+            AutoKeySerializableDictType,
+            AutoPreserveReferences,
+            PreserveSerializableKeyOrdering,
+            SerializeNoneVersionInfo,
+            EnforceReferenceLifecycle,
+            KeySemanticsTemplate,
+            OverrideClassString,
+            IgnoreDuckTypingForType,
+            IgnoreDuckTypingForSubclasses,
+            OmitMe
+        }
 
     def check_in_object(self, obj: T) -> PreservedReference | T:
         object_id = id(obj)
@@ -156,6 +198,7 @@ class Serializer(Processor):
                 return self.serialize(ksd, **kwargs)
         else:
             auto_key_semantics = self.semantics[KeySemanticsTemplate]
+            rems = []
             if not auto_key_semantics:
                 auto_key_semantics = False
             for k, v in instance.items():
@@ -163,7 +206,12 @@ class Serializer(Processor):
                     if auto_key_semantics:
                         if k in auto_key_semantics.val:
                             tuple(map(self.context.add_frame_semantic, auto_key_semantics.val[k]))
-                    instance[k] = self.serialize(v, **kwargs)
+                    try:
+                        instance[k] = self.serialize(v, **kwargs)
+                    except OmitMeError:
+                        rems.append(k)
+            for rem in rems:
+                instance.pop(rem)
             return instance
 
     def handle_user_list(self, instance: list, **kwargs):
@@ -197,8 +245,20 @@ class Serializer(Processor):
             self.context.add_frame_semantic(AutoPreserveReferences(False))
             return self.serialize(tv, **kwargs)
 
-    def handle_serialize_default(self, instance: Any, **kwargs):
-        if hasattr(instance, 'check_in_serialization_context'):
+    def template_object_serialize(self, template_dict: dict, instance, **kwargs):
+        ser_obj = self.context.handler.handle(instance, self.context, **kwargs)
+        with self.semantics:
+            template_dict.update(self.serialize(ser_obj, **kwargs))
+        if ocs := self.semantics[OverrideClassString]:
+            class_str = ocs.val
+        else:
+            class_str = format_class_str(instance.__class__)
+        template_dict[self.spec.class_id] = class_str
+        return template_dict
+
+    def handle_serialize_default(self, instance: object, **kwargs):
+        ducks = self.it_quack(instance.__class__)
+        if ducks and hasattr(instance, 'check_in_serialization_context'):
             instance.check_in_serialization_context(self.context)
         auto_preserve_references = self.semantics[AutoPreserveReferences]
         if auto_preserve_references:
@@ -206,40 +266,27 @@ class Serializer(Processor):
             if p_ref is not instance:
                 instance = p_ref  # serialize the preserved reference instead
         ro = {self.spec.class_id: None}  # keeps placement
-        if hasattr(instance, 'get_version_object'):
+        if ducks and hasattr(instance, 'get_version_object'):
             version_info = instance.get_version_object()
             if self.semantics[SerializeNoneVersionInfo] or version_info is not None:
                 with self.semantics:
                     self.context.add_semantic(AutoPreserveReferences(False))
                     ro[self.spec.version_id] = self.serialize(version_info)
-        ser_obj = self.context.handler.handle(instance, self.context, **kwargs)
-        with self.semantics:
-            ro.update(self.serialize(ser_obj))
-        if ocs := self.semantics[OverrideClassString]:
-            class_str = ocs.val
-        else:
-            class_str = format_class_str(instance.__class__)
-        ro[self.spec.class_id] = class_str
-        return ro
+        return self.template_object_serialize(ro, instance, **kwargs)
+
+    def process(self, obj, **kwargs):
+        return self.serialize(obj, **kwargs)
 
     def serialize(self, obj: Any, **kwargs):
         tobj = obj.__class__
         if tobj in self.primitives:
             return obj
         else:
-            if tobj in self.special:
-                return self.handler.handle(obj, **kwargs)
-            elif issubclass(tobj, Temporary):
-                return self.handle_temporary(obj, **kwargs)
-            elif issubclass(tobj, NoRef):
-                return self.handle_noref(obj, **kwargs)
-            else:
-                return self.handle_serialize_default(obj, **kwargs)
+            return self.handler.handle(self, obj, **kwargs)
 
     def dispose(self):
         super().dispose()
-        self.handler = None
-        self.id_lifecycle_objects = None
+        self.id_lifecycle_objects = []
 
 
 class DeSerializer(Processor):
@@ -248,10 +295,16 @@ class DeSerializer(Processor):
         self.root_object = root_object
         self.preserved_refs = WeakSet()
 
-        self.handler = OrderedHandler()
-        self.handler.add_handlers_by_annotated_callable(
+        self.handler = OrderedMethodHandler()
+        self.handler.add_handlers_by_type_hints(
             self.handle_deserialize_list,
-            self.handle_deserialize_dict
+            self.handle_deserialize_dict,
+            self.handle_deserialize_preserved_referece
+        )
+        self.secondary_handler = OrderedMethodHandler()
+        self.secondary_handler.add_handlers_by_type_hints(
+            self.cache_instance_ref,
+            self.handle_secondary_preserved_reference
         )
 
     def load_type(self, class_str: str) -> Type:
@@ -263,6 +316,18 @@ class DeSerializer(Processor):
                     raise SecurityException()
         return load_type(class_str, do_import=allow_imports)
 
+    def supports_semantic(self, semantic_class: Type[Semantic]) -> bool:
+        return semantic_class in {
+            DetonateDanglingPreservedReferences,
+            ResolvePreservedReferences,
+            NotifyFinalizedMethodName,
+            DoNotAllowImportingModules,
+            ClassStringPassFunction,
+            KeySemanticsTemplate,
+            IgnoreDuckTypingForType,
+            IgnoreDuckTypingForSubclasses
+        }
+
     def run_semantics_through_path(self, key_path: list) -> Semantics:
         start = self.root_object
         save_semantic_contex = self.context.semantic_context
@@ -271,8 +336,8 @@ class DeSerializer(Processor):
         self.context.semantic_context = semantics
         for key in key_path:
             if type(start) == dict and self.spec.class_id in start:
-                _class = self.load_type(start[self.spec.class_id])
-                if hasattr(_class, 'check_in_deserialization_context'):
+                _class = self.load_type(start[self.spec.class_id])  # NOTE: This is why we use check for semantics
+                if self.it_quack(_class) and hasattr(_class, 'check_in_deserialization_context'):
                     _class.check_in_deserialization_context(self.context)
             start = start[key]
         self.context.semantic_context = save_semantic_contex
@@ -286,13 +351,15 @@ class DeSerializer(Processor):
         return instance
 
     def handle_deserialize_dict(self, instance: dict, **kwargs):
+        ducks = True
         version_info = None
         class_id = None
         type_obj = None
         if self.spec.class_id in instance:
             class_id = instance.pop(self.spec.class_id)
             type_obj = self.load_type(class_id)
-            if hasattr(type_obj, 'check_in_deserialization_context'):
+            ducks = self.it_quack(type_obj)
+            if ducks and hasattr(type_obj, 'check_in_deserialization_context'):
                 type_obj.check_in_deserialization_context(self.context)
 
             if self.spec.version_id in instance:
@@ -308,9 +375,10 @@ class DeSerializer(Processor):
                     instance[k] = self.deserialize(v, **kwargs)
 
         if class_id is not None:
-            if version_info is not None and hasattr(type_obj, 'check_convert_update'):
+            if ducks and (version_info is not None) and hasattr(type_obj, 'check_convert_update'):
                 if ti := type_obj.check_convert_update(instance, self.load_type, version_info):
                     instance = ti
+                    self.notify_settings_converted(class_id)
             ret = self.context.handler.handle(type_obj, instance, self.context, **kwargs)
             if method_name := self.semantics[NotifyFinalizedMethodName]:
                 self.context.finalize.subscribe(getattr(ret, method_name.val))
@@ -318,60 +386,70 @@ class DeSerializer(Processor):
         else:
             return instance
 
+    def handle_deserialize_preserved_referece(self, instance: PreservedReference, **kwargs):
+        return instance.obj
+
+    def handle_deserialize_default(self, instance: object, **kwargs):
+        return instance
+
+    def handle_secondary_preserved_reference(self, instance: PreservedReference, **kwargs):
+        key_path = None  # Dont delete this
+
+        resolve_preserved = self.semantics[ResolvePreservedReferences]
+        detonate = self.semantics[DetonateDanglingPreservedReferences]
+        if (not resolve_preserved) or self.spec.is_circular_ref((key_path := self.spec.str_to_path(instance.ref)),
+                                                                self.context.key_path):
+            if detonate:
+                self.preserved_refs.add(instance)
+            return instance
+        else:
+            if v := self.context.check_ref(instance):
+                return v
+            if key_path is None:
+                key_path = self.spec.str_to_path(instance.ref)
+            section_parent = self.spec.get_part_from_path(self.root_object, key_path[:-1])
+            section_key = key_path[-1]
+            section = section_parent[section_key]
+
+            preserve_key_path = self.context.key_path
+            self.context.key_path = key_path
+
+            semantics = self.run_semantics_through_path(key_path[:-1])
+            with self.context(section_key), self.semantics:
+                self.semantics.update(semantics)
+                ro = self.deserialize(section, **kwargs)
+
+            self.context.key_path = preserve_key_path
+
+            npo = PreservedReference(obj=ro, ref=self.path_to_str())
+            self.context.id_cache[npo.ref] = ro
+            section_parent[section_key] = npo
+            if detonate:
+                self.preserved_refs.add(npo)
+            return ro
+
+    def cache_instance_ref(self, instance: object, **kwargs):
+        self.context.id_cache[self.path_to_str()] = instance
+        return instance
+
+    def process(self, obj, **kwargs):
+        return self.deserialize(obj, **kwargs)
+
     def deserialize(self, obj, **kwargs):
         tobj = type(obj)
         if tobj in self.primitives:
             return obj
-        elif tobj in self.special:
-            ro = self.handler.handle(obj, **kwargs)
-            key_path = None
-            if isinstance(ro, PreservedReference):
-                resolve_preserved = self.semantics[ResolvePreservedReferences]
-                detonate = self.semantics[DetonateDanglingPreservedReferences]
-                if (not resolve_preserved) or self.spec.is_circular_ref((key_path := self.spec.str_to_path(ro.ref)),
-                                                                        self.context.key_path):
-                    if detonate:
-                        self.preserved_refs.add(ro)
-                else:
-                    if v := self.context.check_ref(ro):
-                        return v
-                    if key_path is None:
-                        key_path = self.spec.str_to_path(ro.ref)
-                    section_parent = self.spec.get_part_from_path(self.root_object, key_path[:-1])
-                    section_key = key_path[-1]
-                    section = section_parent[section_key]
-
-                    preserve_key_path = self.context.key_path
-                    self.context.key_path = key_path
-
-                    semantics = self.run_semantics_through_path(key_path[:-1])
-                    with self.context(section_key), self.semantics:
-                        self.semantics.update(semantics)
-                        ro = self.deserialize(section, **kwargs)
-
-                    self.context.key_path = preserve_key_path
-
-                    npo = PreservedReference(obj=ro, ref=self.path_to_str())
-                    self.context.id_cache[npo.ref] = ro
-                    section_parent[section_key] = npo
-                    if detonate:
-                        self.preserved_refs.add(npo)
-            else:
-                self.context.id_cache[self.path_to_str()] = ro
-            return ro
-        elif isinstance(obj, PreservedReference):
-            return obj.obj
         else:
-            return obj
+            ro = self.handler.handle(self, obj, **kwargs)
+            return self.secondary_handler.handle(self, ro, **kwargs)
 
     def dispose(self):
         super().dispose()
-        self.handler = None
         if len(self.preserved_refs) > 0:
             raise PreservedReferenceNotDissolvedError()
 
-    @notify(no_origin=True)
-    def notify_settings_converted(self, class_type: Type, context: FormatterContext):
+    @notify(pass_ref=True, no_origin=True)
+    def notify_settings_converted(self, class_type: Type):
         pass
 
 
@@ -406,27 +484,32 @@ class Formatter(IFormatter, ABC):
             ClassStringPassFunction,
             EnforceReferenceLifecycle,
             KeySemanticsTemplate,
-            OverrideClassString
+            OverrideClassString,
+            IgnoreDuckTypingForType,
+            IgnoreDuckTypingForSubclasses,
+            OmitMe
         }
 
     def get_serializer(self, root_obj, context) -> Serializer:
         return Serializer(root_obj, self.spec.copy(), context)
 
-    def serialize(self, obj: Any, **kwargs):
+    def serialize(self, obj: Any, serializer: Serializer = None, kwargs=None):
         context = self.get_serialization_context()
         context.semantic_context.update(self.semantics)
-        serializer = self.get_serializer(obj, context)
-        ret = serializer.serialize(obj, **kwargs)
-        serializer.dispose()
-        return ret
+        with self.get_serializer(obj, context) as serializer:
+            if kwargs:
+                return serializer.serialize(obj, **kwargs)
+            else:
+                return serializer.serialize(obj)
 
     def get_deserializer(self, root_obj, context) -> DeSerializer:
         return DeSerializer(root_obj, self.spec.copy(), context)
 
-    def deserialize(self, obj: TYPES, **kwargs):
+    def deserialize(self, obj: TYPES, serializer: DeSerializer = None, kwargs=None):
         context = self.get_deserialization_context()
         context.semantic_context.update(self.semantics)
-        deserializer = self.get_deserializer(obj, context)
-        ret = deserializer.deserialize(obj, **kwargs)
-        deserializer.dispose()
-        return ret
+        with self.get_deserializer(obj, context) as deserializer:
+            if kwargs:
+                return deserializer.deserialize(obj, **kwargs)
+            else:
+                return deserializer.deserialize(obj)

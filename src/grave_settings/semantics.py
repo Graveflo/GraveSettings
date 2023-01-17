@@ -1,4 +1,4 @@
-from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self
+from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self, Literal
 
 from ram_util.utilities import T
 
@@ -15,7 +15,16 @@ class SecurityException(Exception):
     pass
 
 
+class OmitMeError(Exception):
+    pass
+
+
 class Semantic(Generic[T]):
+    """
+    Semantics are meant to be "frozen" in that they do not change state after they have been initialized. They may be
+    passed from context to context without respect for consistency or state and are expected to always have the same
+    meaning no matter where and "when" they are.
+    """
     COLLECTION: Type[set] | None = None
     C_T = TypeVar('C_T', bound=COLLECTION)
 
@@ -198,6 +207,7 @@ class SemanticContext(Semantics):
         self.context_pop()
 
 
+
 class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
     """
     Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
@@ -212,6 +222,15 @@ class IgnoreDuckTypingForSubclasses(Semantic[Type]):  # TODO: Implement
     happen to share the same name as the built in methods
     """
     pass
+
+
+class OmitMe(Semantic):
+    """
+    Used to inform that an object's parent should not include this object as a member. Its probably a bad idea to overuse
+    this but it is meant for flagging objects that should never be serialized or represented in an objects state
+    """
+    def __init__(self):
+        raise NotImplementedError('This is not meant to be instantiated. Raise OmitMeError if you want this functionality')
 
 
 class PreserveDictionaryOrdering(Semantic[bool]):

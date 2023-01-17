@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from grave_settings.framestackcontext import FrameStackContext
+from grave_settings.framestack_context import FrameStackContext
 from grave_settings.formatter import Formatter
 from grave_settings.semantics import *
 
