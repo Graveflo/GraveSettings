@@ -72,18 +72,19 @@ class Semantics:
     def update(self, semantics: 'Semantics'):
         self.semantics.update(semantics.semantics)
 
-    def add_semantic(self, semantic: Semantic):
+    def add_semantics(self, *semantics: Semantic):
         dict_obj = self.semantics
-        if semantic.COLLECTION is None:
-            dict_obj[semantic.__class__] = semantic
-        else:
-            smc = semantic.__class__
-            if smc in dict_obj:
-                semantic.collection_add(dict_obj[smc])
+        for semantic in semantics:
+            if semantic.COLLECTION is None:
+                dict_obj[semantic.__class__] = semantic
             else:
-                collect = smc.COLLECTION()
-                semantic.collection_add(collect)
-                dict_obj[smc] = collect
+                smc = semantic.__class__
+                if smc in dict_obj:
+                    semantic.collection_add(dict_obj[smc])
+                else:
+                    collect = smc.COLLECTION()
+                    semantic.collection_add(collect)
+                    dict_obj[smc] = collect
 
     def __getitem__(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
         if self.parent is None:
@@ -152,7 +153,7 @@ class SemanticContext(Semantics):
     def add_frame_semantic(self, semantic: Semantic):
         if self.parent is None:
             self.parent = Semantics()
-        self.parent.add_semantic(semantic)
+        self.parent.add_semantics(semantic)
 
     def remove_frame_semantic(self, semantic: Type[Semantic] | Semantic):
         if self.parent is not None:
@@ -161,10 +162,10 @@ class SemanticContext(Semantics):
             else:
                 self.parent.remove_semantic(semantic)
 
-    def add_semantic(self, semantic: Semantic):
+    def add_semantics(self, *semantics: Semantic):
         if self.semantics is None:
             self.semantics = {}
-        return super().add_semantic(semantic)
+        return super().add_semantics(*semantics)
     
     def get_semantic(self, semantic_class: Type[T_S]) -> T_S | list[T_S] | None:
         if self.semantics is None:
@@ -341,7 +342,7 @@ class ClassStringPassFunction(Semantic[Callable[[str], bool]]):
     returns false the class/module will not be imported, executed or instantiated and instead a SecurityException will
     be raised.
     """
-    Collection = set
+    COLLECTION = set
 
 
 class KeySemanticsTemplate(Semantic[dict[Any, Iterable[Semantic]]]):

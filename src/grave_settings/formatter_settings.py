@@ -146,7 +146,10 @@ class FormatterContext:
         self.semantic_context.add_frame_semantic(semantic)
 
     def add_semantic(self, semantic: Semantic):
-        self.semantic_context.add_semantic(semantic)
+        self.semantic_context.add_semantics(semantic)
+
+    def get_stack_depth(self) -> int:
+        return len(self.key_path)
 
     @notify(no_origin=True, pass_ref=True, handler_t=HardRefEventHandler)
     def finalize(self):

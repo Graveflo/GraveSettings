@@ -4,12 +4,14 @@
 
 @author: ☙ Ryan McConnell ❧
 """
+from numbers import Rational, Complex
 from types import NoneType, MethodType
-from datetime import timedelta, datetime, date
+from datetime import timedelta, datetime, date, timezone, tzinfo
 from enum import Enum
 from typing import Mapping
 from types import FunctionType
 from functools import partial
+from zoneinfo import ZoneInfo
 
 from ram_util.modules import format_class_str, load_type, T
 from observer_hooks import FunctionStub, EventHandler
@@ -51,8 +53,24 @@ class SerializationHandler(OrderedHandler):
             partial: self.handle_partial,
             bytes: self.handle_bytes,
             FunctionStub: self.omit,
-            EventHandler: self.omit
+            EventHandler: self.omit,
+            Complex: self.handle_Complex,
+            Rational: self.handle_Rational
         })
+
+    @staticmethod
+    def handle_Complex(key: Complex, *args, **kwargs):
+        return {
+            'imag': key.imag,
+            'real': key.real
+        }
+
+    @staticmethod
+    def handle_Rational(key: Rational, *args, **kwargs):
+        return {
+            'numerator': key.numerator,
+            'denominator': key.denominator
+        }
 
     @staticmethod
     def handle_method(key: MethodType, context: FormatterContext, **kwargs):
@@ -132,9 +150,18 @@ class SerializationHandler(OrderedHandler):
     @staticmethod
     def handle_datetime(key: datetime, context: FormatterContext, **kwargs):
         t = Temporary
-        return {
+        s = {
             'state': t([key.year, key.month, key.day, key.hour, key.minute, key.second, key.microsecond])
         }
+        if key.tzinfo is not None:
+            s['uto'] = key.timestamp()
+            tz = key.tzinfo
+            if isinstance(tz, ZoneInfo):
+                s['timezone'] = tz.key
+            else:
+                s['offset'] = key.utcoffset().total_seconds()
+                s['name'] = key.tzname()
+        return s
 
     @staticmethod
     def handle_date(key: date, context: FormatterContext, **kwargs):
@@ -184,8 +211,18 @@ class DeSerializationHandler(OrderedHandler):
             timedelta: self.handle_timedelta,
             Enum: self.handle_Enum,
             partial: self.handle_partial,
-            bytes: self.handle_bytes
+            bytes: self.handle_bytes,
+            Complex: self.handle_Complex,
+            Rational: self.handle_Rational
         })
+
+    @staticmethod
+    def handle_Complex(t_object: Type[MethodType], json_obj: dict, context: FrameStackContext, **kwargs):
+        return t_object(json_obj['real'], json_obj['imag'])
+
+    @staticmethod
+    def handle_Rational(t_object: Type[MethodType], json_obj: dict, context: FrameStackContext, **kwargs):
+        return t_object(json_obj['numerator'], json_obj['denominator'])
 
     @staticmethod
     def handle_method(t_object: Type[MethodType], json_obj: dict, context: FrameStackContext, **kwargs):
@@ -227,7 +264,7 @@ class DeSerializationHandler(OrderedHandler):
 
     @staticmethod
     def handle_type(t_object: Type[Type], json_obj: dict, context: FrameStackContext, **kwargs):
-        return load_type(json_obj['state'])
+        return load_type(json_obj['state'])  # TODO: This is insecure
 
     @staticmethod
     def handle_serializable(t_object: Type[Serializable], json_obj: dict, context: FrameStackContext, **kwargs) -> Serializable:
@@ -238,8 +275,23 @@ class DeSerializationHandler(OrderedHandler):
     @staticmethod
     def handle_datetime(t_object: Type[datetime], json_obj: dict, context: FrameStackContext, **kwargs) -> datetime:
         obs = json_obj['state']
-        return t_object(year=obs[0], month=obs[1], day=obs[2], hour=obs[3], minute=obs[4], second=obs[5],
-                        microsecond=obs[6])
+
+        tz1 = None
+        total_secs = None
+        if 'timezone' in json_obj:
+            tz1 = ZoneInfo(json_obj['timezone'])
+        elif 'offset' in json_obj:
+            tz1 = timezone(timedelta(seconds=json_obj['offset']), name=json_obj['name'] if 'name' in json_obj else None)
+
+        if 'uto' in json_obj:
+            total_secs = json_obj['uto']
+
+        dt = t_object(year=obs[0], month=obs[1], day=obs[2], hour=obs[3], minute=obs[4], second=obs[5],
+                        microsecond=obs[6], tzinfo=tz1)
+        if total_secs:
+            if abs(total_secs-dt.timestamp()) > 2 * dt.resolution.total_seconds():
+                raise ValueError('Time codes dont match')
+        return dt
 
     @staticmethod
     def handle_date(t_object: Type[date], json_obj: dict, context: FrameStackContext, **kwargs) -> date:

@@ -10,14 +10,16 @@ from datetime import datetime
 from pathlib import Path
 from typing import Self, Any, Type
 
+from observer_hooks import EventCapturer
 from ram_util.modules import format_class_str
 
-from grave_settings.abstract import IASettings
-from grave_settings.framestack_context import FrameStackContext
+from grave_settings.abstract import IASettings, VersionedSerializable
+from grave_settings.formatter_settings import FormatterContext
 from grave_settings.formatters.toml import TomlFormatter
 from grave_settings.formatters.json import JsonFormatter
-from grave_settings.formatter import Formatter
+from grave_settings.formatter import Formatter, DeSerializer
 from grave_settings.semantics import ClassStringPassFunction
+
 
 
 class ConfigFile:
@@ -48,7 +50,7 @@ class ConfigFile:
             backup_path = base / f"{self.file_path.stem}_backup_{dt_n}{self.file_path.suffix}"
             shutil.copyfile(str(self.file_path), str(backup_path))
 
-    def settings_converted(self, old_ver: dict, new_ver: dict):
+    def deserializer_notify_settings_converted(self, processor: DeSerializer, conversion_type: Type[VersionedSerializable]):
         self.backup_settings_file()
 
     def settings_invalidated(self):
@@ -96,14 +98,20 @@ class ConfigFile:
             formatter = self.formatter
         if formatter is None:
             raise ValueError('No formatter supplied')
-        route = formatter.get_deserialization_frame_context()
-        self.check_in_deserialization_route(route)
-        self.data = formatter.read_from_file(str(path), route=route)
+        context = self.formatter.get_deserialization_context()
+        deserializer = self.formatter.get_deserializer(None, context)
+        self.check_in_deserialization_context(context)
+        with EventCapturer(deserializer.notify_settings_converted) as capture:
+            self.data = formatter.read_from_file(str(path), deserializer=deserializer)
+        if len(capture) > 0:
+            self.backup_settings_file()
+        if isinstance(self.data, IASettings):
+            self.data.file_path = self.file_path
         self.changes_made = False
 
-    def check_in_deserialization_route(self, route: FrameStackContext):
-        if isinstance(self.data, Type):
-            route.add_frame_semantic(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
+    def check_in_deserialization_context(self, context: FormatterContext):
+        if isinstance(self.data, type):
+            context.add_frame_semantic(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
 
     def instantiate_data(self):
         return self.data()
@@ -116,7 +124,7 @@ class ConfigFile:
             load = False
         if load:
             self.load(validate_path=False)
-        elif isinstance(self.data, Type):
+        elif isinstance(self.data, type):
             self.data = self.instantiate_data()
         return self
 

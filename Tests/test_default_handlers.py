@@ -4,6 +4,9 @@
 
 @author: ☙ Ryan McConnell ❧
 """
+from fractions import Fraction
+from zoneinfo import ZoneInfo
+import datetime
 from enum import Enum, auto
 from functools import partial
 from unittest import TestCase, main
@@ -98,6 +101,29 @@ class TestHandler(TestCase):
     def test_class(self):
         self.assert_make_remake(ClassFoo)
 
+    def test_date(self):
+        self.assert_make_remake(datetime.date(year=2022, day=1, month=1))
+
+    def test_time_delta(self):
+        self.assert_make_remake(datetime.timedelta(seconds=54))
+
+    def test_datetime_niave(self):
+        dt = datetime.datetime.now()
+        self.assert_make_remake(dt)
+
+    def test_date_time_tzinfo(self):
+        dt = datetime.datetime.now().astimezone()
+        self.assert_make_remake(dt)
+
+    def test_datetime_zoneinfo(self):
+        dt = datetime.datetime.now().astimezone(ZoneInfo('America/Los_Angeles'))
+        self.assert_make_remake(dt)
+
+    def test_fraction(self):
+        self.assert_make_remake(Fraction(1, 10))
+
+    def test_complex(self):
+        self.assert_make_remake(complex(5,3))
 
 
 if __name__ == '__main__':

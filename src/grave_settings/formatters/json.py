@@ -7,7 +7,7 @@ from grave_settings.formatter import Formatter
 class JsonFormatter(Formatter):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.semantics.add_semantic(Indentation(4))
+        self.semantics.add_semantics(Indentation(4))
 
     def serialized_obj_to_buffer(self, ser_obj: dict) -> str:
         if indent := self.semantics[Indentation]:

@@ -29,7 +29,7 @@ class AbstractTestSemantics(TestCase):
         s = self.get_semantics()
 
         self.assertNotIn(self.semantic_type(), s)
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.semantic_type(), s)
 
     def test_get_semantic_returns_None_when_not_member(self):
@@ -39,19 +39,19 @@ class AbstractTestSemantics(TestCase):
 
     def test_del_semantic(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.semantic_type(), s)
         del s[self.semantic_type()]
         self.assertNotIn(self.semantic_type(), s)
 
     def test_remove_semantic_with_value(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.semantic_type(), s)
         s.remove_semantic(self.get_semantic())
         self.assertNotIn(self.semantic_type(), s)
 
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.semantic_type(), s)
         s.remove_semantic(self.get_semantic(alternate=True))
         self.assertIn(self.semantic_type(), s)
@@ -77,18 +77,18 @@ class TestNonStacking(AbstractTestSemantics):
 
     def test_semantic_get_full_obj(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIsInstance(s[self.semantic_type()], self.semantic_type())
 
     def test_value_overwrites(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
-        s.add_semantic(self.get_semantic(alternate=True))
+        s.add_semantics(self.get_semantic())
+        s.add_semantics(self.get_semantic(alternate=True))
         self.assertFalse(s[self.semantic_type()])
 
     def test_pop_semantic_type(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.semantic_type(), s)
         sem = s.pop(self.semantic_type())
         self.assertNotIn(self.semantic_type(), s)
@@ -97,20 +97,20 @@ class TestNonStacking(AbstractTestSemantics):
 
     def test_semantic_retains_value(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertTrue(s[self.semantic_type()])
 
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic(alternate=True))
+        s.add_semantics(self.get_semantic(alternate=True))
         self.assertFalse(s[self.semantic_type()])
 
     def test_parent_overrides(self):
         s = self.get_semantics()
         parent = self.get_semantics()
         s.parent = parent
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertTrue(s[self.semantic_type()])
-        parent.add_semantic(self.get_semantic(alternate=True))
+        parent.add_semantics(self.get_semantic(alternate=True))
         self.assertFalse(s[self.semantic_type()])
         self.assertNotIn(self.get_semantic(), s)
 
@@ -118,9 +118,9 @@ class TestNonStacking(AbstractTestSemantics):
         s = self.get_semantics()
         parent = self.get_semantics()
         s.parent = parent
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertTrue(s.get_semantic(self.semantic_type()))
-        parent.add_semantic(self.get_semantic(alternate=True))
+        parent.add_semantics(self.get_semantic(alternate=True))
         self.assertTrue(s.get_semantic(self.semantic_type()))
         self.assertNotIn(self.get_semantic(), s)
 
@@ -140,19 +140,19 @@ class TestStackerSemantics(AbstractTestSemantics):
 
     def test_semantic_get_full_obj(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIsInstance(s[self.semantic_type()], set)
 
     def test_value_stacks(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
-        s.add_semantic(self.get_semantic(alternate=True))
+        s.add_semantics(self.get_semantic())
+        s.add_semantics(self.get_semantic(alternate=True))
         self.assertIn(self.get_semantic(), s)
         self.assertIn(self.get_semantic(alternate=True), s)
 
     def test_pop_semantic_type(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.semantic_type(), s)
         sem = s.pop(self.semantic_type())
         self.assertNotIn(self.semantic_type(), s)
@@ -161,10 +161,10 @@ class TestStackerSemantics(AbstractTestSemantics):
 
     def test_semantic_values(self):
         s = self.get_semantics()
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.get_semantic(), s[self.semantic_type()])
 
-        s.add_semantic(self.get_semantic(alternate=True))
+        s.add_semantics(self.get_semantic(alternate=True))
         b = s[self.semantic_type()]
         self.assertIn(self.get_semantic(), b)
         self.assertIn(self.get_semantic(alternate=True), b)
@@ -173,11 +173,11 @@ class TestStackerSemantics(AbstractTestSemantics):
         s = self.get_semantics()
         parent = self.get_semantics()
         s.parent = parent
-        s.add_semantic(self.get_semantic())
+        s.add_semantics(self.get_semantic())
         self.assertIn(self.get_semantic(), s[self.semantic_type()])
         self.assertIn(self.get_semantic(), s)
 
-        parent.add_semantic(self.get_semantic(alternate=True))
+        parent.add_semantics(self.get_semantic(alternate=True))
         self.assertIn(self.get_semantic(), s)
         self.assertIn(self.get_semantic(alternate=True), s)
 
@@ -188,14 +188,14 @@ class TestSemanticContext(TestCase):
 
     def test_stack_returns_to_None(self):
         with self.get_semantics() as s:
-            s.add_semantic(DummySemantic(True))
+            s.add_semantics(DummySemantic(True))
         self.assertNotIn(DummySemantic, s)
 
     def test_stack_returns_to_val(self):
         s = self.get_semantics()
-        s.add_semantic(DummySemantic(True))
+        s.add_semantics(DummySemantic(True))
         with s:
-            s.add_semantic(DummySemantic(False))
+            s.add_semantics(DummySemantic(False))
             self.assertFalse(s[DummySemantic])
         self.assertTrue(s[DummySemantic])
 
@@ -220,14 +220,14 @@ class TestSemanticContext(TestCase):
     def test_walk_stack_pool(self):
         s = self.get_semantics()
         with s:
-            s.add_semantic(DummyIntSemantic(5))
+            s.add_semantics(DummyIntSemantic(5))
             with s:
-                s.add_semantic(DummyIntSemantic(7))
+                s.add_semantics(DummyIntSemantic(7))
                 with s:
-                    s.add_semantic(DummyIntSemantic(20))
+                    s.add_semantics(DummyIntSemantic(20))
                     with s:
                         with s:
-                            s.add_semantic(DummyIntSemantic(99))
+                            s.add_semantics(DummyIntSemantic(99))
                             self.assertEqual(s[DummyIntSemantic], DummyIntSemantic(99))
                         self.assertEqual(s[DummyIntSemantic], DummyIntSemantic(20))  # copies over
                     self.assertEqual(s[DummyIntSemantic], DummyIntSemantic(20))
@@ -241,17 +241,17 @@ class TestSemanticContext(TestCase):
 
         s = self.get_semantics()
         with s:
-            s.add_semantic(DummyIntSemantic(5))
-            s.add_semantic(DummySemantic(True))
+            s.add_semantics(DummyIntSemantic(5))
+            s.add_semantics(DummySemantic(True))
             with s:
-                s.add_semantic(FooSemantic('test'))
+                s.add_semantics(FooSemantic('test'))
                 self.assertIn(DummySemantic, s)
                 self.assertIn(DummyIntSemantic, s)
                 self.assertEqual(s[DummyIntSemantic].val, 5)
                 self.assertEqual(s[DummySemantic].val, True)
-                s.add_semantic(DummySemantic(False))
+                s.add_semantics(DummySemantic(False))
                 with s:
-                    s.add_semantic(DummyIntSemantic(2))
+                    s.add_semantics(DummyIntSemantic(2))
                     self.assertIn(DummySemantic, s)
                     self.assertIn(FooSemantic, s)
                     self.assertIn(DummyIntSemantic, s)
@@ -281,9 +281,9 @@ class TestSemanticContext(TestCase):
     def test_transfers_stacking_semantics_up_not_down(self):
         s = self.get_semantics()
         with s:
-            s.add_semantic(StackingSemantic(1))
+            s.add_semantics(StackingSemantic(1))
             with s:
-                s.add_semantic(StackingSemantic(2))
+                s.add_semantics(StackingSemantic(2))
                 self.assertIn(StackingSemantic(1), s[StackingSemantic])
                 self.assertIn(StackingSemantic(2), s[StackingSemantic])
             self.assertIn(StackingSemantic(1), s[StackingSemantic])
@@ -315,7 +315,7 @@ class TestSemanticContext(TestCase):
 
     def test_semantic_frame_override(self):
         s = self.get_semantics()
-        s.add_semantic(DummyIntSemantic(5))
+        s.add_semantics(DummyIntSemantic(5))
         s.add_frame_semantic(DummyIntSemantic(6))
         self.assertEqual(s[DummyIntSemantic].val, 6)
         s.remove_frame_semantic(DummyIntSemantic)
@@ -323,7 +323,7 @@ class TestSemanticContext(TestCase):
 
     def test_semantic_frame_merge_collection(self):
         s = self.get_semantics()
-        s.add_semantic(StackingSemantic(0))
+        s.add_semantics(StackingSemantic(0))
         s.add_frame_semantic(StackingSemantic(1))
         colec = s[StackingSemantic]
         self.assertIn(StackingSemantic(0), colec)
