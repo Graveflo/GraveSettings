@@ -4,8 +4,10 @@
 
 @author: ☙ Ryan McConnell ❧
 """
+import os
 from abc import ABC, abstractmethod
 from io import IOBase
+from traceback import format_tb
 from weakref import WeakSet
 
 from observer_hooks import notify
@@ -17,6 +19,41 @@ from grave_settings.handlers import OrderedHandler, OrderedMethodHandler
 from grave_settings.helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDict
 from grave_settings.formatter_settings import FormatterSpec, Temporary, FormatterContext, PreservedReference, NoRef
 from grave_settings.semantics import *
+
+
+class ProcessingException(Exception):
+    def __init__(self, processor, obj=None, wrapped_exception: Exception = None, key_stack=None,
+                 frame_semantics: Semantics = None, semantics: Semantics = None):
+        super().__init__()
+        self.processor: Processor = processor
+        self.obj = obj
+        self.wrapped_exception = wrapped_exception
+        self.mains_obj = None
+        if len(key_stack) > 0:
+            key_stack_value = key_stack[-1]
+        else:
+            key_stack_value = None
+        self.key_stack_value = key_stack_value
+        self.frame_semantics = frame_semantics
+        self.semantics = semantics
+        if type(self.wrapped_exception) is ProcessingException:
+            self.mains_obj = self.wrapped_exception.mains_obj
+            self.wrapped_exception.mains_obj = None
+        else:
+            self.mains_obj = wrapped_exception
+
+    def __str__(self):
+        encounterd = list(str(self.wrapped_exception).split('\n'))
+        encounterd[0] = f'\t{encounterd[0]}'
+        encounterd = '\n\t'.join(encounterd)
+        sem_str = ''
+        if self.semantics:
+            sems = Semantics.__str__(self.semantics)
+            sem_str += sems
+        if self.frame_semantics:
+            frame_sems = Semantics.__str__(self.frame_semantics)
+            sem_str += f'\n{frame_sems}'
+        return f'Processing Key({self.key_stack_value}): {repr(self.obj)}\n{sem_str}\n\tEncountered ({format_class_str(self.wrapped_exception.__class__)}): {encounterd}'
 
 
 class Processor:
@@ -294,11 +331,21 @@ class Serializer(Processor):
         return self.serialize(obj, **kwargs)
 
     def serialize(self, obj: Any, **kwargs):
-        tobj = obj.__class__
-        if tobj in self.primitives:
-            return obj
-        else:
-            return self.handler.handle(self, obj, **kwargs)
+        try:
+            tobj = obj.__class__
+            if tobj in self.primitives:
+                return obj
+            else:
+                return self.handler.handle(self, obj, **kwargs)
+        except ProcessingException as e:
+                esp = e.mains_obj
+                raise ProcessingException(self, obj=obj, wrapped_exception=e, key_stack=self.context.key_path,
+                                          semantics=self.context.semantic_context,
+                                          frame_semantics=self.context.semantic_context.parent) from esp  # these stack recursively
+        except Exception as e:
+            raise ProcessingException(self, obj=obj, wrapped_exception=e, key_stack=self.context.key_path,
+                                      semantics=self.context.semantic_context,
+                                      frame_semantics=self.context.semantic_context.parent)
 
     def dispose(self):
         super().dispose()
@@ -401,7 +448,7 @@ class DeSerializer(Processor):
                 if ti := type_obj.check_convert_update(instance, self.load_type, version_info):
                     instance = ti
                     self.notify_settings_converted(class_id)
-            ret = self.context.handler.handle(type_obj, instance, self.context, **kwargs)
+            ret = self.context.handler.handle_node(type_obj, instance, self.context, **kwargs)
             if method_name := self.semantics[NotifyFinalizedMethodName]:
                 self.context.finalize.subscribe(getattr(ret, method_name.val))
             return ret
@@ -458,12 +505,22 @@ class DeSerializer(Processor):
         return self.deserialize(obj, **kwargs)
 
     def deserialize(self, obj, **kwargs):
-        tobj = type(obj)
-        if tobj in self.primitives:
-            return obj
-        else:
-            ro = self.handler.handle(self, obj, **kwargs)
-            return self.secondary_handler.handle(self, ro, **kwargs)
+        try:
+            tobj = type(obj)
+            if tobj in self.primitives:
+                return obj
+            else:
+                ro = self.handler.handle(self, obj, **kwargs)
+                return self.secondary_handler.handle(self, ro, **kwargs)
+        except ProcessingException as e:
+            esp = e.mains_obj
+            raise ProcessingException(self, obj=obj, wrapped_exception=e, key_stack=self.context.key_path,
+                                      semantics=self.context.semantic_context,
+                                      frame_semantics=self.context.semantic_context.parent) from esp  # these stack recursively
+        except Exception as e:
+            raise ProcessingException(self, obj=obj, wrapped_exception=e, key_stack=self.context.key_path,
+                                      semantics=self.context.semantic_context,
+                                      frame_semantics=self.context.semantic_context.parent)
 
     def dispose(self):
         super().dispose()

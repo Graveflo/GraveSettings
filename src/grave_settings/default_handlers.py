@@ -4,7 +4,9 @@
 
 @author: ☙ Ryan McConnell ❧
 """
+import os
 from numbers import Rational, Complex
+from pathlib import Path
 from types import NoneType, MethodType
 from datetime import timedelta, datetime, date, timezone, tzinfo
 from enum import Enum
@@ -55,8 +57,28 @@ class SerializationHandler(OrderedHandler):
             FunctionStub: self.omit,
             EventHandler: self.omit,
             Complex: self.handle_Complex,
-            Rational: self.handle_Rational
+            Rational: self.handle_Rational,
+            Path: self.handle_path
         })
+
+    @staticmethod
+    def handle_path(key: Path, *args, **kwargs):
+        rel_path = None
+        is_abs = key.is_absolute()
+        if is_abs:
+            abs_path = str(key)
+            if key.is_relative_to(os.getcwd()):
+                rel_path = str(key.relative_to(os.getcwd()))
+        else:
+            abs_path = str(key.absolute())
+            rel_path = str(key)
+        d = {
+            'path': abs_path,
+            'abs': is_abs
+        }
+        if rel_path is not None:
+            d['rel_path'] = rel_path
+        return d
 
     @staticmethod
     def handle_Complex(key: Complex, *args, **kwargs):
@@ -213,31 +235,45 @@ class DeSerializationHandler(OrderedHandler):
             partial: self.handle_partial,
             bytes: self.handle_bytes,
             Complex: self.handle_Complex,
-            Rational: self.handle_Rational
+            Rational: self.handle_Rational,
+            Path: self.handle_path
         })
 
     @staticmethod
-    def handle_Complex(t_object: Type[MethodType], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_path(t_object: Path, json_obj: dict, *args, **kwargs):
+        path = None
+        if json_obj['abs']:
+            path = Path(json_obj['path']).resolve()
+            if path.exists():
+                return path
+        if 'rel_path' in json_obj:
+            return Path(json_obj['rel_path'])
+        if path is None:
+            raise ValueError(f'Could not deserialize path: {json_obj}')
+        return path
+
+    @staticmethod
+    def handle_Complex(t_object: Type[MethodType], json_obj: dict, context: FormatterContext, **kwargs):
         return t_object(json_obj['real'], json_obj['imag'])
 
     @staticmethod
-    def handle_Rational(t_object: Type[MethodType], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_Rational(t_object: Type[MethodType], json_obj: dict, context: FormatterContext, **kwargs):
         return t_object(json_obj['numerator'], json_obj['denominator'])
 
     @staticmethod
-    def handle_method(t_object: Type[MethodType], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_method(t_object: Type[MethodType], json_obj: dict, context: FormatterContext, **kwargs):
         return getattr(json_obj['object'], json_obj['name'])
 
     @staticmethod
-    def handle_bytes(t_object: Type[bytes], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_bytes(t_object: Type[bytes], json_obj: dict, context: FormatterContext, **kwargs):
         return t_object.fromhex(json_obj['hex'])
 
     @staticmethod
-    def handle_partial(t_object: Type[partial], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_partial(t_object: Type[partial], json_obj: dict, context: FormatterContext, **kwargs):
         return t_object(json_obj['func'], *json_obj['args'], **json_obj['kwargs'])
 
     @staticmethod
-    def handle_Enum(t_object: Type[Enum], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_Enum(t_object: Type[Enum], json_obj: dict, context: FormatterContext, **kwargs):
         return t_object[json_obj['state']]
 
     @staticmethod
@@ -245,7 +281,7 @@ class DeSerializationHandler(OrderedHandler):
         return None
 
     @staticmethod
-    def handle_PreservedReference(t_object: Type[PreservedReference], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_PreservedReference(t_object: Type[PreservedReference], json_obj: dict, context: FormatterContext, **kwargs):
         return t_object(ref=json_obj['ref'])
 
     @staticmethod
@@ -255,25 +291,25 @@ class DeSerializationHandler(OrderedHandler):
         return ksd.wrapped_dict
 
     @staticmethod
-    def handle_tuple(t_object: Type[tuple], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_tuple(t_object: Type[tuple], json_obj: dict, context: FormatterContext, **kwargs):
         return tuple(json_obj['state'])
 
     @staticmethod
-    def handle_set(t_object: Type[set], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_set(t_object: Type[set], json_obj: dict, context: FormatterContext, **kwargs):
         return set(json_obj['state'])
 
     @staticmethod
-    def handle_type(t_object: Type[Type], json_obj: dict, context: FrameStackContext, **kwargs):
+    def handle_type(t_object: Type[Type], json_obj: dict, context: FormatterContext, **kwargs):
         return load_type(json_obj['state'])  # TODO: This is insecure
 
     @staticmethod
-    def handle_serializable(t_object: Type[Serializable], json_obj: dict, context: FrameStackContext, **kwargs) -> Serializable:
+    def handle_serializable(t_object: Type[Serializable], json_obj: dict, context: FormatterContext, **kwargs) -> Serializable:
         settings_obj = force_instantiate(t_object)
         settings_obj.from_dict(json_obj, context, **kwargs)
         return settings_obj
 
     @staticmethod
-    def handle_datetime(t_object: Type[datetime], json_obj: dict, context: FrameStackContext, **kwargs) -> datetime:
+    def handle_datetime(t_object: Type[datetime], json_obj: dict, context: FormatterContext, **kwargs) -> datetime:
         obs = json_obj['state']
 
         tz1 = None
@@ -294,17 +330,17 @@ class DeSerializationHandler(OrderedHandler):
         return dt
 
     @staticmethod
-    def handle_date(t_object: Type[date], json_obj: dict, context: FrameStackContext, **kwargs) -> date:
+    def handle_date(t_object: Type[date], json_obj: dict, context: FormatterContext, **kwargs) -> date:
         obs = json_obj['state']
         return t_object(year=obs[0], month=obs[1], day=obs[2])
 
     @staticmethod
-    def handle_timedelta(t_object: Type[timedelta], json_obj: dict, context: FrameStackContext, **kwargs) -> timedelta:
+    def handle_timedelta(t_object: Type[timedelta], json_obj: dict, context: FormatterContext, **kwargs) -> timedelta:
         obs = json_obj['state']
         return t_object(days=obs[0], seconds=obs[1], microseconds=obs[2])
 
     @staticmethod
-    def default_handler(t_object: Type[T], json_obj: dict, context: FrameStackContext, **kwargs) -> T:
+    def default_handler(t_object: Type[T], json_obj: dict, context: FormatterContext, **kwargs) -> T:
         if hasattr(t_object, 'from_dict'):
             # noinspection PyTypeChecker
             return DeSerializationHandler.handle_serializable(t_object, json_obj, context, **kwargs)  # this is duck typed
@@ -312,7 +348,3 @@ class DeSerializationHandler(OrderedHandler):
             settings_obj = force_instantiate(t_object)
             Serializable.from_dict(settings_obj, json_obj, context)
             return settings_obj
-
-    def handle_node(self, key, *args, **kwargs):
-        f = self.get_key_func(key)  # this overrides the superclass's expectation of an object not a type
-        return f(key, *args, **kwargs)

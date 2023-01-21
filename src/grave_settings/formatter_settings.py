@@ -1,8 +1,10 @@
+import os
 import re
 from types import NoneType
 from typing import Iterable, Self, get_args
 
 from observer_hooks import notify, HardRefEventHandler
+from ram_util.modules import format_class_str
 from ram_util.utilities import T
 
 from grave_settings.handlers import OrderedHandler
@@ -110,6 +112,9 @@ class FormatterContext:
         self.key_path = []
         self.id_cache = {}
         self.semantic_context = semantics
+
+    def __str__(self):
+        return f'Formatter Context ({format_class_str(self.__class__)}): {repr(self.key_path)}{os.linesep}{self.semantic_context}'
 
     @property
     def handler(self) -> OrderedHandler:

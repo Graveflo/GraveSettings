@@ -64,20 +64,13 @@ class Handler(object):
 
     def handle_node(self, key, *args, **kwargs):
         try:
-            return self.get_key_func(key)[0](key, *args, **kwargs)
+            key_func = self.get_key_func(key)
         except KeyError:
             raise HandlerNotFound(key=key, *args, **kwargs)
+        return key_func[0](key, *args, **kwargs)
 
     def handle(self, key, *args, **kwargs):
-        try:
-            ret = self.handle_node(key, *args, **kwargs)
-        except HandlerNotFound:
-            ret = self.default_handler(key, *args, **kwargs)
-        return ret
-
-    @staticmethod
-    def default_handler(key, *args, **kwargs):
-        raise HandlerNotFound(key=key, *args, **kwargs)
+        return self.handle_node(key, *args, **kwargs)
 
     def __contains__(self, item):
         try:
@@ -97,10 +90,16 @@ class OrderedHandler(Handler):
         pass
 
     def update(self, handler: 'OrderedHandler', update_order=True):
-        handle_tb = handler.type_bank
         if update_order:
-            self.type_bank = {k: v for k, v in self.type_bank.items() if k not in handle_tb}
+            handle_tb = self.type_bank
+            handle_ref = handler.type_bank
+        else:
+            handle_tb = handler.type_bank
+            handle_ref = self.type_bank
+        if update_order:
+            self.type_bank = {k: v for k, v in handle_ref.items() if k not in handle_tb}
         self.type_bank.update(handle_tb)
+
         for _type, _func in handle_tb.items():
             if _type in self.cache:
                 self.cache.pop(_type)
@@ -131,8 +130,10 @@ class OrderedHandler(Handler):
             raise HandlerNotFound()
 
     def handle_node(self, key, *args, **kwargs):
-        f = self.get_key_func(key.__class__)
-        return f(key, *args, **kwargs)
+        return self.get_key_func(key)(key, *args, **kwargs)
+
+    def handle(self, key, *args, **kwargs):
+        return self.get_key_func(key.__class__)(key, *args, **kwargs)
 
 
 class OrderedMethodHandler(OrderedHandler):

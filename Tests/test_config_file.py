@@ -10,9 +10,13 @@ from pathlib import Path
 from typing import Any, Type
 from unittest import main
 
+from observer_hooks import EventHandler
+from ram_util.modules import format_class_str
+
 from Tests.integration_tests_base import IntegrationTestCaseBase, Dummy, EmptyFormatter
 from grave_settings.abstract import IASettings
 from grave_settings.config_file import ConfigFile
+from grave_settings.conversion_manager import ConversionManager
 from grave_settings.formatter import Formatter
 from grave_settings.formatters.json import JsonFormatter
 from grave_settings.semantics import SecurityException
@@ -26,8 +30,13 @@ class JsonFormatterIntegrationBase(IntegrationTestCaseBase):
 
 
 class TestConfigFile(IntegrationTestCaseBase):
+    def get_formatter(self) -> Formatter:
+        return JsonFormatter()
+
     def get_config_file(self, file_path: Path, data: IASettings | Any | Type | None = None,
                  formatter: None | Formatter | str = None, auto_save=False, read_only=False) -> ConfigFile:
+        if formatter is None:
+            formatter = self.get_formatter()
         return ConfigFile(file_path, data=data, formatter=formatter, auto_save=auto_save, read_only=read_only)
 
     def setUp(self) -> None:
@@ -41,7 +50,7 @@ class TestConfigFile(IntegrationTestCaseBase):
             os.remove(TEST_FILE_PATH)
 
     def write_object_to_file(self, obj):
-        formatter = self.get_formatter(serialization=True)
+        formatter = self.get_formatter()
         ser_obj = self.get_ser_obj(formatter, obj)
         with open(TEST_FILE_PATH, 'w') as f:
             f.write(json.dumps(ser_obj))
@@ -60,19 +69,24 @@ class TestConfigFile(IntegrationTestCaseBase):
             c.load(path=None)
 
     def test_exception_raised_when_no_formatter(self):
+        self.write_object_to_file(Dummy())
         c = self.get_config_file(TEST_FILE_PATH, Dummy)
+        c.formatter = None
         with self.assertRaises(ValueError):
             c.load()
 
         c = self.get_config_file(TEST_FILE_PATH, Dummy())
+        c.formatter = None
         with self.assertRaises(ValueError):
             c.load()
 
         c = self.get_config_file(TEST_FILE_PATH, Dummy)
+        c.formatter = None
         with self.assertRaises(ValueError):
             c.save()
 
         c = self.get_config_file(TEST_FILE_PATH, Dummy())
+        c.formatter = None
         with self.assertRaises(ValueError):
             c.save()
 
@@ -109,9 +123,60 @@ class TestConfigFile(IntegrationTestCaseBase):
     def test_loading_write_file_path(self):
         self.write_object_to_file(Dummy(a=1, b=1))
         c = self.get_config_file(TEST_FILE_PATH, Dummy, formatter=JsonFormatter())
-        with self.assertRaises(SecurityException):
+        c.load()
+        self.assertEqual(c.data.file_path, TEST_FILE_PATH.resolve())
+
+    def test_no_conversion_no_config_trigger(self):
+        self.write_object_to_file(Dummy(a=1, b=1))
+        c = self.get_config_file(TEST_FILE_PATH, Dummy, formatter=JsonFormatter())
+
+        def sentenal_func(*args, **kwargs):
+            self.assertTrue(False)
+        c.deserializer_notify_settings_converted = EventHandler()
+        c.deserializer_notify_settings_converted.subscribe(sentenal_func)
+        c.load()
+
+    def test_conversion_triggers_callback(self):
+        class CustomDummy(Dummy):
+            VERSION = '1.0.0'
+
+            @classmethod
+            def get_conversion_manager(cls) -> ConversionManager:
+                cm = super().get_conversion_manager()
+                cm.add_converter('0.1.0', CustomDummy, lambda x: x, '1.0.0')
+                return cm
+        globals()['CustomDummy'] = CustomDummy
+        wd = CustomDummy(a=1, b=1)
+        formatter = self.get_formatter()
+        ser_obj = self.get_ser_obj(formatter, wd)
+        ser_obj[formatter.spec.version_id][format_class_str(CustomDummy)] = '0.1.0'
+        with open(TEST_FILE_PATH, 'w') as f:
+            f.write(json.dumps(ser_obj))
+        c = self.get_config_file(TEST_FILE_PATH, CustomDummy, formatter=JsonFormatter())
+
+        class CustExc(Exception):
+            pass
+
+        def sentenal_func(*args, **kwargs):
+            raise CustExc()
+
+        c.backup_settings_file = EventHandler()
+        c.backup_settings_file.subscribe(sentenal_func)
+        with self.assertRaises(CustExc):
             c.load()
-        self.assertEqual(c.data.file_path, str(TEST_FILE_PATH))
+        globals().pop('CustomDummy')
+
+    def test_serialize_logfile_with_link(self):
+        cfg = self.get_config_file(TEST_FILE_PATH, data=Dummy())
+        cfg2 = self.get_config_file(Path('test_config_2.test'), data=Dummy())
+        cfg.data.a = cfg2.data
+        cfg.add_config_dependency(cfg2, relative_path=False)
+        cfg.save()
+        with open(TEST_FILE_PATH, 'r') as f:
+            print(f.read())
+
+        remade_cfg = self.get_config_file(TEST_FILE_PATH, data=Dummy)
+        remade_cfg.load()
 
 
 

@@ -1,5 +1,7 @@
+import os
 from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self, Literal
 
+from ram_util.modules import format_class_str
 from ram_util.utilities import T
 
 
@@ -57,6 +59,9 @@ class Semantic(Generic[T]):
 
     def __hash__(self):
         return hash(hash(self.__class__) + hash(self.val))
+
+    def __str__(self):
+        return f'{self.__class__.__name__}({self.val})'
 
 
 T_S = TypeVar('T_S', bound=Semantic)
@@ -144,6 +149,22 @@ class Semantics:
         sems = self.__class__(semantics=self.semantics.copy())
         return sems
 
+    def __str__(self):
+        sems = set()
+        for semantic in self.semantics.values():
+            if isinstance(semantic, Semantic):
+                sems.add(str(semantic))
+            else:
+                sems.update(str(s) for s in semantic)
+        sems_str = ', '.join(sems)
+        return f'{self.__class__.__name__}({sems_str}, parent={str(self.parent)})'
+
+    def __bool__(self):
+        return len(self.semantics) > 0 or len(self.parent) > 0
+
+    def __len__(self):
+        return len(self.semantics)
+
 
 class SemanticContext(Semantics):
     def __init__(self, semantics: Semantics):
@@ -207,6 +228,11 @@ class SemanticContext(Semantics):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.context_pop()
 
+    def __str__(self):
+        bs = [f'Semantic Context ({format_class_str(self.__class__)})']
+        for s in self.stack:
+            bs.append(f'\t{s}')
+        return os.linesep.join(bs)
 
 
 class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
