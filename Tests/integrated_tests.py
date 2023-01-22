@@ -150,7 +150,7 @@ class Scenarios(IntegrationTestCaseBase):
 class TestSerialization(Scenarios):
     def test_basic(self):
         formatter = self.get_formatter(serialization=True)
-        formatter.semantics.add_semantics(SerializeNoneVersionInfo(False))
+        formatter.semantics.add(SerializeNoneVersionInfo(False))
         obj = formatter.serialize(self.get_basic())
         self.assertDictEqual(obj, {
             formatter.spec.class_id: format_class_str(Dummy),
@@ -170,7 +170,7 @@ class TestSerialization(Scenarios):
 
     def test_nested_in_attribute(self):
         formatter = self.get_formatter(serialization=True)
-        formatter.semantics.add_semantics(SerializeNoneVersionInfo(False))
+        formatter.add_semantics(SerializeNoneVersionInfo(False))
         dummy = self.get_basic(a=90, b='this is a string')
         obj = self.get_basic(a=dummy, b=99)
         ser_obj = formatter.serialize(obj)
@@ -186,7 +186,7 @@ class TestSerialization(Scenarios):
 
     def test_nested_in_list(self):
         formatter = self.get_formatter(serialization=True)
-        formatter.semantics.add_semantics(SerializeNoneVersionInfo(False))
+        formatter.add_semantics(SerializeNoneVersionInfo(False))
         lis = [
             self.get_basic(a=90, b='this'),
             self.get_basic(a=0, b=False)
@@ -209,8 +209,8 @@ class TestSerialization(Scenarios):
 
     def test_duplicate_in_attribute(self):
         formatter = self.get_formatter(serialization=True)
-        formatter.semantics.add_semantics(AutoPreserveReferences(True))
-        formatter.semantics.add_semantics(SerializeNoneVersionInfo(False))
+        formatter.semantics.add(AutoPreserveReferences(True))
+        formatter.semantics.add(SerializeNoneVersionInfo(False))
         dummy = self.get_basic(a=90, b='this is a string')
         obj = self.get_basic(a=dummy, b=dummy)
         ser_obj = formatter.serialize(obj)
@@ -229,8 +229,8 @@ class TestSerialization(Scenarios):
 
     def test_layered_duplicate(self):
         formatter = self.get_formatter(serialization=True)
-        formatter.semantics.add_semantics(AutoPreserveReferences(True))
-        formatter.semantics.add_semantics(SerializeNoneVersionInfo(False))
+        formatter.add_semantics(AutoPreserveReferences(True))
+        formatter.add_semantics(SerializeNoneVersionInfo(False))
         dummy = self.get_basic(a=90, b='this is a string')
         dummy2 = self.get_basic(a=dummy, b=None)
         dummy3 = self.get_basic(a=dummy2, b=dummy)
@@ -255,8 +255,8 @@ class TestSerialization(Scenarios):
 
     def test_circular_reference(self):
         formatter = self.get_formatter(serialization=True)
-        formatter.semantics.add_semantics(AutoPreserveReferences(True))
-        formatter.semantics.add_semantics(SerializeNoneVersionInfo(False))
+        formatter.semantics.add(AutoPreserveReferences(True))
+        formatter.semantics.add(SerializeNoneVersionInfo(False))
         dummy = self.get_basic(a=90, b='this is a string')
         dummy2 = self.get_basic(a=dummy, b=None)
         dummy3 = self.get_basic(a=dummy2, b=dummy)

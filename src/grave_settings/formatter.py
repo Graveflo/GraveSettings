@@ -17,7 +17,8 @@ from grave_settings.framestack_context import FrameStackContext
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
 from grave_settings.handlers import OrderedHandler, OrderedMethodHandler
 from grave_settings.helper_objects import PreservedReferenceNotDissolvedError, KeySerializableDict
-from grave_settings.formatter_settings import FormatterSpec, Temporary, FormatterContext, PreservedReference, NoRef
+from grave_settings.formatter_settings import FormatterSpec, Temporary, FormatterContext, PreservedReference, NoRef, \
+    AddSemantics
 from grave_settings.semantics import *
 
 
@@ -118,21 +119,21 @@ class IFormatter(ABC):
             data = data.decode(encoding)
         return self.loads(data, kwargs=kwargs, deserializer=deserializer)
 
-    def read_from_file(self, path: str, encoding='utf-8', deserializer: Processor = None):
+    def read_from_file(self, path: str, encoding='utf-8', kwargs: dict | None = None, deserializer: Processor = None):
         if encoding == 'utf-8':
             f = open(path, 'r')
         else:
             f = open(path, 'rb')
         with f:
             # noinspection PyTypeChecker
-            return self.from_buffer(f, encoding=encoding, deserializer=deserializer)
+            return self.from_buffer(f, encoding=encoding, kwargs=kwargs, deserializer=deserializer)
 
     @abstractmethod
-    def serialized_obj_to_buffer(self, ser_obj) -> str | bytes:
+    def serialized_obj_to_buffer(self, ser_obj, context: FormatterContext) -> str | bytes:
         pass
 
     @abstractmethod
-    def buffer_to_obj(self, buffer: str | bytes):
+    def buffer_to_obj(self, buffer: str | bytes, context: FormatterContext):
         pass
 
     def get_serialization_handler(self) -> OrderedHandler:
@@ -141,7 +142,7 @@ class IFormatter(ABC):
     def get_deserialization_handler(self) -> OrderedHandler:
         return DeSerializationHandler()
 
-    def get_serialization_frame_context(self, handler: OrderedHandler = None) -> FrameStackContext:
+    def get_serialization_frame_context(self) -> FrameStackContext:
         return FrameStackContext(self.get_serialization_handler(), Semantics())
 
     def get_deserialization_frame_context(self) -> FrameStackContext:
@@ -154,10 +155,16 @@ class IFormatter(ABC):
         return FormatterContext(self.get_deserialization_frame_context())
 
     def dumps(self, obj: Any, kwargs: dict | None = None, serializer: Processor = None) -> str | bytes:
-        return self.serialized_obj_to_buffer(self.serialize(obj, kwargs=kwargs, serializer=serializer))
+        if serializer is None:
+            serializer = self.get_serializer(obj, self.get_serialization_context())
+        return self.serialized_obj_to_buffer(self.serialize(obj, kwargs=kwargs, serializer=serializer), serializer.context)
 
     def loads(self, buffer, kwargs: dict | None = None, deserializer: Processor = None):
-        return self.deserialize(self.buffer_to_obj(buffer), kwargs=kwargs, deserializer=deserializer)
+        if deserializer is None:
+            deserializer = self.get_deserializer(None, self.get_deserialization_context())
+        obj = self.buffer_to_obj(buffer, deserializer.context)
+        deserializer.root_obj = obj
+        return self.deserialize(obj, kwargs=kwargs, deserializer=deserializer)
 
     @abstractmethod
     def get_serializer(self, root_obj, context: FormatterContext) -> Processor:
@@ -198,7 +205,7 @@ class Serializer(Processor):
         # noinspection PyTypeChecker
         self.handler.add_handlers_by_type_hints(
             self.handle_serialize_default,
-            self.handle_noref,
+            self.handle_add_semantics,
             self.handle_temporary,
             self.handle_user_list,
             self.handle_user_dict
@@ -247,7 +254,7 @@ class Serializer(Processor):
         if auto_key_serializable_dict and any(x.__class__ not in self.attribute for x in instance.keys()):
             ksd = auto_key_serializable_dict.val(instance)
             with self.semantics:
-                self.context.add_frame_semantic(AutoPreserveReferences(False))
+                self.context.add_frame_semantics(AutoPreserveReferences(False))
                 return self.serialize(ksd, **kwargs)
         else:
             auto_key_semantics = self.semantics[KeySemanticsTemplate]
@@ -258,7 +265,7 @@ class Serializer(Processor):
                 with self.context(k), self.semantics:
                     if auto_key_semantics:
                         if k in auto_key_semantics.val:
-                            tuple(map(self.context.add_frame_semantic, auto_key_semantics.val[k]))
+                            self.context.add_frame_semantics(*auto_key_semantics.val[k])
                     try:
                         instance[k] = self.serialize(v, **kwargs)
                     except OmitMeError:
@@ -269,23 +276,26 @@ class Serializer(Processor):
 
     def handle_user_list(self, instance: list, **kwargs):
         p_ref = self.check_in_object(instance)
-        if p_ref is not instance:
-            self.context.add_semantic(AutoPreserveReferences(False))
+        if p_ref is not instance:  # This is true if the object was converted into a PreservedReference
+            self.context.add_semantics(AutoPreserveReferences(False))
             return self.serialize(p_ref, **kwargs)
         else:
             return self.handle_serialize_list_in_place(instance.copy(), **kwargs)
 
     def handle_user_dict(self, instance: dict, **kwargs):
         p_ref = self.check_in_object(instance)
-        if p_ref is not instance:
-            self.context.add_semantic(AutoPreserveReferences(False))
+        if p_ref is not instance:  # This is true if the object was converted into a PreservedReference
+            self.context.add_semantics(AutoPreserveReferences(False))
             return self.serialize(p_ref, **kwargs)
         else:
             return self.handle_serialize_dict_in_place(instance.copy(), **kwargs)
 
-    def handle_noref(self, instance: NoRef, **kwargs):
+    def handle_add_semantics(self, instance: AddSemantics, **kwargs):
         tv = instance.val
-        self.context.add_frame_semantic(AutoPreserveReferences(False))
+        if instance.semantics:
+            self.context.add_semantics(*instance.semantics)
+        if instance.frame_semantics:
+            self.context.add_frame_semantics(*instance.frame_semantics)
         return self.serialize(tv, **kwargs)
 
     def handle_temporary(self, instance: Temporary, **kwargs):
@@ -295,7 +305,7 @@ class Serializer(Processor):
         elif type(tv) is dict:
             return self.handle_serialize_dict_in_place(tv, **kwargs)
         else:
-            self.context.add_frame_semantic(AutoPreserveReferences(False))
+            self.context.add_frame_semantics(AutoPreserveReferences(False))
             return self.serialize(tv, **kwargs)
 
     def template_object_serialize(self, template_dict: dict, instance, **kwargs):
@@ -323,7 +333,7 @@ class Serializer(Processor):
             version_info = instance.get_version_object()
             if self.semantics[SerializeNoneVersionInfo] or version_info is not None:
                 with self.semantics:
-                    self.context.add_semantic(AutoPreserveReferences(False))
+                    self.context.add_semantics(AutoPreserveReferences(False))
                     ro[self.spec.version_id] = self.serialize(version_info)
         return self.template_object_serialize(ro, instance, **kwargs)
 
@@ -540,7 +550,7 @@ class Formatter(IFormatter, ABC):
         if spec is None:
             spec = self.FORMAT_SETTINGS.copy()
         self.spec = spec
-        self.semantics = Semantics()
+        self.semantics = set()
         self.serialization_handler = SerializationHandler()
         self.deserializer_handler = DeSerializationHandler()
 
@@ -551,7 +561,7 @@ class Formatter(IFormatter, ABC):
         return self.deserializer_handler
 
     def get_serializer(self, root_obj, context) -> Serializer:
-        s =  Serializer(root_obj, self.spec.copy(), context)
+        s = Serializer(root_obj, self.spec.copy(), context)
         s.semantics.update(self.semantics)
         return s
 
@@ -559,3 +569,6 @@ class Formatter(IFormatter, ABC):
         d = DeSerializer(root_obj, self.spec.copy(), context)
         d.semantics.update(self.semantics)
         return d
+
+    def add_semantics(self, *semantics: T_S_E):
+        self.semantics.update(semantics)

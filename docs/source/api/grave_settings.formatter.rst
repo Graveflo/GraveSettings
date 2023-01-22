@@ -1,5 +1,5 @@
 formatter
-================================
+=========
 
 .. automodule:: grave_settings.formatter
    :members:

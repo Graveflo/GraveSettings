@@ -22,7 +22,7 @@ class TestSemantics(IntegrationTestCaseBase):
         class NonSerializableDummy(Dummy):
             @classmethod
             def check_in_serialization_context(cls, context: FrameStackContext):
-                context.add_frame_semantic(AutoPreserveReferences(False))
+                context.add_frame_semantics(AutoPreserveReferences(False))
         globals()['NonSerializableDummy'] = NonSerializableDummy
         try:
             inner_dummy = NonSerializableDummy()

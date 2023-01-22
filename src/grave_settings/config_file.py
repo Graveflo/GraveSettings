@@ -183,7 +183,7 @@ class ConfigFile(Serializable):
     def get_deserialization_context(self):
         context = self.formatter.get_deserialization_context()
         if isinstance(self.data, type):
-            context.add_frame_semantic(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
+            context.add_frame_semantics(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
         return context
 
     def handle_deserialize_LogFileLink(self, deserializer: DeSerializer, obj: LogFileLink, **kwargs):

@@ -9,14 +9,31 @@ from ram_util.utilities import T
 
 from grave_settings.handlers import OrderedHandler
 from grave_settings.framestack_context import FrameStackContext
-from grave_settings.semantics import Semantic
+from grave_settings.semantics import Semantic, AutoPreserveReferences, T_S_E
 
 
-class NoRef:
-    __slots__ = 'val',
+class AddSemantics:
+    __slots__ = 'val', 'semantics', 'frame_semantics'
 
-    def __init__(self, val: T):
+    def __init__(self, val: T, semantics: set[Semantic] | None = None, frame_semantics: set[Semantic] | None = None):
         self.val = val
+        self.semantics = semantics
+        self.frame_semantics = frame_semantics
+
+    def __str__(self):
+        return f'AddSemantics({self.val})'
+
+
+class NoRef(AddSemantics):
+    __slots__ = tuple()
+
+    def __init__(self, val: T, semantics: set[Semantic] | None = None, frame_semantics: set[Semantic] | None = None):
+        if frame_semantics is None:
+            frame_semantics = {AutoPreserveReferences(False)}
+        else:
+            if AutoPreserveReferences(True) not in frame_semantics:
+                frame_semantics.add(AutoPreserveReferences(False))
+        super().__init__(val, semantics=semantics, frame_semantics=frame_semantics)
 
     def __str__(self):
         return f'NoRef({self.val})'
@@ -147,11 +164,11 @@ class FormatterContext:
         if reference.ref in self.id_cache:
             return self.id_cache[reference.ref]
 
-    def add_frame_semantic(self, semantic: Semantic):
-        self.semantic_context.add_frame_semantic(semantic)
+    def add_frame_semantics(self, *semantic: T_S_E):
+        self.semantic_context.add_frame_semantics(*semantic)
 
-    def add_semantic(self, semantic: Semantic):
-        self.semantic_context.add_semantics(semantic)
+    def add_semantics(self, *semantic: T_S_E):
+        self.semantic_context.add_semantics(*semantic)
 
     def get_stack_depth(self) -> int:
         return len(self.key_path)

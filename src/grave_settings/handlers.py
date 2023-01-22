@@ -130,10 +130,22 @@ class OrderedHandler(Handler):
             raise HandlerNotFound()
 
     def handle_node(self, key, *args, **kwargs):
-        return self.get_key_func(key)(key, *args, **kwargs)
+        try:
+            return self.get_key_func(key)(key, *args, **kwargs)
+        except HandlerNotFound as e:
+            e.args = args
+            e.kwargs = kwargs
+            e.key = key
+            raise e
 
     def handle(self, key, *args, **kwargs):
-        return self.get_key_func(key.__class__)(key, *args, **kwargs)
+        try:
+            return self.get_key_func(key.__class__)(key, *args, **kwargs)
+        except HandlerNotFound as e:
+            e.args = args
+            e.kwargs = kwargs
+            e.key = key
+            raise e
 
 
 class OrderedMethodHandler(OrderedHandler):

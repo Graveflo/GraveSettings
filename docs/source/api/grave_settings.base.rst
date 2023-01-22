@@ -1,5 +1,5 @@
 base
-===========================
+====
 
 .. automodule:: grave_settings.base
    :members:

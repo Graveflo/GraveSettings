@@ -11,9 +11,6 @@ from unittest import TestCase, main
 from grave_settings.handlers import OrderedHandler, OrderedMethodHandler
 
 
-
-
-
 class TrackException(Exception):
     pass
 

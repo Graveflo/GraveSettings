@@ -21,9 +21,8 @@ At least skim the limitations if you plan on using the library. :ref:`Limitation
 
 
 .. toctree::
-   :maxdepth: 2
    :caption: Directory
-   
+
    limitations
    examples
    api_reference

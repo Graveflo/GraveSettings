@@ -1,5 +1,5 @@
-API Documenation
-================
+API Documentation
+==================
 
 blahblhaha
 

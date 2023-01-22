@@ -1,5 +1,5 @@
 semantics
-================================
+=========
 
 .. automodule:: grave_settings.semantics
    :members:

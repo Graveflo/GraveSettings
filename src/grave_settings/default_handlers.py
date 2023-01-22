@@ -40,6 +40,7 @@ class SerializationHandler(OrderedHandler):
     def init_handler(self):
         super(SerializationHandler, self).init_handler()
         self.add_handlers({  # This only works because dictionaries preserve order! Be careful order matters here
+            object: self.default_handler,
             Type: self.handle_type,
             NoneType: self.handle_NoneType,
             Iterable: self.handle_Iterable,
@@ -96,7 +97,7 @@ class SerializationHandler(OrderedHandler):
 
     @staticmethod
     def handle_method(key: MethodType, context: FormatterContext, **kwargs):
-        context.add_frame_semantic(OverrideClassString('types.MethodType'))
+        context.add_frame_semantics(OverrideClassString('types.MethodType'))
         return {
             'object': key.__self__,
             'name': key.__name__
@@ -152,14 +153,14 @@ class SerializationHandler(OrderedHandler):
     def handle_function_type(key: FunctionType, context: FormatterContext, **kwargs):
         if key.__name__ == '<lambda>':
             raise NotSerializableException('lambda functions are not serializable')
-        context.add_frame_semantic(OverrideClassString('types.FunctionType'))
+        context.add_frame_semantics(OverrideClassString('types.FunctionType'))
         return {
             'state': format_class_str(key)
         }
 
     @staticmethod
     def handle_NoneType(key: NoneType, context: FormatterContext, **kwargs):
-        context.add_frame_semantic(OverrideClassString('types.NoneType'))
+        context.add_frame_semantics(OverrideClassString('types.NoneType'))
         nid = id(None)
         if nid in context.id_cache:
             del context.id_cache[nid]
@@ -219,6 +220,7 @@ class DeSerializationHandler(OrderedHandler):
     def init_handler(self):
         super(DeSerializationHandler, self).init_handler()
         self.add_handlers({
+            object: self.default_handler,
             Type: self.handle_type,
             NoneType: self.handle_NoneType,
             tuple: self.handle_tuple,

@@ -1,5 +1,5 @@
 abstract
-===============================
+========
 
 .. automodule:: grave_settings.abstract
    :members:

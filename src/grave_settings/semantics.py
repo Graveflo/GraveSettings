@@ -21,12 +21,23 @@ class OmitMeError(Exception):
     pass
 
 
+class Negate:
+    __slots__ = 'semantic',
+
+    def __init__(self, semantic):
+        self.semantic = semantic
+
+    def __neg__(self):
+        return self.semantic
+
+
 class Semantic(Generic[T]):
     """
     Semantics are meant to be "frozen" in that they do not change state after they have been initialized. They may be
     passed from context to context without respect for consistency or state and are expected to always have the same
     meaning no matter where and "when" they are.
     """
+    __slots__ = 'val',
     COLLECTION: Type[set] | None = None
     C_T = TypeVar('C_T', bound=COLLECTION)
 
@@ -63,8 +74,15 @@ class Semantic(Generic[T]):
     def __str__(self):
         return f'{self.__class__.__name__}({self.val})'
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}({repr(self.val)})'
+
+    def __invert__(self):
+        return Negate(self)
+
 
 T_S = TypeVar('T_S', bound=Semantic)
+T_S_E = TypeVar('T_S_E', bound=Semantic | Negate)
 
 
 class Semantics:
@@ -74,12 +92,18 @@ class Semantics:
         self.semantics = semantics
         self.parent: None | Semantics = None
 
-    def update(self, semantics: 'Semantics'):
-        self.semantics.update(semantics.semantics)
+    def update(self, semantics: Iterable[T_S_E]):
+        self.add_semantics(*semantics)
 
-    def add_semantics(self, *semantics: Semantic):
+    def add_semantics(self, *semantics: T_S_E):
         dict_obj = self.semantics
         for semantic in semantics:
+            if type(semantic) is Negate:
+                if type(semantic.semantic) is type:
+                    self.pop(semantic.semantic)
+                else:
+                    self.remove_semantic(semantic.semantic)
+                continue
             if semantic.COLLECTION is None:
                 dict_obj[semantic.__class__] = semantic
             else:
@@ -165,16 +189,23 @@ class Semantics:
     def __len__(self):
         return len(self.semantics)
 
+    def __iter__(self):
+        for sem in self.semantics.values():
+            if isinstance(sem, Semantic):
+                yield sem
+            else:
+                yield from sem
+
 
 class SemanticContext(Semantics):
     def __init__(self, semantics: Semantics):
         super().__init__(semantics=semantics.semantics.copy())
         self.stack = []
 
-    def add_frame_semantic(self, semantic: Semantic):
+    def add_frame_semantics(self, *semantic: T_S_E):
         if self.parent is None:
             self.parent = Semantics()
-        self.parent.add_semantics(semantic)
+        self.parent.add_semantics(*semantic)
 
     def remove_frame_semantic(self, semantic: Type[Semantic] | Semantic):
         if self.parent is not None:
@@ -183,7 +214,7 @@ class SemanticContext(Semantics):
             else:
                 self.parent.remove_semantic(semantic)
 
-    def add_semantics(self, *semantics: Semantic):
+    def add_semantics(self, *semantics: T_S_E):
         if self.semantics is None:
             self.semantics = {}
         return super().add_semantics(*semantics)
@@ -238,7 +269,7 @@ class SemanticContext(Semantics):
 class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
     """
     Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
-    happen to share the same name as the built in methods
+    happen to share the same name as the built-in methods
     """
     pass
 
@@ -246,15 +277,15 @@ class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
 class IgnoreDuckTypingForSubclasses(Semantic[Type]):  # TODO: Implement
     """
     Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
-    happen to share the same name as the built in methods
+    happen to share the same name as the built-in methods
     """
     pass
 
 
 class OmitMe(Semantic):
     """
-    Used to inform that an object's parent should not include this object as a member. Its probably a bad idea to overuse
-    this but it is meant for flagging objects that should never be serialized or represented in an objects state
+    Used to inform that an object's parent should not include this object as a member. It's probably a bad idea to overuse
+    this, but it is meant for flagging objects that should never be serialized or represented in an objects state
     """
     def __init__(self):
         raise NotImplementedError('This is not meant to be instantiated. Raise OmitMeError if you want this functionality')
@@ -302,8 +333,7 @@ class Indentation(Semantic[int]):
     """
     Specified indentation formatting if applicable
     """
-    def __init__(self, val: int):
-        super().__init__(val)
+    pass
 
 
 class AutoPreserveReferences(Semantic[bool]):

@@ -29,7 +29,7 @@ class Dummy(SlotSettings):
 
     @classmethod
     def check_in_deserialization_context(cls, route: FrameStackContext):
-        route.add_frame_semantic(NotifyFinalizedMethodName('finalize'))
+        route.add_frame_semantics(NotifyFinalizedMethodName('finalize'))
 
     def assert_attr_equiv(self, tc: TestCase, self_val, other_val, circle=None):
         if circle is None:
