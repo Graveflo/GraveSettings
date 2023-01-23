@@ -1,14 +1,15 @@
 import os
 import re
 from types import NoneType
-from typing import Iterable, Self, get_args
+from typing import Iterable, Self, get_args, Type
 
 from observer_hooks import notify, HardRefEventHandler
 
-from grave_settings.utilities import T, format_class_str
+from grave_settings.utilities import T, format_class_str, load_type
 from grave_settings.handlers import OrderedHandler
 from grave_settings.framestack_context import FrameStackContext
-from grave_settings.semantics import Semantic, AutoPreserveReferences, T_S_E
+from grave_settings.semantics import Semantic, AutoPreserveReferences, T_S_E, DoNotAllowImportingModules, \
+    ClassStringPassFunction, SecurityException
 
 
 class AddSemantics:
@@ -174,6 +175,16 @@ class FormatterContext:
 
     def get_stack_depth(self) -> int:
         return len(self.key_path)
+
+    def load_type(self, class_str: str) -> Type:
+        semantics = self.semantic_context
+        allow_imports = not bool(semantics[DoNotAllowImportingModules])
+        validation = semantics[ClassStringPassFunction]
+        if validation:
+            for validation_call in validation:
+                if not validation_call.val(class_str):
+                    raise SecurityException()
+        return load_type(class_str, do_import=allow_imports)
 
     @notify(no_origin=True, pass_ref=True, handler_t=HardRefEventHandler)
     def finalize(self):

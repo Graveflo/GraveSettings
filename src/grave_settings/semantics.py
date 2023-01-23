@@ -265,7 +265,7 @@ class SemanticContext(Semantics):
         return os.linesep.join(bs)
 
 
-class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
+class IgnoreDuckTypingForType(Semantic[Type]):
     """
     Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
     happen to share the same name as the built-in methods
@@ -273,7 +273,7 @@ class IgnoreDuckTypingForType(Semantic[Type]):  # TODO: Implement
     pass
 
 
-class IgnoreDuckTypingForSubclasses(Semantic[Type]):  # TODO: Implement
+class IgnoreDuckTypingForSubclasses(Semantic[Type]):
     """
     Disables duck typing in the formatter for a specific class. This is to take care of naming clashes with types that
     happen to share the same name as the built-in methods

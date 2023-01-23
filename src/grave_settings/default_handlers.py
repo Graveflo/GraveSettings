@@ -303,7 +303,7 @@ class DeSerializationHandler(OrderedHandler):
 
     @staticmethod
     def handle_type(t_object: Type[Type], json_obj: dict, context: FormatterContext, **kwargs):
-        return load_type(json_obj['state'])  # TODO: This is insecure
+        return context.load_type(json_obj['state'])
 
     @staticmethod
     def handle_serializable(t_object: Type[Serializable], json_obj: dict, context: FormatterContext, **kwargs) -> Serializable:

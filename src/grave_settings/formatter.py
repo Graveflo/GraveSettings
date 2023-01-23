@@ -4,16 +4,12 @@
 
 @author: ☙ Ryan McConnell ❧
 """
-import gc
-import os
 from abc import ABC, abstractmethod
 from io import IOBase
-from traceback import format_tb
 from weakref import WeakSet
 
 from observer_hooks import notify
 
-from grave_settings.utilities import load_type, format_class_str
 from grave_settings.framestack_context import FrameStackContext
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
 from grave_settings.handlers import OrderedHandler, OrderedMethodHandler
@@ -393,15 +389,6 @@ class DeSerializer(Processor):
         self.semantics.add_semantics(DetonateDanglingPreservedReferences(True),
                                      ResolvePreservedReferences(True))
 
-    def load_type(self, class_str: str) -> Type:
-        allow_imports = not bool(self.semantics[DoNotAllowImportingModules])
-        validation = self.semantics[ClassStringPassFunction]
-        if validation:
-            for validation_call in validation:
-                if not validation_call.val(class_str):
-                    raise SecurityException()
-        return load_type(class_str, do_import=allow_imports)
-
     def supports_semantic(self, semantic_class: Type[Semantic]) -> bool:
         return semantic_class in {
             DetonateDanglingPreservedReferences,
@@ -422,7 +409,7 @@ class DeSerializer(Processor):
         self.context.semantic_context = semantics
         for key in key_path:
             if type(start) == dict and self.spec.class_id in start:
-                _class = self.load_type(start[self.spec.class_id])  # NOTE: This is why we use check for semantics
+                _class = self.context.load_type(start[self.spec.class_id])  # NOTE: This is why we use check for semantics
                 if self.it_quack(_class) and hasattr(_class, 'check_in_deserialization_context'):
                     _class.check_in_deserialization_context(self.context)
             start = start[key]
@@ -443,7 +430,7 @@ class DeSerializer(Processor):
         type_obj = None
         if self.spec.class_id in instance:
             class_id = instance.pop(self.spec.class_id)
-            type_obj = self.load_type(class_id)
+            type_obj = self.context.load_type(class_id)
             ducks = self.it_quack(type_obj)
             if ducks and hasattr(type_obj, 'check_in_deserialization_context'):
                 type_obj.check_in_deserialization_context(self.context)
@@ -462,7 +449,7 @@ class DeSerializer(Processor):
 
         if class_id is not None:
             if ducks and (version_info is not None) and hasattr(type_obj, 'check_convert_update'):
-                if ti := type_obj.check_convert_update(instance, self.load_type, version_info):
+                if ti := type_obj.check_convert_update(instance, self.context.load_type, version_info):
                     instance = ti
                     self.notify_settings_converted(class_id)
             ret = self.context.handler.handle_node(type_obj, instance, self.context, **kwargs)

@@ -14,7 +14,7 @@ from grave_settings.formatter_settings import FormatterContext, FormatterSpec
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler, NotSerializableException
 from grave_settings.framestack_context import FrameStackContext
 from grave_settings.semantics import *
-from grave_settings.formatter import Serializer, DeSerializer
+from grave_settings.formatter import Serializer, DeSerializer, ProcessingException
 
 
 def test_function(arg1, arg2, name=None):
@@ -89,7 +89,7 @@ class TestHandler(TestCase):
         self.assert_make_remake(SomeEnum.VLO)
 
     def test_lambda(self):
-        with self.assertRaises(NotSerializableException):
+        with self.assertRaises(ProcessingException):
             self.serialize(lambda: None)
 
     def test_method(self):
