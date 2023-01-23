@@ -10,7 +10,7 @@ from enum import Enum, auto
 from unittest import TestCase, main
 
 from ram_util.modules import format_class_str
-from grave_settings.formatter_settings import PreservedReference, Temporary, NoRef
+from grave_settings.formatter_settings import PreservedReference, Temporary, NoRef, FormatterContext
 from integration_tests_base import Dummy, IntegrationTestCaseBase
 from grave_settings.abstract import Serializable
 from grave_settings.base import SlotSettings
@@ -416,6 +416,43 @@ class TestRoundTrip(Scenarios):
         obj = DefaultHandlerObj()
         self.assert_obj_roundtrip(obj)
 
+    def test_noref(self):
+        class Foo:
+            def __init__(self):
+                self.list1 = [1, 2, 3]
+                self.list2 = [1, 2, 3]
+
+            def to_dict(self, *args, **kwargs):
+                return {
+                    'list1': self.list1,
+                    'list2': NoRef(self.list2)
+                }
+
+        class Bar:
+            def __init__(self, foo: Foo):
+                self.list1 = foo.list1
+                self.list2 = foo.list2
+                self.foo = foo
+
+            def to_dict(self, *args, **kwargs):
+                return {
+                    'list1': self.list1,
+                    'list2': NoRef(self.list2),
+                    'foo': self.foo
+                }
+        globals()['Foo'] = Foo
+        globals()['Bar'] = Bar
+        try:
+            formatter = self.get_formatter(serialization=True)
+            obj = Bar(Foo())
+            ser_obj = self.get_ser_obj(formatter, obj)
+            re_made_object = self.deser_ser_obj(ser_obj)
+            self.assertIsNot(obj, re_made_object)
+            self.assertIsNot(re_made_object.list2, re_made_object.foo.list2)
+        finally:
+            del globals()['Foo']
+            del globals()['Bar']
+
 
 class TestDeSerialization(Scenarios):
     def test_look_ahead_preserved_reference(self):
@@ -587,6 +624,27 @@ class TestDeSerialization(Scenarios):
             self.assertEqual(remade_object.b, 225)
         finally:
             globals().pop('RGB')
+
+    def test_deser_preserved_ref_last(self):
+        class MyObject(Serializable):
+            def __init__(self):
+                self.foo = self
+
+            @classmethod
+            def check_in_deserialization_context(cls, context: FormatterContext):
+                context.add_frame_semantics(NotifyFinalizedMethodName('finalize'))
+
+            def finalize(self, context: FormatterContext) -> None:
+                if isinstance(self.foo, PreservedReference):
+                    self.foo = context.check_ref(self.foo)
+        globals()['MyObject'] = MyObject
+        try:
+            json_formatter = self.get_formatter(serialization=True)
+            s = json_formatter.serialize(MyObject())
+            json_formatter = self.get_formatter(serialization=False)
+            json_formatter.deserialize(s)
+        finally:
+            del globals()['MyObject']
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@
 
 @author: ☙ Ryan McConnell ❧
 """
+import gc
 import os
 from abc import ABC, abstractmethod
 from io import IOBase
@@ -87,6 +88,7 @@ class Processor:
 
     def dispose(self):
         self.context.finalize()
+        self.context.dispose()
         self.semantics.parent = None
         self.root_obj = None
 
@@ -183,6 +185,9 @@ class IFormatter(ABC):
             else:
                 return serializer.process(obj)
 
+    def free_deser_obj(self, obj):
+        obj.clear()
+
     def deserialize(self, obj, kwargs: dict | None = None, deserializer: Processor = None):
         if deserializer is None:
             deserializer = self.get_deserializer(obj, self.get_deserialization_context())
@@ -190,9 +195,11 @@ class IFormatter(ABC):
             deserializer.root_obj = obj
         with deserializer:
             if kwargs:
-                return deserializer.process(obj, **kwargs)
+                ret = deserializer.process(obj, **kwargs)
             else:
-                return deserializer.process(obj)
+                ret = deserializer.process(obj)
+            self.free_deser_obj(obj)
+            return ret
 
 
 class Serializer(Processor):
@@ -236,7 +243,11 @@ class Serializer(Processor):
         object_id = id(obj)
         id_cache = self.context.id_cache
         if object_id in id_cache:
-            return PreservedReference(obj=obj, ref=id_cache[object_id])
+            auto_preserve_references = self.semantics[AutoPreserveReferences]
+            if auto_preserve_references:
+                return PreservedReference(obj=obj, ref=id_cache[object_id])
+            else:
+                return obj
         else:
             id_cache[object_id] = self.path_to_str()
             if self.semantics[EnforceReferenceLifecycle]:
@@ -323,11 +334,7 @@ class Serializer(Processor):
         ducks = self.it_quack(instance.__class__)
         if ducks and hasattr(instance, 'check_in_serialization_context'):
             instance.check_in_serialization_context(self.context)
-        auto_preserve_references = self.semantics[AutoPreserveReferences]
-        if auto_preserve_references:
-            p_ref = self.check_in_object(instance)
-            if p_ref is not instance:
-                instance = p_ref  # serialize the preserved reference instead
+        instance = self.check_in_object(instance)
         ro = {self.spec.class_id: None}  # keeps placement
         if ducks and hasattr(instance, 'get_version_object'):
             version_info = instance.get_version_object()
@@ -552,13 +559,13 @@ class Formatter(IFormatter, ABC):
         self.spec = spec
         self.semantics = set()
         self.serialization_handler = SerializationHandler()
-        self.deserializer_handler = DeSerializationHandler()
+        self.deserialization_handler = DeSerializationHandler()
 
     def get_serialization_handler(self) -> OrderedHandler:
         return self.serialization_handler
 
     def get_deserialization_handler(self) -> OrderedHandler:
-        return self.deserializer_handler
+        return self.deserialization_handler
 
     def get_serializer(self, root_obj, context) -> Serializer:
         s = Serializer(root_obj, self.spec.copy(), context)

@@ -19,6 +19,7 @@ release = grave_settings.VERSION
 extensions = ["sphinx.ext.autodoc",
               "sphinx.ext.viewcode",
               "sphinx.ext.intersphinx",
+              'sphinx_copybutton',
               #'sphinx.ext.autosummary',
               #'sphinx.ext.napoleon'
               ]

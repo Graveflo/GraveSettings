@@ -12,7 +12,7 @@ class FrameStackContext(SemanticContext):
     def clear(self):
         self.handler = None
 
-    def set_handler(self, handler: OrderedHandler, merge: bool = True, update_order=False):
+    def set_handler(self, handler: OrderedHandler, merge: bool = True, update_order=True):
         if merge and self.handler is not None and self.handler is not handler:
             handler.update(self.handler, update_order=update_order)
         self.handler = handler

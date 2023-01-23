@@ -58,6 +58,9 @@ class PreservedReference(object):
     def __hash__(self):
         return hash(id(self.obj))
 
+    def __str__(self):
+        return f'PreservedReference(ref={repr(self.ref)}, obj={self.obj})'
+
 
 class FormatterSpec:
     ROUTE_PATH_TRANSLATION = str.maketrans({
@@ -139,7 +142,7 @@ class FormatterContext:
 
     @handler.setter
     def handler(self, handler: OrderedHandler):
-        self.semantic_context.set_handler(handler)
+        self.semantic_context.set_handler(handler, update_order=True)
 
     def handle(self, obj):
         return self.semantic_context.handler.handle(obj, self)
@@ -177,3 +180,5 @@ class FormatterContext:
     def finalize(self):
         pass
 
+    def dispose(self):
+        self.id_cache.clear()

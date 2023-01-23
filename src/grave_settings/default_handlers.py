@@ -10,13 +10,15 @@ from pathlib import Path
 from types import NoneType, MethodType
 from datetime import timedelta, datetime, date, timezone, tzinfo
 from enum import Enum
-from typing import Mapping
+from typing import Mapping, Union, get_args
 from types import FunctionType
 from functools import partial
 from zoneinfo import ZoneInfo
 
 from ram_util.modules import format_class_str, load_type, T
 from observer_hooks import FunctionStub, EventHandler
+from ram_util.utilities import get_type_hints
+
 from grave_settings.formatter_settings import Temporary, PreservedReference, FormatterContext, NoRef
 from grave_settings.handlers import OrderedHandler
 from grave_settings.abstract import Serializable
@@ -350,3 +352,6 @@ class DeSerializationHandler(OrderedHandler):
             settings_obj = force_instantiate(t_object)
             Serializable.from_dict(settings_obj, json_obj, context)
             return settings_obj
+
+    def add_handlers_by_type_hints(self, *callables):
+        self.add_handlers((Union[get_args(get_type_hints(c)[0])], c) for c in callables)
