@@ -12,8 +12,8 @@ from traceback import format_tb
 from weakref import WeakSet
 
 from observer_hooks import notify
-from ram_util.modules import load_type, format_class_str
 
+from grave_settings.utilities import load_type, format_class_str
 from grave_settings.framestack_context import FrameStackContext
 from grave_settings.default_handlers import DeSerializationHandler, SerializationHandler
 from grave_settings.handlers import OrderedHandler, OrderedMethodHandler

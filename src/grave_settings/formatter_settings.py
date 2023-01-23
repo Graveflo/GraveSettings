@@ -4,9 +4,8 @@ from types import NoneType
 from typing import Iterable, Self, get_args
 
 from observer_hooks import notify, HardRefEventHandler
-from ram_util.modules import format_class_str
-from ram_util.utilities import T
 
+from grave_settings.utilities import T, format_class_str
 from grave_settings.handlers import OrderedHandler
 from grave_settings.framestack_context import FrameStackContext
 from grave_settings.semantics import Semantic, AutoPreserveReferences, T_S_E

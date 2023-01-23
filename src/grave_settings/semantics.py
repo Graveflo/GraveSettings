@@ -1,8 +1,7 @@
 import os
 from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self, Literal
 
-from ram_util.modules import format_class_str
-from ram_util.utilities import T
+from grave_settings.utilities import T, format_class_str
 
 
 class SymantecNotSupportedError(Exception):

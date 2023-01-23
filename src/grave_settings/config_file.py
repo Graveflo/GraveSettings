@@ -11,8 +11,8 @@ from pathlib import Path
 from typing import Self, Any, Type
 
 from observer_hooks import EventCapturer
-from ram_util.modules import format_class_str
 
+from grave_settings.utilities import format_class_str
 from grave_settings.abstract import IASettings, Serializable
 from grave_settings.formatter_settings import FormatterContext
 from grave_settings.formatters.toml import TomlFormatter

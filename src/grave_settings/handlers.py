@@ -2,8 +2,8 @@ from types import MethodType
 from typing import Mapping, Iterable, Type, Callable, Self
 
 from ordered_set import OrderedSet
-from ram_util.modules import T
-from ram_util.utilities import ext_str_fmt, get_type_hints
+
+from grave_settings.utilities import ext_str_fmt, get_type_hints, T
 
 
 class HandlerNotFound(Exception):

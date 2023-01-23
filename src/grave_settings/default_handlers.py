@@ -15,9 +15,8 @@ from types import FunctionType
 from functools import partial
 from zoneinfo import ZoneInfo
 
-from ram_util.modules import format_class_str, load_type, T
 from observer_hooks import FunctionStub, EventHandler
-from ram_util.utilities import get_type_hints
+from grave_settings.utilities import get_type_hints, format_class_str, load_type, T
 
 from grave_settings.formatter_settings import Temporary, PreservedReference, FormatterContext, NoRef
 from grave_settings.handlers import OrderedHandler

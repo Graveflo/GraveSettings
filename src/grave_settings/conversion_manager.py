@@ -6,9 +6,8 @@
 """
 from typing import Callable, Type
 
-from ram_util.modules import format_class_str
 from observer_hooks import EventHandler
-from ram_util.utilities import generate_type_hierarchy_to_base
+from grave_settings.utilities import generate_type_hierarchy_to_base, format_class_str
 
 
 class ConversionError(Exception):
