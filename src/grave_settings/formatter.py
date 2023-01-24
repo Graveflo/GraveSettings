@@ -57,13 +57,21 @@ class ProcessingException(Exception):
 class Processor:
     def __init__(self, root_obj, spec: FormatterSpec, context: FormatterContext):
         self.spec = spec
-        self.root_obj = root_obj
+        self._root_obj = root_obj
         self.context = context
         self.semantics = self.context.semantic_context
         self.primitives = spec.get_primitive_types()
         self.special = spec.get_special_types()
         self.attribute = spec.get_attribute_types()
         self.set_default_semantics()
+
+    @property
+    def root_obj(self):
+        return self._root_obj
+
+    @root_obj.setter
+    def root_obj(self, root_obj):
+        self._root_obj = root_obj
 
     def set_default_semantics(self):
         pass
@@ -76,7 +84,7 @@ class Processor:
             ducks = not any(issubclass(t_obj, t.val) for t in v)
         return ducks
 
-    def process(self, obj, **kwargs):
+    def process(self, obj=None, **kwargs):
         pass
 
     def path_to_str(self):
@@ -86,7 +94,7 @@ class Processor:
         self.context.finalize()
         self.context.dispose()
         self.semantics.parent = None
-        self.root_obj = None
+        self._root_obj = None
 
     def __enter__(self) -> Self:
         return self
@@ -161,7 +169,6 @@ class IFormatter(ABC):
         if deserializer is None:
             deserializer = self.get_deserializer(None, self.get_deserialization_context())
         obj = self.buffer_to_obj(buffer, deserializer.context)
-        deserializer.root_obj = obj
         return self.deserialize(obj, kwargs=kwargs, deserializer=deserializer)
 
     @abstractmethod
@@ -177,9 +184,9 @@ class IFormatter(ABC):
             serializer = self.get_serializer(obj, self.get_serialization_context())
         with serializer:
             if kwargs:
-                return serializer.process(obj, **kwargs)
+                return serializer.process(**kwargs)
             else:
-                return serializer.process(obj)
+                return serializer.process()
 
     def free_deser_obj(self, obj):
         obj.clear()
@@ -191,9 +198,9 @@ class IFormatter(ABC):
             deserializer.root_obj = obj
         with deserializer:
             if kwargs:
-                ret = deserializer.process(obj, **kwargs)
+                ret = deserializer.process(**kwargs)
             else:
-                ret = deserializer.process(obj)
+                ret = deserializer.process()
             self.free_deser_obj(obj)
             return ret
 
@@ -207,7 +214,7 @@ class Serializer(Processor):
         self.handler = OrderedMethodHandler()
         # noinspection PyTypeChecker
         self.handler.add_handlers_by_type_hints(
-            self.handle_serialize_default,
+            self.handle_default,
             self.handle_add_semantics,
             self.handle_temporary,
             self.handle_user_list,
@@ -326,7 +333,7 @@ class Serializer(Processor):
         template_dict[self.spec.class_id] = class_str
         return template_dict
 
-    def handle_serialize_default(self, instance: object, **kwargs):
+    def handle_default(self, instance: object, **kwargs):
         ducks = self.it_quack(instance.__class__)
         if ducks and hasattr(instance, 'check_in_serialization_context'):
             instance.check_in_serialization_context(self.context)
@@ -340,7 +347,9 @@ class Serializer(Processor):
                     ro[self.spec.version_id] = self.serialize(version_info)
         return self.template_object_serialize(ro, instance, **kwargs)
 
-    def process(self, obj, **kwargs):
+    def process(self, obj=None, **kwargs):
+        if obj is None:
+            obj = self.root_obj
         return self.serialize(obj, **kwargs)
 
     def serialize(self, obj: Any, **kwargs):
@@ -374,9 +383,9 @@ class DeSerializer(Processor):
         self.handler = OrderedMethodHandler()
         # noinspection PyTypeChecker
         self.handler.add_handlers_by_type_hints(
-            self.handle_deserialize_list,
-            self.handle_deserialize_dict,
-            self.handle_deserialize_preserved_referece
+            self.handle_list,
+            self.handle_dict,
+            self.handle_preserved_referece
         )
         self.secondary_handler = OrderedMethodHandler()
         # noinspection PyTypeChecker
@@ -416,14 +425,14 @@ class DeSerializer(Processor):
         self.context.semantic_context = save_semantic_contex
         return semantics
 
-    def handle_deserialize_list(self, instance: list, **kwargs):
+    def handle_list(self, instance: list, **kwargs):
         for i in range(len(instance)):
             cv = instance[i]
             with self.context(i), self.semantics:
                 instance[i] = cv if type(cv) in self.primitives else self.deserialize(cv, **kwargs)
         return instance
 
-    def handle_deserialize_dict(self, instance: dict, **kwargs):
+    def handle_dict(self, instance: dict, **kwargs):
         ducks = True
         version_info = None
         class_id = None
@@ -459,10 +468,10 @@ class DeSerializer(Processor):
         else:
             return instance
 
-    def handle_deserialize_preserved_referece(self, instance: PreservedReference, **kwargs):
+    def handle_preserved_referece(self, instance: PreservedReference, **kwargs):
         return instance.obj
 
-    def handle_deserialize_default(self, instance: object, **kwargs):
+    def handle_default(self, instance: object, **kwargs):
         return instance
 
     def handle_secondary_preserved_reference(self, instance: PreservedReference, **kwargs):
@@ -505,7 +514,9 @@ class DeSerializer(Processor):
         self.context.id_cache[self.path_to_str()] = instance
         return instance
 
-    def process(self, obj, **kwargs):
+    def process(self, obj=None, **kwargs):
+        if obj is None:
+            obj = self.root_obj
         return self.deserialize(obj, **kwargs)
 
     def deserialize(self, obj, **kwargs):

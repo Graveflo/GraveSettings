@@ -148,9 +148,9 @@ class ConfigFile(Serializable):
         if obj in self.sub_configs:
             link = self.sub_configs[obj]
             link.config.save()
-            return serializer.handle_serialize_default(self.sub_configs[obj])
+            return serializer.handle_default(self.sub_configs[obj])
         else:
-            return serializer.handle_serialize_default(obj, **kwargs)
+            return serializer.handle_default(obj, **kwargs)
 
     def load(self, path: Path = None, formatter: None | Formatter = None, validate_path=True, semantics: Semantics = None):
         if path is None:

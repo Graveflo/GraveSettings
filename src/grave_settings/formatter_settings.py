@@ -132,6 +132,7 @@ class FormatterContext:
         self.key_path = []
         self.id_cache = {}
         self.semantic_context = semantics
+        self.key = None
 
     def __str__(self):
         return f'Formatter Context ({format_class_str(self.__class__)}): {repr(self.key_path)}{os.linesep}{self.semantic_context}'
@@ -151,13 +152,14 @@ class FormatterContext:
         self.key_path = obj.key_path.copy()
 
     def __enter__(self):
+        self.key_path.append(self.key)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.key_path.pop(-1)
 
     def __call__(self, path):
-        self.key_path.append(path)
+        self.key = path
         return self
 
     def find(self, reference: PreservedReference):

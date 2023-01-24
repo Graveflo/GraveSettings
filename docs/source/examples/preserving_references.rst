@@ -174,6 +174,8 @@ Now lets say that you have two objects that reference two two separately identic
         }
     }
 
+.. _NoRefExample:
+
 By wrapping the lists in :py:class:`~grave_settings.formatter_settings.NoRef` objects the formatter is instructed to disable preserved references for this object.
 
 .. note::
