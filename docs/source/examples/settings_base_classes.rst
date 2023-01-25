@@ -82,6 +82,7 @@ I'll make a "the works" example of an object inheriting from :py:class:`~grave_s
     print('The deserialized value is: ', graph.theta)
 
 .. code-block::
+  :caption: Output
 
     {
         "__class__": "__main__.Graph3D",
@@ -100,6 +101,6 @@ I'll make a "the works" example of an object inheriting from :py:class:`~grave_s
 
     The json string that is output is **NOT** the same as the string that is deserialized in the code. I changed it on purpose.
 
-I'm not exactly sure that these data structures are supposed to represent. I'll call this poetry, but anyway, we see two classes; one inherits from the other. We see that they are defining their own ``__slots__`` and ``_slot_rems`` and this effects which attributes are serialized. We see that they are defining their version with the ``VERSION`` attribute and the version object in the output string records the version of the child class and the super class. We see that the super class is adding a semantic to the FrameContext for absolutely no reason. We see that the child class is installing a converter to it's ConversionManager that fixes a spelling error in version 1. We see that supplying a string that has the spelling error in it and the string ``"1"`` as its version information for that classes triggers the automatic conversion when the string is deserialized.
+I'm not exactly sure what these data structures are supposed to represent. I'll call this poetry, but anyway, we see two classes; one inherits from the other. We see that they are defining their own ``__slots__`` and ``_slot_rems`` and this effects which attributes are serialized. We see that they are defining their version with the ``VERSION`` attribute and the version object in the output string records the version of the child class and the super class. We see that the super class is adding a semantic to the FrameContext for absolutely no reason. We see that the child class is installing a converter to it's ConversionManager that fixes a spelling error in version 1. We see that supplying a string that has the spelling error in it and the string ``"1"`` as its version information for that classes triggers the automatic conversion when the string is deserialized.
 
 The convention of making the ``__slots__`` attribute names class level variables is by no means required, that is just a convention of mine as I like to have statically defined paths for static data.

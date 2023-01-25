@@ -41,6 +41,13 @@ A library for automatic serialization of python object hierarchies to storage.
         522692,
     ]
 
+Install
+-----------
+
+.. code-block::
+
+    pip install grave-settings
+
 
 Getting Started:
 -----------------
