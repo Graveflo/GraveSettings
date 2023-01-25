@@ -5,7 +5,7 @@ from grave_settings.formatters.toml import TomlFormatter
 from integrated_tests import TestRoundTrip
 
 
-OUTPUT_FILES = True
+OUTPUT_FILES = False
 
 
 class TestJsonRoundtrip(TestRoundTrip):

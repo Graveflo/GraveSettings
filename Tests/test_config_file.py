@@ -17,7 +17,7 @@ from Tests.integration_tests_base import IntegrationTestCaseBase, Dummy, EmptyFo
 from grave_settings.abstract import IASettings
 from grave_settings.config_file import ConfigFile
 from grave_settings.conversion_manager import ConversionManager
-from grave_settings.formatter import Formatter
+from grave_settings.formatter import Formatter, ProcessingException
 from grave_settings.formatters.json import JsonFormatter
 from grave_settings.semantics import SecurityException
 
@@ -117,7 +117,7 @@ class TestConfigFile(IntegrationTestCaseBase):
         class Foo:
             pass
         c = self.get_config_file(TEST_FILE_PATH, Foo, formatter=JsonFormatter())
-        with self.assertRaises(SecurityException):
+        with self.assertRaises(ProcessingException):
             c.load()
 
     def test_loading_write_file_path(self):
@@ -172,8 +172,6 @@ class TestConfigFile(IntegrationTestCaseBase):
         cfg.data.a = cfg2.data
         cfg.add_config_dependency(cfg2, relative_path=False)
         cfg.save()
-        with open(TEST_FILE_PATH, 'r') as f:
-            print(f.read())
 
         remade_cfg = self.get_config_file(TEST_FILE_PATH, data=Dummy)
         remade_cfg.load()
