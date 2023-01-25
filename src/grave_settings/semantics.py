@@ -1,5 +1,5 @@
 import os
-from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self, Literal
+from typing import Generic, Type, TypeVar, Callable, Any, Iterable, Self
 
 from grave_settings.utilities import T, format_class_str
 

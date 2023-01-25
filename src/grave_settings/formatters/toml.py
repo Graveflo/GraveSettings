@@ -1,8 +1,5 @@
 import tomllib
-from types import NoneType
-
 from grave_settings.formatter_settings import FormatterContext
-from grave_settings.semantics import OverrideClassString
 
 try:
     import tomli_w as tlw

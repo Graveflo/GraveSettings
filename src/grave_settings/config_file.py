@@ -133,7 +133,8 @@ class ConfigFile(Serializable):
         if formatter is None:
             raise ValueError('No formatter supplied')
         serializer = self.formatter.get_serializer(self.data, self.get_serialization_context())
-        serializer.handler.add_handler(IASettings, self.handle_serialize_IASettings)
+        serializer.handler.type_bank[object] = self.handle_serialize_IASettings
+        #serializer.handler.add_handler(IASettings, self.handle_serialize_IASettings)
         formatter.write_to_file(self.data, str(self.file_path), serializer=serializer)
         self.changes_made = vf
 
@@ -148,7 +149,7 @@ class ConfigFile(Serializable):
         if obj in self.sub_configs:
             link = self.sub_configs[obj]
             link.config.save()
-            return serializer.handle_default(self.sub_configs[obj])
+            return serializer.handle_default(link)
         else:
             return serializer.handle_default(obj, **kwargs)
 

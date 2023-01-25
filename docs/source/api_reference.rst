@@ -5,7 +5,10 @@ blahblhaha
 
 
 .. toctree::
-   :caption: Modules
-   :glob:
+    :caption: Modules
+    :glob:
 
-   api_reference/*
+    api_reference/semantics
+    api_reference/handlers
+    api_reference/formatters
+    api_reference/*

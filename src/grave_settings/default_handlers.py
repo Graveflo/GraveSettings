@@ -4,7 +4,6 @@
 
 @author: ☙ Ryan McConnell ❧
 """
-import os
 from numbers import Rational, Complex
 from pathlib import Path
 from types import NoneType, MethodType

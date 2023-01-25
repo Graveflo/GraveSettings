@@ -277,7 +277,7 @@ Lets see if we can turn that string back into a python object.
 
 .. admonition:: Note [4]
 
-  This handler is attached to the ``secondary_handler``. The :py:class:`~grave_settings.formatter.DeSerializer` has two handlers. This is for dealing with things like :py:class:`~grave_settings.formatter_settings.PreservedReference`s and caching object paths for fixing reference issues. This method keeps the primitives from being cached for references since this is meant only for higher level objects
+  This handler is attached to the ``secondary_handler``. The :py:class:`~grave_settings.formatter.DeSerializer` has two handlers. This is for dealing with things like :py:class:`~grave_settings.formatter_settings.PreservedReference` and caching object paths for fixing reference issues. This method keeps the primitives from being cached for references since this is meant only for higher level objects.
 
 Now lets ass this method to the custom formatter:
 
