@@ -1,7 +1,7 @@
 Preserving References
 ======================
 
-Preserving references means maintaining "is" relationships through the serialization / deserialization process. The automatic preserving of references is managed by the Processors and the behavior is set by the following semantics:
+Preserving references means maintaining "is" relationships through the serialization / deserialization process. The automatic preserving of references is managed by the :py:class:`~grave_settings.formatter.Processor` and the behavior is set by the following :py:class:`Semantics<grave_settings.semantics.Semantic>`:
 
 :py:class:`~grave_settings.semantics.AutoPreserveReferences`
 
@@ -26,7 +26,7 @@ Preserving references means maintaining "is" relationships through the serializa
 
 .. note::
 
-    I think it would be a bad idea to turn off :py:class:`~grave_settings.semantics.EnforceReferenceLifecycle`. The only rational for doing this I can think of would be to save on some time and memory complexity, but compared to the rest of the process this semantic is not expensive. It is confusing to determine when this semantic is necessary and its function is a safety net. It attempts to protect the Processor from mixing up object ids, so when this semantic is turned off and the processor gets confused this will lead to data loss, crashes and undefined behavior as objects will be incorrectly referencing each other.
+    I think it would be a bad idea to turn off :py:class:`~grave_settings.semantics.EnforceReferenceLifecycle`. The only rational for doing this I can think of would be to save on some time and memory complexity, but compared to the rest of the process this semantic is not expensive. It is confusing to determine when this semantic is necessary and its function is a safety net. It attempts to protect the :py:class:`~grave_settings.formatter.Processor` from mixing up object ids, so when this semantic is turned off and the :py:class:`~grave_settings.formatter.Processor` gets confused this will lead to data loss, crashes and undefined behavior as objects will be incorrectly referencing each other.
 
 Simple example
 ----------------
@@ -63,7 +63,7 @@ Lets serialize a data structure with duplicate references
 
 .. note::
 
-    The preserved reference object is simple but the a note about the ``ref`` attribute. It is not guaranteed that the ``ref`` attribute will follow any particular format, and so, we should not look at it directly or use it to make decisions without consulting the :py:class:`~grave_settings.formatter_settings.FormatterSpec`. In most cases the :py:class:`~grave_settings.formatter_settings.FormatterSpec` or :py:class:`~grave_settings.formatter_settings.FormatterContext` will expose methods that act as an abstraction layer. This is just an FYI that a formatter or file format may be set up to use a different :py:class:`~grave_settings.formatter_settings.FormatterSpec` then what you may be anticipating if you choose to look at the ``ref`` value directly.
+    The preserved reference object is simple but the a note about the ``ref`` attribute. It is not guaranteed that the ``ref`` attribute will follow any particular format, and so, we should not look at it directly or use it to make decisions without consulting the :py:class:`~grave_settings.formatter_settings.FormatterSpec`. In most cases the :py:class:`~grave_settings.formatter_settings.FormatterSpec` or :py:class:`~grave_settings.formatter_settings.FormatterContext` will expose methods that act as an abstraction layer. This is just an FYI that a formatter or file format may be set up to use a different :py:class:`~grave_settings.formatter_settings.FormatterSpec` then what you may be anticipating if you choose to look at the ``ref`` value directly. In fact the formatter built in :doc:`/examples/building_a_formatter` does not follow the default behavior.
 
 This way when the structure is deserialized ``foo`` and ``bar`` will be associated with the same list object as opposed to two separate lists with the same values. Note that this can be weird if you are deserializing :doc:`/examples/circular_references`
 
@@ -87,6 +87,10 @@ Lets have a quick look at the output if the :py:class:`~grave_settings.semantics
     formatter = JsonFormatter()
     formatter.add_semantics(AutoPreserveReferences(False))  # [1]
     print(formatter.dumps(some_dict))
+
+.. admonition:: Note [1]
+
+    Adding the :py:class:`~grave_settings.semantics.AutoPreserveReferences` on the formatter sets is as a default :py:class:`~grave_settings.semantics.Semantic` for this formatter object. The :py:class:`~grave_settings.formatter.Serializer` ``Processor`` has this set to ``True`` by default but the formatter defaults will override it. This effectively adds the Semantic to the root frame, not as a frame semantic, meaning that it will propigat through the entire process. No reference will be preserved in the entire hierarchy.
 
 .. code-block::
   :caption: Output

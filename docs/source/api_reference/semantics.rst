@@ -64,6 +64,7 @@ If the COLLECTION variable is not :py:class:`None` then it is assumed that seman
 This will print:
 
 .. code-block::
+  :caption: Output
 
     {SomeSemantic(4), SomeSemantic(5)}
     True
@@ -136,6 +137,7 @@ Normally this semantic is either not present, meaning that the python objects wi
 This will output:
 
 .. code-block::
+  :caption: Output
 
     {
         "__class__": "__main__.MyObject",

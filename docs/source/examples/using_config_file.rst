@@ -52,9 +52,9 @@ Basic Example
         }
     }
 
-First we defined a type that will be our container. This type is ``MyObject``. The class is given to the :py:class:`~grave_settings.config_file.ConfigFile` constructor as the named parameter ``data``. The reason we pass the type in is, if the file already existed and contained serialized data we don't want to instantiate ``MyObject`` just to throw it out immediately with a replacement. Also, we want the deserialization process to anticipate the file containing data that describes an object of the correct type to avoid attacks (this is only a very basic security measure) but more precisely to avoid errors. If the type in the file does not match the type supplied by the ``data`` kwarg a :py:class:`~grave_settings.semantics.SecurityException` is raised. This behavior exists because of the logic in :py:meth:`~grave_settings.config_file.ConfigFile.get_deserialization_context`.
+First we defined a type that will be our container. This type is ``MyObject``. The class is given to the :py:class:`~grave_settings.config_file.ConfigFile` constructor as the named parameter ``data``. The reason we pass the type as opposed to an object is: if the file already existed and contained serialized data we don't want to instantiate ``MyObject`` just to throw it out immediately with a replacement. Also, we want the deserialization process to anticipate that existing files contain data that describes an object of the correct type to avoid attacks (this is only a very basic security measure) but more precisely to avoid errors. If the type in the file does not match the type supplied by the ``data`` kwarg a :py:class:`~grave_settings.semantics.SecurityException` is raised. This behavior exists because of the logic in :py:meth:`~grave_settings.config_file.ConfigFile.get_deserialization_context`.
 
-When the file does not exist and there is no data to reconstruct the object of type ``MyObject`` it is created by :py:meth:`~grave_settings.config_file.ConfigFile.__enter__` by calling :py:meth:`~grave_settings.config_file.ConfigFile.instantiate_data`. As long as the type doesnt have positional arguments, this should be fine.
+When the file does not exist, ``MyObject`` it is created by :py:meth:`~grave_settings.config_file.ConfigFile.__enter__` by calling :py:meth:`~grave_settings.config_file.ConfigFile.instantiate_data`. As long as the type doesnt have positional arguments, this should be fine.
 
 
 A less basic example
@@ -129,6 +129,7 @@ Lets make our object hierarchy more complex.
     This demo is meant to show how linking :py:class:`~grave_settings.config_file.ConfigFile` can be done. The manner in which is is done here a questionable but it's hard to find a good example that is simple. I just want to make it clear that linking config files should be something that has a lot more structure around it or it probably is not necessary in your program.
 
 .. code-block::
+  :caption: Output
 
     ---------- test.json -----------
     {
@@ -215,7 +216,7 @@ Lets make our object hierarchy more complex.
         "width": 2
     }
 
-Lets point out something important about :py:meth:`~grave_settings.config_file.ConfigFile.add_config_dependency`, as of right now nothing is shared between the config files. This includes semantics and references. This means that "is" relationships are not shared between config files. This can be done, but I'm not sure if I need it enough to work out the kinks. It should be doable within the :py:class:`~grave_settings.config_file.ConfigFile`. It may be that this behavior would not be desirable since the file being references may change, and that could be just as "unexpected" to naive code then not preserving "is" relationships.
+Lets point out something important about :py:meth:`~grave_settings.config_file.ConfigFile.add_config_dependency`, as of right now nothing is shared between the config files. This includes semantics and references. This means that "is" relationships are not shared between config files. This can be done, but I'm not sure if I need it enough to work out the kinks. It should be doable within the :py:class:`~grave_settings.config_file.ConfigFile`. It may be that this behavior would not be desirable since the file being referenced may change, and that could be just as "unexpected" to naive code then not preserving "is" relationships.
 
 Lets preserve the "is" relationship
 ---------------------------------------

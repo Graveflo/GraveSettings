@@ -1,7 +1,7 @@
 Circular References
 =======================
 
-Below are examples of dealing with circular references when using the built in functionality provided by the :py:class:`~grave_settings.semantics.AutoPreserveReferences` and :py:class:`~grave_settings.semantics.ResolvePreservedReferences` semantics (enabled by default). When these semantics are not used, circular references will simply blow up the execution stack and cause a :py:class:`RecursionError`
+Below are examples of dealing with circular references when using the default functionality provided by the :py:class:`~grave_settings.semantics.AutoPreserveReferences` and :py:class:`~grave_settings.semantics.ResolvePreservedReferences` semantics (enabled by default). When these semantics are not used, circular references will simply blow up the execution stack and cause a :py:class:`RecursionError`, or they will cause :py:class:`~grave_settings.formatter_settings.PreservedReference` instances to be left wherever they appear in the serialized data in the user objects.
 
 Basic Example - Failure
 -------------------------
