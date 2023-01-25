@@ -33,17 +33,21 @@ pip install grave-settings
 <p>
 Defining new handlers or adding functionality to the default handlers is easy, but some types have already been done:
 
-| Name         | Description                                                  |
-|--------------|--------------------------------------------------------------|
-| Type         | built-in python type object                                  |
-| NoneType     | None                                                         |
-| Iterable     | General catch all for Iterable defined in collections module |
-| Mapping      | General catch all for Mapping defined in collections module  |
-| FunctionType | Python user-defined function                                 |
-| date         | from datetime module                                         |
-| datetime     | from datetime module                                         |
-| timedelta    | from datetime module                                         |
-| Enum         | from enum module                                             |
+| Name               | Description                                                  |
+|--------------------|--------------------------------------------------------------|
+| Type               | built-in python type object                                  |
+| NoneType           | None                                                         |
+| Iterable           | General catch all for Iterable defined in collections module |
+| Mapping            | General catch all for Mapping defined in collections module  |
+| FunctionType       | Python user-defined function                                 |
+| date               | from datetime module                                         |
+| datetime           | from datetime module  (experimental timezone support)        |
+| timedelta          | from datetime module                                         |
+| Enum               | from enum module                                             |
+| partial            | builtin partial class                                        |
+| bytes              | builtin bytes data                                           |
+| Complex / Rational | builtin numerical classes                                    |
+| Path               | from pathlib                                                 |
 
 There is still a ways to go before most of the built in types have handlers. To see how the handlers work read:
 [default_handlers.py](src/grave_settings/default_handlers.py)
