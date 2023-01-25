@@ -1,0 +1,1447 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 --><title>Index - grave_settings 0.1.1 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">grave_settings 0.1.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  
+  <span class="sidebar-brand-text">grave_settings 0.1.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Directory</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="limitations.html">Limitations</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="limitations/security_concerns.html">Security Concerns</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api_reference.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_reference/semantics.html">Semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference/handlers.html">Handler Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference/formatters.html">Formatters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference/bases.html">User Object Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_reference/conversion_manager.html">Conversion Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/settings_base_classes.html">Settings Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using_config_file.html">Config File Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/preserving_references.html">Preserving References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/circular_references.html">Circular References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/using_handlers.html">Using Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/building_a_formatter.html">Custom Formatter</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Documentation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.abstract.html">abstract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.base.html">base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.config_file.html">config_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.conversion_manager.html">conversion_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.default_handlers.html">default_handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.formatter.html">formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.formatter_settings.html">formatter_settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.framestack_context.html">framestack_context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.handlers.html">handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.helper_objects.html">helper_objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.semantics.html">semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.utilities.html">utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/grave_settings.validation.html">validation</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/modules.html">Formatters</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.add_config_dependency">add_config_dependency() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.add_converter">add_converter() (grave_settings.conversion_manager.ConversionManager method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.add_frame_semantics">add_frame_semantics() (grave_settings.formatter_settings.FormatterContext method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.add_frame_semantics">(grave_settings.semantics.SemanticContext method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.add_handler">add_handler() (grave_settings.handlers.Handler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler.add_handler">(grave_settings.handlers.MroHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler.add_handler">(grave_settings.handlers.OrderedHandler method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.add_handlers">add_handlers() (grave_settings.handlers.Handler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler.add_handlers">(grave_settings.handlers.MroHandler method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.add_handlers_by_type_hints">add_handlers_by_type_hints() (grave_settings.default_handlers.DeSerializationHandler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.add_handlers_by_type_hints">(grave_settings.handlers.Handler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedMethodHandler.add_handlers_by_type_hints">(grave_settings.handlers.OrderedMethodHandler method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.add_log_file_link">add_log_file_link() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.add_semantics">add_semantics() (grave_settings.formatter.Formatter method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.add_semantics">(grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.add_semantics">(grave_settings.semantics.SemanticContext method)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics.add_semantics">(grave_settings.semantics.Semantics method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.SettingsValidator.add_validation">add_validation() (grave_settings.validation.SettingsValidator method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.SettingsValidator.add_validations">add_validations() (grave_settings.validation.SettingsValidator method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.AddSemantics">AddSemantics (class in grave_settings.formatter_settings)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.assemble_settings_keys_from_base">assemble_settings_keys_from_base() (grave_settings.base.SlotSettings static method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.ATTRIBUTE">ATTRIBUTE (grave_settings.formatter_settings.FormatterSpec attribute)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.AutoKeySerializableDictType">AutoKeySerializableDictType (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.AutoPreserveReferences">AutoPreserveReferences (class in grave_settings.semantics)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.backup_settings_file">backup_settings_file() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.basic_converter">basic_converter() (in module grave_settings.conversion_manager)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.buffer_to_obj">buffer_to_obj() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.build_attribute_string">build_attribute_string() (in module grave_settings.utilities)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.C_T">C_T (grave_settings.semantics.Semantic attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.cache_instance_ref">cache_instance_ref() (grave_settings.formatter.DeSerializer method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.check_convert_update">check_convert_update() (grave_settings.abstract.VersionedSerializable class method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.Serializable.check_in_deserialization_context">check_in_deserialization_context() (grave_settings.abstract.Serializable class method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.check_in_deserialization_context">(grave_settings.config_file.ConfigFile class method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.check_in_object">check_in_object() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.Serializable.check_in_serialization_context">check_in_serialization_context() (grave_settings.abstract.Serializable class method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.check_in_serialization_context">(grave_settings.config_file.ConfigFile class method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.check_ref">check_ref() (grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.ClassStringPassFunction">ClassStringPassFunction (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.framestack_context.html#grave_settings.framestack_context.FrameStackContext.clear">clear() (grave_settings.framestack_context.FrameStackContext method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.ClassStringPassFunction.COLLECTION">COLLECTION (grave_settings.semantics.ClassStringPassFunction attribute)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.COLLECTION">(grave_settings.semantics.Semantic attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.collection_add">collection_add() (grave_settings.semantics.Semantic method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.collection_concatenate">collection_concatenate() (grave_settings.semantics.Semantic static method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.collection_copy">collection_copy() (grave_settings.semantics.Semantic static method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.collection_remove">collection_remove() (grave_settings.semantics.Semantic method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile">ConfigFile (class in grave_settings.config_file)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.context_pop">context_pop() (grave_settings.semantics.SemanticContext method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.context_push">context_push() (grave_settings.semantics.SemanticContext method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.conversion_manager_converted">conversion_manager_converted() (grave_settings.abstract.VersionedSerializable class method)</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionError">ConversionError</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager">ConversionManager (class in grave_settings.conversion_manager)</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.converted">converted (grave_settings.conversion_manager.ConversionManager attribute)</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.converters">converters (grave_settings.conversion_manager.ConversionManager attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.copy">copy() (grave_settings.formatter_settings.FormatterSpec method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics.copy">(grave_settings.semantics.Semantics method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.copy_semantics">copy_semantics() (grave_settings.semantics.SemanticContext method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.SettingsValidator.create_validation">create_validation() (grave_settings.validation.SettingsValidator method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.SettingsValidator.create_validations">create_validations() (grave_settings.validation.SettingsValidator method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.default_handler">default_handler() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.default_handler">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport.description">description (grave_settings.validation.ValidationReport attribute)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler">DeSerializationHandler (class in grave_settings.default_handlers)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.deserialize">deserialize() (grave_settings.formatter.DeSerializer method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.deserialize">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer">DeSerializer (class in grave_settings.formatter)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.DetonateDanglingPreservedReferences">DetonateDanglingPreservedReferences (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.dispose">dispose() (grave_settings.formatter.DeSerializer method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor.dispose">(grave_settings.formatter.Processor method)</a>
+</li>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.dispose">(grave_settings.formatter.Serializer method)</a>
+</li>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.dispose">(grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.DoNotAllowImportingModules">DoNotAllowImportingModules (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.dumps">dumps() (grave_settings.formatter.IFormatter method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.EnforceReferenceLifecycle">EnforceReferenceLifecycle (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.ex_str">ex_str() (in module grave_settings.utilities)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.ext_str_fmt">ext_str_fmt() (in module grave_settings.utilities)</a>
+</li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.ext_str_slots">ext_str_slots() (in module grave_settings.utilities)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.file_path">file_path (grave_settings.abstract.IASettings attribute)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.finalize">finalize() (grave_settings.abstract.IASettings method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.Serializable.finalize">(grave_settings.abstract.Serializable method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.find">find() (grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport.fixes">fixes (grave_settings.validation.ValidationReport attribute)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.force_instantiate">force_instantiate() (in module grave_settings.default_handlers)</a>
+</li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.format_class_str">format_class_str() (in module grave_settings.utilities)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.FORMAT_SETTINGS">FORMAT_SETTINGS (grave_settings.formatter.Formatter attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter">Formatter (class in grave_settings.formatter)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.FORMATTER_STR_DICT">FORMATTER_STR_DICT (grave_settings.config_file.ConfigFile attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext">FormatterContext (class in grave_settings.formatter_settings)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec">FormatterSpec (class in grave_settings.formatter_settings)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.AddSemantics.frame_semantics">frame_semantics (grave_settings.formatter_settings.AddSemantics attribute)</a>
+</li>
+        <li><a href="api/grave_settings.framestack_context.html#grave_settings.framestack_context.FrameStackContext">FrameStackContext (class in grave_settings.framestack_context)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.free_deser_obj">free_deser_obj() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.from_buffer">from_buffer() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.Serializable.from_dict">from_dict() (grave_settings.abstract.Serializable method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.from_dict">(grave_settings.config_file.ConfigFile method)</a>
+</li>
+          <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.LogFileLink.from_dict">(grave_settings.config_file.LogFileLink method)</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDict.from_dict">(grave_settings.helper_objects.KeySerializableDict method)</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDictKvpList.from_dict">(grave_settings.helper_objects.KeySerializableDictKvpList method)</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDictNumbered.from_dict">(grave_settings.helper_objects.KeySerializableDictNumbered method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.generate_key_value_pairs">generate_key_value_pairs() (grave_settings.abstract.IASettings method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.Settings.generate_key_value_pairs">(grave_settings.base.Settings method)</a>
+</li>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.generate_key_value_pairs">(grave_settings.base.SlotSettings method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.generate_slots_kvps">generate_slots_kvps() (in module grave_settings.utilities)</a>
+</li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.generate_type_hierarchy_to_base">generate_type_hierarchy_to_base() (in module grave_settings.utilities)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.get_attribute_types">get_attribute_types() (grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.get_conversion_manager">get_conversion_manager() (grave_settings.abstract.VersionedSerializable class method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.get_deserialization_context">get_deserialization_context() (grave_settings.config_file.ConfigFile method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_deserialization_context">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_deserialization_frame_context">get_deserialization_frame_context() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.get_deserialization_handler">get_deserialization_handler() (grave_settings.formatter.Formatter method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_deserialization_handler">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.get_deserializer">get_deserializer() (grave_settings.formatter.Formatter method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_deserializer">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.get_first_parameter_type_hint">get_first_parameter_type_hint() (in module grave_settings.utilities)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.get_key_func">get_key_func() (grave_settings.handlers.Handler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler.get_key_func">(grave_settings.handlers.OrderedHandler method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.get_load_data_obj">get_load_data_obj() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler.get_ordered_handlers">get_ordered_handlers() (grave_settings.handlers.MroHandler method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.get_part_from_path">get_part_from_path() (grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.get_primitive_types">get_primitive_types() (grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.get_semantic">get_semantic() (grave_settings.semantics.SemanticContext method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics.get_semantic">(grave_settings.semantics.Semantics method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.get_serialization_context">get_serialization_context() (grave_settings.config_file.ConfigFile method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_serialization_context">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_serialization_frame_context">get_serialization_frame_context() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.get_serialization_handler">get_serialization_handler() (grave_settings.formatter.Formatter method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_serialization_handler">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.get_serializer">get_serializer() (grave_settings.formatter.Formatter method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.get_serializer">(grave_settings.formatter.IFormatter method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.get_settings_keys">get_settings_keys() (grave_settings.base.SlotSettings method)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.get_settings_keys_base_slots">get_settings_keys_base_slots() (grave_settings.base.SlotSettings method)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.get_settings_keys_rems">get_settings_keys_rems() (grave_settings.base.SlotSettings method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.get_special_types">get_special_types() (grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.get_stack_depth">get_stack_depth() (grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.get_type_hints">get_type_hints() (in module grave_settings.utilities)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.SettingsValidator.get_validation_issues">get_validation_issues() (grave_settings.validation.SettingsValidator method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.get_validator">get_validator() (grave_settings.abstract.IASettings method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.get_version">get_version() (grave_settings.abstract.VersionedSerializable class method)</a>
+</li>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.get_version_info_from_class">get_version_info_from_class() (grave_settings.conversion_manager.ConversionManager class method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.get_version_object">get_version_object() (grave_settings.abstract.VersionedSerializable class method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.get_version_object">(grave_settings.conversion_manager.ConversionManager class method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.get_versioning_endpoint">get_versioning_endpoint() (grave_settings.abstract.IASettings method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.get_versioning_endpoint">(grave_settings.abstract.VersionedSerializable class method)</a>
+</li>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.Settings.get_versioning_endpoint">(grave_settings.base.Settings class method)</a>
+</li>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.get_versioning_endpoint">(grave_settings.base.SlotSettings class method)</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.abstract
+
+        <ul>
+          <li><a href="api/grave_settings.abstract.html#module-grave_settings.abstract">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.base
+
+        <ul>
+          <li><a href="api/grave_settings.base.html#module-grave_settings.base">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.config_file
+
+        <ul>
+          <li><a href="api/grave_settings.config_file.html#module-grave_settings.config_file">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.conversion_manager
+
+        <ul>
+          <li><a href="api/grave_settings.conversion_manager.html#module-grave_settings.conversion_manager">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.default_handlers
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#module-grave_settings.default_handlers">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.formatter
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#module-grave_settings.formatter">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.formatter_settings
+
+        <ul>
+          <li><a href="api/grave_settings.formatter_settings.html#module-grave_settings.formatter_settings">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.framestack_context
+
+        <ul>
+          <li><a href="api/grave_settings.framestack_context.html#module-grave_settings.framestack_context">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.handlers
+
+        <ul>
+          <li><a href="api/grave_settings.handlers.html#module-grave_settings.handlers">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.helper_objects
+
+        <ul>
+          <li><a href="api/grave_settings.helper_objects.html#module-grave_settings.helper_objects">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.semantics
+
+        <ul>
+          <li><a href="api/grave_settings.semantics.html#module-grave_settings.semantics">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.utilities
+
+        <ul>
+          <li><a href="api/grave_settings.utilities.html#module-grave_settings.utilities">module</a>
+</li>
+        </ul></li>
+        <li>
+    grave_settings.validation
+
+        <ul>
+          <li><a href="api/grave_settings.validation.html#module-grave_settings.validation">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle">handle() (grave_settings.default_handlers.SerializationHandler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.handle">(grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.handle">(grave_settings.handlers.Handler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler.handle">(grave_settings.handlers.MroHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler.handle">(grave_settings.handlers.OrderedHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedMethodHandler.handle">(grave_settings.handlers.OrderedMethodHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.StackedHandler.handle">(grave_settings.handlers.StackedHandler method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_add_semantics">handle_add_semantics() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_bytes">handle_bytes() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_bytes">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_Complex">handle_Complex() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_Complex">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler.handle_custom">handle_custom() (grave_settings.handlers.MroHandler method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_date">handle_date() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_date">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_datetime">handle_datetime() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_datetime">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.handle_default">handle_default() (grave_settings.formatter.DeSerializer method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_default">(grave_settings.formatter.Serializer method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.handle_deserialize_LogFileLink">handle_deserialize_LogFileLink() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.handle_dict">handle_dict() (grave_settings.formatter.DeSerializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_Enum">handle_Enum() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_Enum">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_function_type">handle_function_type() (grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_Iterable">handle_Iterable() (grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_KeySerializableDict">handle_KeySerializableDict() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.handle_list">handle_list() (grave_settings.formatter.DeSerializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_Mapping">handle_Mapping() (grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.handle_me">handle_me() (grave_settings.config_file.ConfigFile class method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_method">handle_method() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_method">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.handle_node">handle_node() (grave_settings.handlers.Handler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler.handle_node">(grave_settings.handlers.OrderedHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedMethodHandler.handle_node">(grave_settings.handlers.OrderedMethodHandler method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_NoneType">handle_NoneType() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_NoneType">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_partial">handle_partial() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_partial">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_path">handle_path() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_path">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.handle_preserved_referece">handle_preserved_referece() (grave_settings.formatter.DeSerializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_PreservedReference">handle_PreservedReference() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_PreservedReference">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_Rational">handle_Rational() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_Rational">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.handle_secondary_preserved_reference">handle_secondary_preserved_reference() (grave_settings.formatter.DeSerializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_serializable">handle_serializable() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_serializable">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_serialize_dict_in_place">handle_serialize_dict_in_place() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.handle_serialize_IASettings">handle_serialize_IASettings() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_serialize_list_in_place">handle_serialize_list_in_place() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_set">handle_set() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_temporary">handle_temporary() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_timedelta">handle_timedelta() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_timedelta">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_tuple">handle_tuple() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.handle_type">handle_type() (grave_settings.default_handlers.DeSerializationHandler static method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.handle_type">(grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_user_dict">handle_user_dict() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.handle_user_list">handle_user_list() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler">Handler (class in grave_settings.handlers)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.handler">handler (grave_settings.formatter_settings.FormatterContext property)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.HandlerNotFound">HandlerNotFound</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings">IASettings (class in grave_settings.abstract)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter">IFormatter (class in grave_settings.formatter)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.IgnoreDuckTypingForSubclasses">IgnoreDuckTypingForSubclasses (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.IgnoreDuckTypingForType">IgnoreDuckTypingForType (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Indentation">Indentation (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler.init_handler">init_handler() (grave_settings.default_handlers.DeSerializationHandler method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.init_handler">(grave_settings.default_handlers.SerializationHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.init_handler">(grave_settings.handlers.Handler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler.init_handler">(grave_settings.handlers.OrderedHandler method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.init_settings">init_settings() (grave_settings.abstract.IASettings method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.instantiate_data">instantiate_data() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.invalidate">invalidate (grave_settings.abstract.IASettings attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.is_circular_ref">is_circular_ref() (grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.is_loaded">is_loaded() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor.it_quack">it_quack() (grave_settings.formatter.Processor method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.KeySemanticsTemplate">KeySemanticsTemplate (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDict">KeySerializableDict (class in grave_settings.helper_objects)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDictKvpList">KeySerializableDictKvpList (class in grave_settings.helper_objects)</a>
+</li>
+        <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDictNumbered">KeySerializableDictNumbered (class in grave_settings.helper_objects)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.load">load() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.load_type">load_type() (grave_settings.formatter_settings.FormatterContext method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.load_type">(in module grave_settings.utilities)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.loads">loads() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.LogFileLink">LogFileLink (class in grave_settings.config_file)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport.long_description">long_description (grave_settings.validation.ValidationReport attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.make_kill_converter">make_kill_converter() (in module grave_settings.abstract)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationCapsule.make_validation_report">make_validation_report (grave_settings.validation.ValidationCapsule attribute)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.Validation.make_validation_report">make_validation_report() (grave_settings.validation.Validation method)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="api/grave_settings.abstract.html#module-grave_settings.abstract">grave_settings.abstract</a>
+</li>
+          <li><a href="api/grave_settings.base.html#module-grave_settings.base">grave_settings.base</a>
+</li>
+          <li><a href="api/grave_settings.config_file.html#module-grave_settings.config_file">grave_settings.config_file</a>
+</li>
+          <li><a href="api/grave_settings.conversion_manager.html#module-grave_settings.conversion_manager">grave_settings.conversion_manager</a>
+</li>
+          <li><a href="api/grave_settings.default_handlers.html#module-grave_settings.default_handlers">grave_settings.default_handlers</a>
+</li>
+          <li><a href="api/grave_settings.formatter.html#module-grave_settings.formatter">grave_settings.formatter</a>
+</li>
+          <li><a href="api/grave_settings.formatter_settings.html#module-grave_settings.formatter_settings">grave_settings.formatter_settings</a>
+</li>
+          <li><a href="api/grave_settings.framestack_context.html#module-grave_settings.framestack_context">grave_settings.framestack_context</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#module-grave_settings.handlers">grave_settings.handlers</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#module-grave_settings.helper_objects">grave_settings.helper_objects</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#module-grave_settings.semantics">grave_settings.semantics</a>
+</li>
+          <li><a href="api/grave_settings.utilities.html#module-grave_settings.utilities">grave_settings.utilities</a>
+</li>
+          <li><a href="api/grave_settings.validation.html#module-grave_settings.validation">grave_settings.validation</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler">MroHandler (class in grave_settings.handlers)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport.name">name (grave_settings.validation.ValidationReport attribute)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Negate">Negate (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.NoRef">NoRef (class in grave_settings.formatter_settings)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.NotifyFinalizedMethodName">NotifyFinalizedMethodName (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.NotNoneValidation">NotNoneValidation (class in grave_settings.validation)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.NotSerializableException">NotSerializableException</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.PreservedReference.obj">obj (grave_settings.formatter_settings.PreservedReference attribute)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler.omit">omit() (grave_settings.default_handlers.SerializationHandler static method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.OmitMe">OmitMe (class in grave_settings.semantics)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.OmitMeError">OmitMeError</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler">OrderedHandler (class in grave_settings.handlers)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedMethodHandler">OrderedMethodHandler (class in grave_settings.handlers)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.OverrideClassString">OverrideClassString (class in grave_settings.semantics)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.parent">parent (grave_settings.abstract.IASettings attribute)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.PassLogFilePath">PassLogFilePath (class in grave_settings.config_file)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor.path_to_str">path_to_str() (grave_settings.formatter.Processor method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.path_to_str">(grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics.pop">pop() (grave_settings.semantics.Semantics method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.PreserveDictionaryOrdering">PreserveDictionaryOrdering (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.PreservedReference">PreservedReference (class in grave_settings.formatter_settings)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.PreservedReferenceNotDissolvedError">PreservedReferenceNotDissolvedError</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.PreserveSerializableKeyOrdering">PreserveSerializableKeyOrdering (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.PRIMITIVES">PRIMITIVES (grave_settings.formatter_settings.FormatterSpec attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.process">process() (grave_settings.formatter.DeSerializer method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor.process">(grave_settings.formatter.Processor method)</a>
+</li>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.process">(grave_settings.formatter.Serializer method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.ProcessingException">ProcessingException</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor">Processor (class in grave_settings.formatter)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.read_from_file">read_from_file() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.PreservedReference.ref">ref (grave_settings.formatter_settings.PreservedReference attribute)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.remove_frame_semantic">remove_frame_semantic() (grave_settings.semantics.SemanticContext method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext.remove_semantic">remove_semantic() (grave_settings.semantics.SemanticContext method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics.remove_semantic">(grave_settings.semantics.Semantics method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.ResolvePreservedReferences">ResolvePreservedReferences (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor.root_obj">root_obj (grave_settings.formatter.Processor property)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.ROUTE_PATH_REGEX">ROUTE_PATH_REGEX (grave_settings.formatter_settings.FormatterSpec attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.ROUTE_PATH_TRANSLATION">ROUTE_PATH_TRANSLATION (grave_settings.formatter_settings.FormatterSpec attribute)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.run_semantics_through_path">run_semantics_through_path() (grave_settings.formatter.DeSerializer method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.safe_update">safe_update() (grave_settings.base.SlotSettings method)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.save">save() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.Settings.sd">sd (grave_settings.base.Settings attribute)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SecurityException">SecurityException</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic">Semantic (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Negate.semantic">semantic (grave_settings.semantics.Negate attribute)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SemanticContext">SemanticContext (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics">Semantics (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.AddSemantics.semantics">semantics (grave_settings.formatter_settings.AddSemantics attribute)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.Serializable">Serializable (class in grave_settings.abstract)</a>
+</li>
+        <li><a href="api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler">SerializationHandler (class in grave_settings.default_handlers)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.serialize">serialize() (grave_settings.formatter.IFormatter method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.serialize">(grave_settings.formatter.Serializer method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.serialized_obj_to_buffer">serialized_obj_to_buffer() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SerializeNoneVersionInfo">SerializeNoneVersionInfo (class in grave_settings.semantics)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer">Serializer (class in grave_settings.formatter)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.set_default_handler">set_default_handler() (grave_settings.handlers.Handler method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.set_default_semantics">set_default_semantics() (grave_settings.formatter.DeSerializer method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Processor.set_default_semantics">(grave_settings.formatter.Processor method)</a>
+</li>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.set_default_semantics">(grave_settings.formatter.Serializer method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.framestack_context.html#grave_settings.framestack_context.FrameStackContext.set_handler">set_handler() (grave_settings.framestack_context.FrameStackContext method)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.Settings">Settings (class in grave_settings.base)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport.settings">settings (grave_settings.validation.ValidationReport attribute)</a>
+</li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.settings_invalidated">settings_invalidated() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport.settings_key">settings_key (grave_settings.validation.ValidationReport attribute)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.SETTINGS_KEYS">SETTINGS_KEYS (grave_settings.base.SlotSettings attribute)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.SettingsValidator">SettingsValidator (class in grave_settings.validation)</a>
+</li>
+        <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings">SlotSettings (class in grave_settings.base)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.SPECIAL">SPECIAL (grave_settings.formatter_settings.FormatterSpec attribute)</a>
+</li>
+        <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.StackedHandler">StackedHandler (class in grave_settings.handlers)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.str_to_path">str_to_path() (grave_settings.formatter_settings.FormatterSpec method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.DeSerializer.supports_semantic">supports_semantic() (grave_settings.formatter.DeSerializer method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.supports_semantic">(grave_settings.formatter.Serializer method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SymantecConfigurationInvalid">SymantecConfigurationInvalid</a>
+</li>
+        <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SymantecNotSupportedError">SymantecNotSupportedError</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Serializer.template_object_serialize">template_object_serialize() (grave_settings.formatter.Serializer method)</a>
+</li>
+        <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.Temporary">Temporary (class in grave_settings.formatter_settings)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.to_buffer">to_buffer() (grave_settings.formatter.IFormatter method)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.Serializable.to_dict">to_dict() (grave_settings.abstract.Serializable method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.Settings.to_dict">(grave_settings.base.Settings method)</a>
+</li>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.SlotSettings.to_dict">(grave_settings.base.SlotSettings method)</a>
+</li>
+          <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.to_dict">(grave_settings.config_file.ConfigFile method)</a>
+</li>
+          <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.LogFileLink.to_dict">(grave_settings.config_file.LogFileLink method)</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDict.to_dict">(grave_settings.helper_objects.KeySerializableDict method)</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDictKvpList.to_dict">(grave_settings.helper_objects.KeySerializableDictKvpList method)</a>
+</li>
+          <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDictNumbered.to_dict">(grave_settings.helper_objects.KeySerializableDictNumbered method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.try_convert">try_convert() (grave_settings.conversion_manager.ConversionManager method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.TypeCheckValidation">TypeCheckValidation (class in grave_settings.validation)</a>
+</li>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.Formatter.TYPES">TYPES (grave_settings.formatter.Formatter attribute)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec.TYPES">(grave_settings.formatter_settings.FormatterSpec attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.utilities.html#grave_settings.utilities.unwrap_slots_to_base">unwrap_slots_to_base() (in module grave_settings.utilities)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.IASettings.update">update() (grave_settings.abstract.IASettings method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.base.html#grave_settings.base.Settings.update">(grave_settings.base.Settings method)</a>
+</li>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext.update">(grave_settings.formatter_settings.FormatterContext method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.Handler.update">(grave_settings.handlers.Handler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.MroHandler.update">(grave_settings.handlers.MroHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler.update">(grave_settings.handlers.OrderedHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.handlers.html#grave_settings.handlers.StackedHandler.update">(grave_settings.handlers.StackedHandler method)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantics.update">(grave_settings.semantics.Semantics method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.conversion_manager.html#grave_settings.conversion_manager.ConversionManager.update_to_current">update_to_current() (grave_settings.conversion_manager.ConversionManager method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.PassLogFilePath.val">val (grave_settings.config_file.PassLogFilePath attribute)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.AddSemantics.val">(grave_settings.formatter_settings.AddSemantics attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.AutoKeySerializableDictType.val">(grave_settings.semantics.AutoKeySerializableDictType attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.AutoPreserveReferences.val">(grave_settings.semantics.AutoPreserveReferences attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.ClassStringPassFunction.val">(grave_settings.semantics.ClassStringPassFunction attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.DetonateDanglingPreservedReferences.val">(grave_settings.semantics.DetonateDanglingPreservedReferences attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.DoNotAllowImportingModules.val">(grave_settings.semantics.DoNotAllowImportingModules attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.EnforceReferenceLifecycle.val">(grave_settings.semantics.EnforceReferenceLifecycle attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.IgnoreDuckTypingForSubclasses.val">(grave_settings.semantics.IgnoreDuckTypingForSubclasses attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.IgnoreDuckTypingForType.val">(grave_settings.semantics.IgnoreDuckTypingForType attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Indentation.val">(grave_settings.semantics.Indentation attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.KeySemanticsTemplate.val">(grave_settings.semantics.KeySemanticsTemplate attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.NotifyFinalizedMethodName.val">(grave_settings.semantics.NotifyFinalizedMethodName attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.OmitMe.val">(grave_settings.semantics.OmitMe attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.OverrideClassString.val">(grave_settings.semantics.OverrideClassString attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.PreserveDictionaryOrdering.val">(grave_settings.semantics.PreserveDictionaryOrdering attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.PreserveSerializableKeyOrdering.val">(grave_settings.semantics.PreserveSerializableKeyOrdering attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.ResolvePreservedReferences.val">(grave_settings.semantics.ResolvePreservedReferences attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.Semantic.val">(grave_settings.semantics.Semantic attribute)</a>
+</li>
+          <li><a href="api/grave_settings.semantics.html#grave_settings.semantics.SerializeNoneVersionInfo.val">(grave_settings.semantics.SerializeNoneVersionInfo attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.NotNoneValidation.validate">validate() (grave_settings.validation.NotNoneValidation method)</a>
+
+        <ul>
+          <li><a href="api/grave_settings.validation.html#grave_settings.validation.TypeCheckValidation.validate">(grave_settings.validation.TypeCheckValidation method)</a>
+</li>
+          <li><a href="api/grave_settings.validation.html#grave_settings.validation.Validation.validate">(grave_settings.validation.Validation method)</a>
+</li>
+        </ul></li>
+        <li><a href="api/grave_settings.config_file.html#grave_settings.config_file.ConfigFile.validate_file_path">validate_file_path() (grave_settings.config_file.ConfigFile method)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.Validation">Validation (class in grave_settings.validation)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationCapsule">ValidationCapsule (class in grave_settings.validation)</a>
+</li>
+        <li><a href="api/grave_settings.validation.html#grave_settings.validation.ValidationReport">ValidationReport (class in grave_settings.validation)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable.VERSION">VERSION (grave_settings.abstract.VersionedSerializable attribute)</a>
+</li>
+        <li><a href="api/grave_settings.abstract.html#grave_settings.abstract.VersionedSerializable">VersionedSerializable (class in grave_settings.abstract)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.helper_objects.html#grave_settings.helper_objects.KeySerializableDict.wrapped_dict">wrapped_dict (grave_settings.helper_objects.KeySerializableDict attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api/grave_settings.formatter.html#grave_settings.formatter.IFormatter.write_to_file">write_to_file() (grave_settings.formatter.IFormatter method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ryan McConnell
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    </body>
+</html>

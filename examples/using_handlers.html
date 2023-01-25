@@ -1,0 +1,553 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Custom Formatter" href="building_a_formatter.html" /><link rel="prev" title="Circular References" href="circular_references.html" />
+
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
+        <title>Using Handlers - grave_settings 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">grave_settings 0.1.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">grave_settings 0.1.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Directory</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../limitations.html">Limitations</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../limitations/security_concerns.html">Security Concerns</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api_reference.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/semantics.html">Semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/handlers.html">Handler Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/formatters.html">Formatters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/bases.html">User Object Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/conversion_manager.html">Conversion Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../examples.html">Examples</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="settings_base_classes.html">Settings Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="using_config_file.html">Config File Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preserving_references.html">Preserving References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="circular_references.html">Circular References</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Using Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="building_a_formatter.html">Custom Formatter</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Documentation</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.abstract.html">abstract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.base.html">base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.config_file.html">config_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.conversion_manager.html">conversion_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.default_handlers.html">default_handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.formatter.html">formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.formatter_settings.html">formatter_settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.framestack_context.html">framestack_context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.handlers.html">handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.helper_objects.html">helper_objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.semantics.html">semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.utilities.html">utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/grave_settings.validation.html">validation</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/modules.html">Formatters</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="using-handlers">
+<h1>Using Handlers<a class="headerlink" href="#using-handlers" title="Permalink to this heading">#</a></h1>
+<p>The word “handler” is used… a lot on this page. Uppercase “Handler” refers to an object that is an instance of <a class="reference internal" href="../api/grave_settings.handlers.html#grave_settings.handlers.Handler" title="grave_settings.handlers.Handler"><code class="xref py py-class docutils literal notranslate"><span class="pre">Handler</span></code></a>. Lowercase “handler” refers to a callable that is added to a Handler object.</p>
+<p>You might want to read the <a class="reference internal" href="../api_reference/handlers.html"><span class="doc">API Reference on this topic</span></a> before looks at these examples.</p>
+<p>There are some situations where it is impractical, or I’ll inaccurately say “impossible,” to use inheritance to describe how a class should be converted to and from state objects. This is the main reason to use Handlers. Also, it can be easier to manage many instances of objects downstream from a parent object if the parent overrides a handler for them.</p>
+<p>Lets look at an example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span>
+
+<span class="kn">from</span> <span class="nn">grave_settings.formatters.json</span> <span class="kn">import</span> <span class="n">JsonFormatter</span>
+
+<span class="k">class</span> <span class="nc">Color</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_number</span> <span class="o">=</span> <span class="n">random</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Color(r=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="si">}</span><span class="s1">, g=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="si">}</span><span class="s1">, b=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">()</span>
+<span class="n">obj_str</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_str</span><span class="p">)</span>
+<span class="n">remade_obj</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">obj_str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">remade_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+      <span class="s2">&quot;__class__&quot;</span><span class="p">:</span> <span class="s2">&quot;__main__.Color&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+      <span class="s2">&quot;g&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+      <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+      <span class="s2">&quot;random_number&quot;</span><span class="p">:</span> <span class="mf">0.9294795200396854</span>
+  <span class="p">}</span>
+  <span class="o">-----------------</span>
+  <span class="n">Color</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>There is a problem here. It’s not catastrophic, in this case, but it can be if we are not careful. Since the constructor or <code class="docutils literal notranslate"><span class="pre">Color</span></code> requires positional arguments the default deserialization handler is going to attempt to instantiate it and fail. The default Handler will use the <code class="docutils literal notranslate"><span class="pre">__new__</span></code> method to create the type without requiring the arguments and then set the attributes to the values that were serialized, but this means that <strong>we do not call __init__ in this case</strong>. If the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method does something important or sets up attributes that are not serialized this can lead to some unexpected behavior because some attributes will not have membership to the created object and some logic that is usually expected to take place may be skipped. Lets fix this.</p>
+<section id="adding-a-default-handler">
+<h2>Adding a default handler<a class="headerlink" href="#adding-a-default-handler" title="Permalink to this heading">#</a></h2>
+<p>Lets say that we did not want to serialize the <code class="docutils literal notranslate"><span class="pre">random_number</span></code> attribute of <code class="docutils literal notranslate"><span class="pre">Color</span></code> instances and we do not want to inherit from Color. Color does not have methods like <code class="docutils literal notranslate"><span class="pre">to_dict</span></code> and <code class="docutils literal notranslate"><span class="pre">from_dict</span></code>, but actually, those methods are called by the default Handler if they are available. We can skip all of that by simply defining a new handler for this type.</p>
+<p>There are a couple of different places we can add a handler for <code class="docutils literal notranslate"><span class="pre">Color</span></code> each with their advantages and disadvantages. We’ll start with adding the handlers to a <a class="reference internal" href="../api/grave_settings.formatter.html#grave_settings.formatter.Formatter" title="grave_settings.formatter.Formatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Formatter</span></code></a>. This will effectively set them as defaults for the <code class="docutils literal notranslate"><span class="pre">formatter</span></code> object. Defaults can be overriden by further alterations to the Handlers (discussed later), but this is probably the best place to put catch-alls for a program.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span>
+
+<span class="kn">from</span> <span class="nn">grave_settings.formatters.json</span> <span class="kn">import</span> <span class="n">JsonFormatter</span>
+
+
+<span class="k">class</span> <span class="nc">Color</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_number</span> <span class="o">=</span> <span class="n">random</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Color(r=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="si">}</span><span class="s1">, g=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="si">}</span><span class="s1">, b=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_color</span><span class="p">(</span><span class="n">color</span><span class="p">:</span> <span class="n">Color</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># [2]</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span>
+        <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">color</span><span class="o">.</span><span class="n">g</span><span class="p">,</span>
+        <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">color</span><span class="o">.</span><span class="n">b</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">deserialize_color</span><span class="p">(</span><span class="n">_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Color</span><span class="p">],</span> <span class="n">dict_obj</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># [2]</span>
+    <span class="k">return</span> <span class="n">Color</span><span class="p">(</span><span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">],</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
+
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">()</span>
+<span class="n">formatter</span><span class="o">.</span><span class="n">serialization_handler</span><span class="o">.</span><span class="n">add_handlers_by_type_hints</span><span class="p">(</span><span class="n">serialize_color</span><span class="p">)</span>  <span class="c1"># [1]</span>
+<span class="n">formatter</span><span class="o">.</span><span class="n">deserialization_handler</span><span class="o">.</span><span class="n">add_handlers_by_type_hints</span><span class="p">(</span><span class="n">deserialize_color</span><span class="p">)</span>  <span class="c1"># [1]</span>
+<span class="n">obj_str</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_str</span><span class="p">)</span>
+<span class="n">remade_obj</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">obj_str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">remade_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+      <span class="s2">&quot;__class__&quot;</span><span class="p">:</span> <span class="s2">&quot;__main__.Color&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+      <span class="s2">&quot;g&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+      <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">255</span>
+  <span class="p">}</span>
+  <span class="o">-----------------</span>
+  <span class="n">Color</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-note-1 admonition">
+<p class="admonition-title">Note [1]</p>
+<p>We are using the <code class="docutils literal notranslate"><span class="pre">add_handlers_by_type_hints</span></code> method to scan the type hint of the first parameter of the callable. The type of the first parameter will indicate which type the callable is associated with. The <code class="docutils literal notranslate"><span class="pre">deserialization_handler</span></code> by default is an instance of <a class="reference internal" href="../api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler" title="grave_settings.default_handlers.DeSerializationHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeSerializationHandler</span></code></a> which overrides this behavior to read the type inside the <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Type</span></code></a> hint.</p>
+</div>
+<div class="admonition-note-2 admonition">
+<p class="admonition-title">Note [2]</p>
+<p>We are collapsing the positional arguments beyond the first to <code class="docutils literal notranslate"><span class="pre">*args</span></code> and the keyword arguments to <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>. It is standard to have <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> on all handler functions / methods since the <a class="reference internal" href="../api/grave_settings.formatter.html#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Processors</span></code></a> will propagate <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> arguments through their process. The <code class="docutils literal notranslate"><span class="pre">*args</span></code> should always be a tuple of length 1. The argument that is passed will be an object of type <a class="reference internal" href="../api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">FormatterContext</span></code></a>. We are not using the <a class="reference internal" href="../api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">FormatterContext</span></code></a> in this example so I did not bother importing it and acknowledging it in the code, but it is important to know that it is there. If you wanted to do something like add <a class="reference internal" href="../api_reference/semantics.html"><span class="doc">Semantics</span></a> to the context you accomplish this by interacting with this object.</p>
+</div>
+<p>The handlers we added as defaults have changed the way Color is serialized and deserialized. Now there is no <code class="docutils literal notranslate"><span class="pre">random_number</span></code> attribute in the serialized object. Also since we defined a custom deserializing handler we are instantiating <code class="docutils literal notranslate"><span class="pre">Color</span></code> manually and thus we <strong>are</strong> calling <code class="docutils literal notranslate"><span class="pre">__init__</span></code> during the deserialization process this time.</p>
+</section>
+<section id="dynamically-add-handler-during-processing">
+<h2>Dynamically add handler during processing<a class="headerlink" href="#dynamically-add-handler-during-processing" title="Permalink to this heading">#</a></h2>
+<p>Lets take a look at adding handlers during processing. This has niche applications. It can save a lot of time if you have custom unmanaged objects that live under a managed object and you want the managed object to provide the logic for the unmanaged objects that it references. We will make a managed object, by using inheritance, that will take the responsibility of providing handlers for it’s child objects.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">random</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span>
+
+<span class="kn">from</span> <span class="nn">grave_settings.abstract</span> <span class="kn">import</span> <span class="n">Serializable</span>
+<span class="kn">from</span> <span class="nn">grave_settings.formatter_settings</span> <span class="kn">import</span> <span class="n">FormatterContext</span><span class="p">,</span> <span class="n">Temporary</span>
+<span class="kn">from</span> <span class="nn">grave_settings.formatters.json</span> <span class="kn">import</span> <span class="n">JsonFormatter</span>
+<span class="kn">from</span> <span class="nn">grave_settings.handlers</span> <span class="kn">import</span> <span class="n">OrderedHandler</span>
+
+
+<span class="k">class</span> <span class="nc">Color</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_number</span> <span class="o">=</span> <span class="n">random</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Color(r=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">r</span><span class="si">}</span><span class="s1">, g=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="si">}</span><span class="s1">, b=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">b</span><span class="si">}</span><span class="s1">)&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">serialize_color</span><span class="p">(</span><span class="n">color</span><span class="p">:</span> <span class="n">Color</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Temporary</span><span class="p">({</span>  <span class="c1"># [2]</span>
+        <span class="s1">&#39;r&#39;</span><span class="p">:</span> <span class="n">color</span><span class="o">.</span><span class="n">r</span><span class="p">,</span>
+        <span class="s1">&#39;g&#39;</span><span class="p">:</span> <span class="n">color</span><span class="o">.</span><span class="n">g</span><span class="p">,</span>
+        <span class="s1">&#39;b&#39;</span><span class="p">:</span> <span class="n">color</span><span class="o">.</span><span class="n">b</span>
+    <span class="p">})</span>
+
+
+<span class="k">def</span> <span class="nf">deserialize_color</span><span class="p">(</span><span class="n">_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">Color</span><span class="p">],</span> <span class="n">dict_obj</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">Color</span><span class="p">(</span><span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;r&#39;</span><span class="p">],</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;g&#39;</span><span class="p">],</span> <span class="n">dict_obj</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">])</span>
+
+
+<span class="k">class</span> <span class="nc">MyColors</span><span class="p">(</span><span class="n">Serializable</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">Color</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">2555</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_in_serialization_context</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">FormatterContext</span><span class="p">):</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">OrderedHandler</span><span class="p">()</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span><span class="n">Color</span><span class="p">,</span> <span class="n">serialize_color</span><span class="p">)</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>  <span class="c1"># [1]</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">check_in_deserialization_context</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">FormatterContext</span><span class="p">):</span>
+        <span class="n">handler</span> <span class="o">=</span> <span class="n">OrderedHandler</span><span class="p">()</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">add_handler</span><span class="p">(</span><span class="n">Color</span><span class="p">,</span> <span class="n">deserialize_color</span><span class="p">)</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>  <span class="c1"># [1]</span>
+
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">JsonFormatter</span><span class="p">()</span>
+<span class="n">obj_str</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">MyColors</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">obj_str</span><span class="p">)</span>
+<span class="n">remade_obj</span> <span class="o">=</span> <span class="n">formatter</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">obj_str</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">remade_obj</span><span class="o">.</span><span class="n">color</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Output</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="p">{</span>
+      <span class="s2">&quot;__class__&quot;</span><span class="p">:</span> <span class="s2">&quot;__main__.MyColors&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">{</span>
+          <span class="s2">&quot;__class__&quot;</span><span class="p">:</span> <span class="s2">&quot;__main__.Color&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;r&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+          <span class="s2">&quot;g&quot;</span><span class="p">:</span> <span class="mi">255</span><span class="p">,</span>
+          <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2555</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="o">-----------------</span>
+  <span class="n">Color</span><span class="p">(</span><span class="n">r</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">g</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">2555</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-note-1 admonition">
+<p class="admonition-title">Note [1]</p>
+<p>The reason we create an entirely new <a class="reference internal" href="../api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedHandlers</span></code></a> for this task is so the handlers do no propagate backwards. If we change the current Handler object then stack frames before the current frame will also be effected. Updating the handler during processing usually only effects down-stream objects and may negatively impact upstream objects. The <code class="docutils literal notranslate"><span class="pre">handler</span></code> attribute is a <a class="reference external" href="https://docs.python.org/3/library/functions.html#property" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">property</span></code></a> and setting the property automatically does a <code class="docutils literal notranslate"><span class="pre">merge</span></code>, <code class="docutils literal notranslate"><span class="pre">update_order</span></code> operation on the new Handler with the previous Handler thus maintaining all the previous handlers but allowing the new <a class="reference internal" href="../api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedHandler</span></code></a> to override functionality.</p>
+</div>
+<div class="admonition-note-2 admonition" id="handlersandtemporary">
+<p class="admonition-title">Note [2]</p>
+<p><a class="reference internal" href="../api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.Temporary" title="grave_settings.formatter_settings.Temporary"><code class="xref py py-class docutils literal notranslate"><span class="pre">Temporary</span></code></a> objects are special wrappers that inform the formatter that the data object it encapsulates is created for the sole purpose of communicating object structure. The object wrapped in the <a class="reference internal" href="../api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.Temporary" title="grave_settings.formatter_settings.Temporary"><code class="xref py py-class docutils literal notranslate"><span class="pre">Temporary</span></code></a> instance <strong>cannot</strong> belong to a user object. The formatter will use this information to save memory, by mutating it in-place. Temporary objects are also dereferenced mid-process and because of this their object-ids become available for re-use. Without the <a class="reference internal" href="../api/grave_settings.semantics.html#grave_settings.semantics.EnforceReferenceLifecycle" title="grave_settings.semantics.EnforceReferenceLifecycle"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnforceReferenceLifecycle</span></code></a> semantic (enabled by default) these object references will cause all kinds of mix ups in the formatter when <a class="reference internal" href="../api/grave_settings.semantics.html#grave_settings.semantics.AutoPreserveReferences" title="grave_settings.semantics.AutoPreserveReferences"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoPreserveReferences</span></code></a> is enabled (default). Temporary objects inform the formatter to skip all of this nonsense and will never attempt to reference them. Any time you have a data structure that was created for the sole purpose of communicating structure to the formatter you will want to wrap it in a Temporary object. The default <a class="reference internal" href="../api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler" title="grave_settings.default_handlers.SerializationHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">SerializationHandler</span></code></a> will automatically wrap the object returned by a handler, but since we are swapping the Handler out for <a class="reference internal" href="../api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedHandlers</span></code></a> ([1]) in this case we should manually wrap it.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We used bare <a class="reference internal" href="../api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedHandlers</span></code></a> instances in this example but it would probably be smarter to use new <a class="reference internal" href="../api/grave_settings.default_handlers.html#grave_settings.default_handlers.SerializationHandler" title="grave_settings.default_handlers.SerializationHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">SerializationHandler</span></code></a> and <a class="reference internal" href="../api/grave_settings.default_handlers.html#grave_settings.default_handlers.DeSerializationHandler" title="grave_settings.default_handlers.DeSerializationHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">DeSerializationHandler</span></code></a> instances since they automatically wrap the output in <a class="reference internal" href="../api/grave_settings.formatter_settings.html#grave_settings.formatter_settings.Temporary" title="grave_settings.formatter_settings.Temporary"><code class="xref py py-class docutils literal notranslate"><span class="pre">Temporary</span></code></a> and down-stream objects may expect the interface on these objects instead of <a class="reference internal" href="../api/grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">OrderedHandlers</span></code></a> causing errors.</p>
+</div>
+<p>We see this output is the same as the previous except the color object is within <code class="docutils literal notranslate"><span class="pre">MyColors</span></code> and this class provides the logic for handling <code class="docutils literal notranslate"><span class="pre">Color</span></code> objects.</p>
+</section>
+<section id="using-the-mrohandler">
+<h2>Using the MroHandler<a class="headerlink" href="#using-the-mrohandler" title="Permalink to this heading">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is not currently used in this package</p>
+</div>
+<p>I use the MroHandler to decouple the creation of GUI settings windows (wip) from the settings objects. They blend the functionality of handlers with cooperative concepts from method overloading. MroHandlers are just like the OrderedHandler except all of the available handlers are run on an object for each of the classes in its mro and the output of each handler is passed to the next in a special positional argument named <code class="docutils literal notranslate"><span class="pre">nest</span></code></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">grave_settings.handlers</span> <span class="kn">import</span> <span class="n">MroHandler</span>
+
+<span class="k">class</span> <span class="nc">A</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">get_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">B</span><span class="p">(</span><span class="n">A</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span>
+        <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">handle_a</span><span class="p">(</span><span class="n">instance</span><span class="p">:</span> <span class="n">A</span><span class="p">,</span> <span class="n">nest</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">nest</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nest</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">nest</span><span class="p">[</span><span class="s1">&#39;list&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_list</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">nest</span>
+
+<span class="k">def</span> <span class="nf">handle_b</span><span class="p">(</span><span class="n">instance</span><span class="p">:</span> <span class="n">B</span><span class="p">,</span> <span class="n">nest</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">nest</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nest</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">nest</span><span class="p">[</span><span class="s1">&#39;dict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instance</span><span class="o">.</span><span class="n">get_dict</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">nest</span>
+
+<span class="n">handler</span> <span class="o">=</span> <span class="n">MroHandler</span><span class="p">()</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">add_handlers_by_type_hints</span><span class="p">(</span><span class="n">handle_a</span><span class="p">)</span>
+<span class="n">handler</span><span class="o">.</span><span class="n">add_handlers_by_type_hints</span><span class="p">(</span><span class="n">handle_b</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">B</span><span class="p">()))</span>
+</pre></div>
+</div>
+<p>output: <code class="docutils literal notranslate"><span class="pre">{'list':</span> <span class="pre">[1,</span> <span class="pre">2,</span> <span class="pre">3],</span> <span class="pre">'dict':</span> <span class="pre">{'foo':</span> <span class="pre">'bar'}}</span></code></p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="building_a_formatter.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Custom Formatter</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="circular_references.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Circular References</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ryan McConnell
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Using Handlers</a><ul>
+<li><a class="reference internal" href="#adding-a-default-handler">Adding a default handler</a></li>
+<li><a class="reference internal" href="#dynamically-add-handler-during-processing">Dynamically add handler during processing</a></li>
+<li><a class="reference internal" href="#using-the-mrohandler">Using the MroHandler</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    </body>
+</html>

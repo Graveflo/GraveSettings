@@ -1,0 +1,1020 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="formatter_settings" href="grave_settings.formatter_settings.html" /><link rel="prev" title="default_handlers" href="grave_settings.default_handlers.html" />
+
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
+        <title>formatter - grave_settings 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">grave_settings 0.1.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">grave_settings 0.1.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Directory</span></p>
+<ul class="current">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../limitations.html">Limitations</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../limitations/security_concerns.html">Security Concerns</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api_reference.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/semantics.html">Semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/handlers.html">Handler Objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/formatters.html">Formatters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/bases.html">User Object Base Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api_reference/conversion_manager.html">Conversion Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples.html">Examples</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../examples/settings_base_classes.html">Settings Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/using_config_file.html">Config File Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/preserving_references.html">Preserving References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/circular_references.html">Circular References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/using_handlers.html">Using Handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/building_a_formatter.html">Custom Formatter</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API Documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.abstract.html">abstract</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.base.html">base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.config_file.html">config_file</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.conversion_manager.html">conversion_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.default_handlers.html">default_handlers</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">formatter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.formatter_settings.html">formatter_settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.framestack_context.html">framestack_context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.handlers.html">handlers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.helper_objects.html">helper_objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.semantics.html">semantics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.utilities.html">utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grave_settings.validation.html">validation</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="modules.html">Formatters</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="simple">
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-grave_settings.formatter">
+<span id="formatter"></span><h1>formatter<a class="headerlink" href="#module-grave_settings.formatter" title="Permalink to this heading">#</a></h1>
+<p>&#64;author: ☙ Ryan McConnell ❧</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="grave_settings.formatter.ProcessingException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grave_settings.formatter.</span></span><span class="sig-name descname"><span class="pre">ProcessingException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrapped_exception</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_stack</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frame_semantics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semantics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#ProcessingException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.ProcessingException" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wrapped_exception</strong> (<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.11)"><em>Exception</em></a>) – </p></li>
+<li><p><strong>frame_semantics</strong> (<a class="reference internal" href="grave_settings.semantics.html#grave_settings.semantics.Semantics" title="grave_settings.semantics.Semantics"><em>Semantics</em></a>) – </p></li>
+<li><p><strong>semantics</strong> (<a class="reference internal" href="grave_settings.semantics.html#grave_settings.semantics.Semantics" title="grave_settings.semantics.Semantics"><em>Semantics</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grave_settings.formatter.</span></span><span class="sig-name descname"><span class="pre">Processor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Processor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Processor" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec" title="grave_settings.formatter_settings.FormatterSpec"><em>FormatterSpec</em></a>) – </p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor.root_obj">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">root_obj</span></span><a class="headerlink" href="#grave_settings.formatter.Processor.root_obj" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor.set_default_semantics">
+<span class="sig-name descname"><span class="pre">set_default_semantics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Processor.set_default_semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Processor.set_default_semantics" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor.it_quack">
+<span class="sig-name descname"><span class="pre">it_quack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Processor.it_quack"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Processor.it_quack" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>t_obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.11)"><em>type</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Processor.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Processor.process" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor.path_to_str">
+<span class="sig-name descname"><span class="pre">path_to_str</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Processor.path_to_str"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Processor.path_to_str" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Processor.dispose">
+<span class="sig-name descname"><span class="pre">dispose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Processor.dispose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Processor.dispose" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grave_settings.formatter.</span></span><span class="sig-name descname"><span class="pre">IFormatter</span></span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.to_buffer">
+<span class="sig-name descname"><span class="pre">to_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.to_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.to_buffer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_io</strong> (<a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><em>IOBase</em></a>) – </p></li>
+<li><p><strong>serializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.write_to_file">
+<span class="sig-name descname"><span class="pre">write_to_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.write_to_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.write_to_file" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>serializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.from_buffer">
+<span class="sig-name descname"><span class="pre">from_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_io</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deserializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.from_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.from_buffer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_io</strong> (<a class="reference external" href="https://docs.python.org/3/library/io.html#io.IOBase" title="(in Python v3.11)"><em>IOBase</em></a>) – </p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>deserializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.read_from_file">
+<span class="sig-name descname"><span class="pre">read_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deserializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.read_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.read_from_file" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>deserializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.serialized_obj_to_buffer">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">serialized_obj_to_buffer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ser_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.serialized_obj_to_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.serialized_obj_to_buffer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.buffer_to_obj">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buffer_to_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.buffer_to_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.buffer_to_obj" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>buffer</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)"><em>bytes</em></a>) – </p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_serialization_handler">
+<span class="sig-name descname"><span class="pre">get_serialization_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_serialization_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_serialization_handler" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><em>OrderedHandler</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_deserialization_handler">
+<span class="sig-name descname"><span class="pre">get_deserialization_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_deserialization_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_deserialization_handler" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><em>OrderedHandler</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_serialization_frame_context">
+<span class="sig-name descname"><span class="pre">get_serialization_frame_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_serialization_frame_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_serialization_frame_context" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.framestack_context.html#grave_settings.framestack_context.FrameStackContext" title="grave_settings.framestack_context.FrameStackContext"><em>FrameStackContext</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_deserialization_frame_context">
+<span class="sig-name descname"><span class="pre">get_deserialization_frame_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_deserialization_frame_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_deserialization_frame_context" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.framestack_context.html#grave_settings.framestack_context.FrameStackContext" title="grave_settings.framestack_context.FrameStackContext"><em>FrameStackContext</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_serialization_context">
+<span class="sig-name descname"><span class="pre">get_serialization_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_serialization_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_serialization_context" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_deserialization_context">
+<span class="sig-name descname"><span class="pre">get_deserialization_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_deserialization_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_deserialization_context" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.dumps">
+<span class="sig-name descname"><span class="pre">dumps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.dumps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.dumps" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><em>Any</em></a>) – </p></li>
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>serializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a> | <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.11)">bytes</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.loads">
+<span class="sig-name descname"><span class="pre">loads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deserializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.loads"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.loads" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>deserializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_serializer">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_serializer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.get_deserializer">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_deserializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.get_deserializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.get_deserializer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.serialize">
+<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.serialize" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>serializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.free_deser_obj">
+<span class="sig-name descname"><span class="pre">free_deser_obj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.free_deser_obj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.free_deser_obj" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.IFormatter.deserialize">
+<span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deserializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#IFormatter.deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.IFormatter.deserialize" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>deserializer</strong> (<a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><em>Processor</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grave_settings.formatter.</span></span><span class="sig-name descname"><span class="pre">Serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Processor</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec" title="grave_settings.formatter_settings.FormatterSpec"><em>FormatterSpec</em></a>) – </p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.set_default_semantics">
+<span class="sig-name descname"><span class="pre">set_default_semantics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.set_default_semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.set_default_semantics" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.supports_semantic">
+<span class="sig-name descname"><span class="pre">supports_semantic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantic_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.supports_semantic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.supports_semantic" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>semantic_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.11)"><em>Type</em></a><em>[</em><a class="reference internal" href="grave_settings.semantics.html#grave_settings.semantics.Semantic" title="grave_settings.semantics.Semantic"><em>Semantic</em></a><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.check_in_object">
+<span class="sig-name descname"><span class="pre">check_in_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.check_in_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.check_in_object" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> (<em>T</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.PreservedReference" title="grave_settings.formatter_settings.PreservedReference"><em>PreservedReference</em></a> | <em>T</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_serialize_list_in_place">
+<span class="sig-name descname"><span class="pre">handle_serialize_list_in_place</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_serialize_list_in_place"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_serialize_list_in_place" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_serialize_dict_in_place">
+<span class="sig-name descname"><span class="pre">handle_serialize_dict_in_place</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_serialize_dict_in_place"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_serialize_dict_in_place" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_user_list">
+<span class="sig-name descname"><span class="pre">handle_user_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_user_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_user_list" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_user_dict">
+<span class="sig-name descname"><span class="pre">handle_user_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_user_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_user_dict" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_add_semantics">
+<span class="sig-name descname"><span class="pre">handle_add_semantics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_add_semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_add_semantics" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.AddSemantics" title="grave_settings.formatter_settings.AddSemantics"><em>AddSemantics</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_temporary">
+<span class="sig-name descname"><span class="pre">handle_temporary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_temporary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_temporary" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.Temporary" title="grave_settings.formatter_settings.Temporary"><em>Temporary</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.template_object_serialize">
+<span class="sig-name descname"><span class="pre">template_object_serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">template_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.template_object_serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.template_object_serialize" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>template_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.handle_default">
+<span class="sig-name descname"><span class="pre">handle_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.handle_default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.handle_default" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.process" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.serialize">
+<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.serialize" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><em>Any</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Serializer.dispose">
+<span class="sig-name descname"><span class="pre">dispose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Serializer.dispose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Serializer.dispose" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grave_settings.formatter.</span></span><span class="sig-name descname"><span class="pre">DeSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grave_settings.formatter.Processor" title="grave_settings.formatter.Processor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Processor</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spec</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec" title="grave_settings.formatter_settings.FormatterSpec"><em>FormatterSpec</em></a>) – </p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterContext" title="grave_settings.formatter_settings.FormatterContext"><em>FormatterContext</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.set_default_semantics">
+<span class="sig-name descname"><span class="pre">set_default_semantics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.set_default_semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.set_default_semantics" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.supports_semantic">
+<span class="sig-name descname"><span class="pre">supports_semantic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">semantic_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.supports_semantic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.supports_semantic" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>semantic_class</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.11)"><em>Type</em></a><em>[</em><a class="reference internal" href="grave_settings.semantics.html#grave_settings.semantics.Semantic" title="grave_settings.semantics.Semantic"><em>Semantic</em></a><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.run_semantics_through_path">
+<span class="sig-name descname"><span class="pre">run_semantics_through_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.run_semantics_through_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.run_semantics_through_path" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="grave_settings.semantics.html#grave_settings.semantics.Semantics" title="grave_settings.semantics.Semantics"><em>Semantics</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.handle_list">
+<span class="sig-name descname"><span class="pre">handle_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.handle_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.handle_list" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><em>list</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.handle_dict">
+<span class="sig-name descname"><span class="pre">handle_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.handle_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.handle_dict" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><em>dict</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.handle_preserved_referece">
+<span class="sig-name descname"><span class="pre">handle_preserved_referece</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.handle_preserved_referece"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.handle_preserved_referece" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.PreservedReference" title="grave_settings.formatter_settings.PreservedReference"><em>PreservedReference</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.handle_default">
+<span class="sig-name descname"><span class="pre">handle_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.handle_default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.handle_default" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.handle_secondary_preserved_reference">
+<span class="sig-name descname"><span class="pre">handle_secondary_preserved_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.handle_secondary_preserved_reference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.handle_secondary_preserved_reference" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.PreservedReference" title="grave_settings.formatter_settings.PreservedReference"><em>PreservedReference</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.cache_instance_ref">
+<span class="sig-name descname"><span class="pre">cache_instance_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.cache_instance_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.cache_instance_ref" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>instance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><em>object</em></a>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.process" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.deserialize">
+<span class="sig-name descname"><span class="pre">deserialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.deserialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.deserialize" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.DeSerializer.dispose">
+<span class="sig-name descname"><span class="pre">dispose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#DeSerializer.dispose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.DeSerializer.dispose" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grave_settings.formatter.</span></span><span class="sig-name descname"><span class="pre">Formatter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Formatter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Formatter" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#grave_settings.formatter.IFormatter" title="grave_settings.formatter.IFormatter"><code class="xref py py-class docutils literal notranslate"><span class="pre">IFormatter</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spec</strong> (<a class="reference internal" href="grave_settings.formatter_settings.html#grave_settings.formatter_settings.FormatterSpec" title="grave_settings.formatter_settings.FormatterSpec"><em>FormatterSpec</em></a>) – </p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.FORMAT_SETTINGS">
+<span class="sig-name descname"><span class="pre">FORMAT_SETTINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;grave_settings.formatter_settings.FormatterSpec</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#grave_settings.formatter.Formatter.FORMAT_SETTINGS" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.TYPES">
+<span class="sig-name descname"><span class="pre">TYPES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">int</span> <span class="pre">|</span> <span class="pre">float</span> <span class="pre">|</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">|</span> <span class="pre">dict</span> <span class="pre">|</span> <span class="pre">list</span></em><a class="headerlink" href="#grave_settings.formatter.Formatter.TYPES" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.get_serialization_handler">
+<span class="sig-name descname"><span class="pre">get_serialization_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Formatter.get_serialization_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Formatter.get_serialization_handler" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><em>OrderedHandler</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.get_deserialization_handler">
+<span class="sig-name descname"><span class="pre">get_deserialization_handler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Formatter.get_deserialization_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Formatter.get_deserialization_handler" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="grave_settings.handlers.html#grave_settings.handlers.OrderedHandler" title="grave_settings.handlers.OrderedHandler"><em>OrderedHandler</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.get_serializer">
+<span class="sig-name descname"><span class="pre">get_serializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Formatter.get_serializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Formatter.get_serializer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#grave_settings.formatter.Serializer" title="grave_settings.formatter.Serializer"><em>Serializer</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.get_deserializer">
+<span class="sig-name descname"><span class="pre">get_deserializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Formatter.get_deserializer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Formatter.get_deserializer" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#grave_settings.formatter.DeSerializer" title="grave_settings.formatter.DeSerializer"><em>DeSerializer</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grave_settings.formatter.Formatter.add_semantics">
+<span class="sig-name descname"><span class="pre">add_semantics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">semantics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/grave_settings/formatter.html#Formatter.add_semantics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grave_settings.formatter.Formatter.add_semantics" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>semantics</strong> (<em>T_S_E</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="grave_settings.formatter_settings.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">formatter_settings</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="grave_settings.default_handlers.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">default_handlers</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2023, Ryan McConnell
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">formatter</a><ul>
+<li><a class="reference internal" href="#grave_settings.formatter.ProcessingException"><code class="docutils literal notranslate"><span class="pre">ProcessingException</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor"><code class="docutils literal notranslate"><span class="pre">Processor</span></code></a><ul>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor.root_obj"><code class="docutils literal notranslate"><span class="pre">Processor.root_obj</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor.set_default_semantics"><code class="docutils literal notranslate"><span class="pre">Processor.set_default_semantics()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor.it_quack"><code class="docutils literal notranslate"><span class="pre">Processor.it_quack()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor.process"><code class="docutils literal notranslate"><span class="pre">Processor.process()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor.path_to_str"><code class="docutils literal notranslate"><span class="pre">Processor.path_to_str()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Processor.dispose"><code class="docutils literal notranslate"><span class="pre">Processor.dispose()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter"><code class="docutils literal notranslate"><span class="pre">IFormatter</span></code></a><ul>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.to_buffer"><code class="docutils literal notranslate"><span class="pre">IFormatter.to_buffer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.write_to_file"><code class="docutils literal notranslate"><span class="pre">IFormatter.write_to_file()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.from_buffer"><code class="docutils literal notranslate"><span class="pre">IFormatter.from_buffer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.read_from_file"><code class="docutils literal notranslate"><span class="pre">IFormatter.read_from_file()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.serialized_obj_to_buffer"><code class="docutils literal notranslate"><span class="pre">IFormatter.serialized_obj_to_buffer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.buffer_to_obj"><code class="docutils literal notranslate"><span class="pre">IFormatter.buffer_to_obj()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_serialization_handler"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_serialization_handler()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_deserialization_handler"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_deserialization_handler()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_serialization_frame_context"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_serialization_frame_context()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_deserialization_frame_context"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_deserialization_frame_context()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_serialization_context"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_serialization_context()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_deserialization_context"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_deserialization_context()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.dumps"><code class="docutils literal notranslate"><span class="pre">IFormatter.dumps()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.loads"><code class="docutils literal notranslate"><span class="pre">IFormatter.loads()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_serializer"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_serializer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.get_deserializer"><code class="docutils literal notranslate"><span class="pre">IFormatter.get_deserializer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.serialize"><code class="docutils literal notranslate"><span class="pre">IFormatter.serialize()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.free_deser_obj"><code class="docutils literal notranslate"><span class="pre">IFormatter.free_deser_obj()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.IFormatter.deserialize"><code class="docutils literal notranslate"><span class="pre">IFormatter.deserialize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer"><code class="docutils literal notranslate"><span class="pre">Serializer</span></code></a><ul>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.set_default_semantics"><code class="docutils literal notranslate"><span class="pre">Serializer.set_default_semantics()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.supports_semantic"><code class="docutils literal notranslate"><span class="pre">Serializer.supports_semantic()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.check_in_object"><code class="docutils literal notranslate"><span class="pre">Serializer.check_in_object()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_serialize_list_in_place"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_serialize_list_in_place()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_serialize_dict_in_place"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_serialize_dict_in_place()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_user_list"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_user_list()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_user_dict"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_user_dict()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_add_semantics"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_add_semantics()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_temporary"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_temporary()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.template_object_serialize"><code class="docutils literal notranslate"><span class="pre">Serializer.template_object_serialize()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.handle_default"><code class="docutils literal notranslate"><span class="pre">Serializer.handle_default()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.process"><code class="docutils literal notranslate"><span class="pre">Serializer.process()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.serialize"><code class="docutils literal notranslate"><span class="pre">Serializer.serialize()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Serializer.dispose"><code class="docutils literal notranslate"><span class="pre">Serializer.dispose()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer"><code class="docutils literal notranslate"><span class="pre">DeSerializer</span></code></a><ul>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.set_default_semantics"><code class="docutils literal notranslate"><span class="pre">DeSerializer.set_default_semantics()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.supports_semantic"><code class="docutils literal notranslate"><span class="pre">DeSerializer.supports_semantic()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.run_semantics_through_path"><code class="docutils literal notranslate"><span class="pre">DeSerializer.run_semantics_through_path()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.handle_list"><code class="docutils literal notranslate"><span class="pre">DeSerializer.handle_list()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.handle_dict"><code class="docutils literal notranslate"><span class="pre">DeSerializer.handle_dict()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.handle_preserved_referece"><code class="docutils literal notranslate"><span class="pre">DeSerializer.handle_preserved_referece()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.handle_default"><code class="docutils literal notranslate"><span class="pre">DeSerializer.handle_default()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.handle_secondary_preserved_reference"><code class="docutils literal notranslate"><span class="pre">DeSerializer.handle_secondary_preserved_reference()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.cache_instance_ref"><code class="docutils literal notranslate"><span class="pre">DeSerializer.cache_instance_ref()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.process"><code class="docutils literal notranslate"><span class="pre">DeSerializer.process()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.deserialize"><code class="docutils literal notranslate"><span class="pre">DeSerializer.deserialize()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.DeSerializer.dispose"><code class="docutils literal notranslate"><span class="pre">DeSerializer.dispose()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter"><code class="docutils literal notranslate"><span class="pre">Formatter</span></code></a><ul>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.FORMAT_SETTINGS"><code class="docutils literal notranslate"><span class="pre">Formatter.FORMAT_SETTINGS</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.TYPES"><code class="docutils literal notranslate"><span class="pre">Formatter.TYPES</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.get_serialization_handler"><code class="docutils literal notranslate"><span class="pre">Formatter.get_serialization_handler()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.get_deserialization_handler"><code class="docutils literal notranslate"><span class="pre">Formatter.get_deserialization_handler()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.get_serializer"><code class="docutils literal notranslate"><span class="pre">Formatter.get_serializer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.get_deserializer"><code class="docutils literal notranslate"><span class="pre">Formatter.get_deserializer()</span></code></a></li>
+<li><a class="reference internal" href="#grave_settings.formatter.Formatter.add_semantics"><code class="docutils literal notranslate"><span class="pre">Formatter.add_semantics()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    </body>
+</html>
