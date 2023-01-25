@@ -110,14 +110,16 @@ class IFormatter(ABC):
             buffer = buffer.encode(encoding)
         _io.write(buffer)
 
-    def write_to_file(self, settings, path: str, encoding='utf-8', serializer: Processor = None):
+    def write_to_file(self, data, path: str, encoding='utf-8', serializer: Processor = None):
         if encoding == 'utf-8':
-            f = open(path, 'w')
+            fm = 'w'
         else:
-            f = open(path, 'wb')
-        with f:
-            # noinspection PyTypeChecker
-            self.to_buffer(settings, f, encoding=encoding, serializer=serializer)
+            fm = 'wb'
+        buffer = self.dumps(data, serializer=serializer)
+        if encoding is not None and encoding != 'utf-8':
+            buffer = buffer.encode(encoding)
+        with open(path, fm) as f:  # We don't want to overwrite the file is there was an exception
+            f.write(buffer)
 
     def from_buffer(self, _io: IOBase, encoding='utf-8', kwargs: dict | None = None, deserializer: Processor = None):
         data = _io.read()

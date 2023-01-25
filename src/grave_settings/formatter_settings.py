@@ -13,6 +13,9 @@ from grave_settings.semantics import Semantic, AutoPreserveReferences, T_S_E, Do
 
 
 class AddSemantics:
+    """
+    Wrapping an object in this class will tell the formatter to add semantics to its frame
+    """
     __slots__ = 'val', 'semantics', 'frame_semantics'
 
     def __init__(self, val: T, semantics: set[Semantic] | None = None, frame_semantics: set[Semantic] | None = None):
@@ -25,6 +28,9 @@ class AddSemantics:
 
 
 class NoRef(AddSemantics):
+    """
+    Wrapping an object in this class will tell the formatter to not reference this object or cache it
+    """
     __slots__ = tuple()
 
     def __init__(self, val: T, semantics: set[Semantic] | None = None, frame_semantics: set[Semantic] | None = None):
@@ -40,13 +46,22 @@ class NoRef(AddSemantics):
 
 
 class Temporary(NoRef):
+    """
+    Wrapping an object in this class will tell the formatter that the object is not to be referenced and has no strings
+    attached to any other object. The wrapped object exists only for communicating data to the formatter.
+    The formatter may mutate it and destroy it.
+    """
     __slots__ = tuple()
 
     def __str__(self):
         return f'Temporary({self.val})'
 
 
-class PreservedReference(object):
+class PreservedReference:
+    """
+    This clas denotes a reference to another path in an object hierarchy. This object should act like a pointer
+    describing where an object exists in the structure.
+    """
     __slots__ = 'obj', 'ref', '__weakref__'
 
     def __init__(self, obj: None | object = None, ref=None):

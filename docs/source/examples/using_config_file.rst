@@ -215,4 +215,37 @@ Lets make our object hierarchy more complex.
         "width": 2
     }
 
-Lets point out something important about :py:meth:`~grave_settings.config_file.ConfigFile.add_config_dependency`, as of right now nothing is shared between the config files. This includes semantics and references. This means that "is" relationships are not shared between config files. This can be done, but I'm not sure if I need it enough to work out the kinks. It should be doable within the :py:class:`~grave_settings.config_file.ConfigFile`.
+Lets point out something important about :py:meth:`~grave_settings.config_file.ConfigFile.add_config_dependency`, as of right now nothing is shared between the config files. This includes semantics and references. This means that "is" relationships are not shared between config files. This can be done, but I'm not sure if I need it enough to work out the kinks. It should be doable within the :py:class:`~grave_settings.config_file.ConfigFile`. It may be that this behavior would not be desirable since the file being references may change, and that could be just as "unexpected" to naive code then not preserving "is" relationships.
+
+Lets preserve the "is" relationship
+---------------------------------------
+
+This is not using the currently unimplemented ideas above, just an example of using the interface to handle a special case.
+
+.. code-block:: python
+
+    class MyObject:
+        def __init__(self):
+            self.foreground_color = Color(255, 0, 0)
+            self.background_color = Color(255, 255, 255)
+            self.active_pen = None
+            self.pens: list[Pen] = []
+
+        def select_pen(self, index: int):
+            self.active_pen = self.pens[index]
+            self.foreground_color = self.active_pen.color
+
+        def add_pen(self, pen: Pen):
+            self.pens.append(pen)
+
+        def to_dict(self, *args, **kwargs):
+            base = Serializable.to_dict(self, *args, **kwargs)
+            base['active_pen'] = self.pens.index(self.active_pen)
+            return base
+
+        def from_dict(self, state_object: dict, *args, **kwargs):
+            active_pen_idx = state_object['active_pen']
+            state_object['active_pen'] = state_object['pens'][active_pen_idx]
+            Serializable.from_dict(self, state_object, *args, **kwargs)
+
+This new structure for ``MyObject`` would not be compatible with the old one but it does do it's job. If we wanted the ``active_pen`` and  ``foreground_color`` to maintain their synchronicity we could simply call ``select_pen`` after repurposing :py:meth:`~grave_settings.abstract.Serializable.from_dict`

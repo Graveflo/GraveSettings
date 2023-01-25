@@ -22,11 +22,18 @@ class Serializable:
 
     @classmethod
     def check_in_serialization_context(cls, context: FormatterContext):
+        """
+        This method typically is called on an instantiated object, so it may not be necessary for it to be a class
+        method.
+        """
         pass
 
     @classmethod
     def check_in_deserialization_context(cls, context: FormatterContext):
-        # Uncomment this to get the limited auto circular reference resolution
+        """
+        This method is typically called on type objects, so it should remain a class method in sub-classes. This is where
+        you can put a reference to :py:class:`~grave_settings.semantics.NotifyFinalizedMethodName` to get a callback
+        """
         # context.register_frame_semantic(NotifyFinalizedMethodName('finalize'))
         pass
 
@@ -56,7 +63,7 @@ class VersionedSerializable(Serializable):
     @classmethod
     def get_version_object(cls):
         """
-        It is saf to override this as a instance method
+        It is saf to override this as an instance method
         """
         return cls.get_conversion_manager().get_version_object(cls)
 

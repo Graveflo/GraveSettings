@@ -3,6 +3,8 @@ Using Handlers
 
 The word "handler" is used... a lot on this page. Uppercase "Handler" refers to an object that is an instance of :py:class:`~grave_settings.handlers.Handler`. Lowercase "handler" refers to a callable that is added to a Handler object.
 
+You might want to read the :doc:`API Reference on this topic</api_reference/handlers>` before looks at these examples.
+
 There are some situations where it is impractical, or I'll inaccurately say "impossible," to use inheritance to describe how a class should be converted to and from state objects. This is the main reason to use Handlers. Also, it can be easier to manage many instances of objects downstream from a parent object if the parent overrides a handler for them.
 
 Lets look at an example:
@@ -120,7 +122,7 @@ The handlers we added as defaults have changed the way Color is serialized and d
 Dynamically add handler during processing
 ---------------------------------------------
 
-Lets take a look at adding handlers during processing. This has niche applications. It can save a lot of time if you have custom unmanaged objects that live under an managed object and you want the managed object to provide the logic for the unmanaged objects that it references. We will make a managed object, by using inheritance, that will take the responsibility of providing handlers for it's child objects.
+Lets take a look at adding handlers during processing. This has niche applications. It can save a lot of time if you have custom unmanaged objects that live under a managed object and you want the managed object to provide the logic for the unmanaged objects that it references. We will make a managed object, by using inheritance, that will take the responsibility of providing handlers for it's child objects.
 
 .. code-block:: python
 

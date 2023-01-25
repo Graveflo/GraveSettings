@@ -14,7 +14,7 @@ class ConversionError(Exception):
     pass
 
 
-def basic_converter(json_obj: dict, mapping: dict, new_ver: str) -> dict:
+def basic_converter(json_obj: dict, mapping: dict) -> dict:
     new_json_obj = {}
     for k, v in mapping.items():
         if k in json_obj:

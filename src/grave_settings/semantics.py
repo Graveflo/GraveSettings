@@ -17,6 +17,9 @@ class SecurityException(Exception):
 
 
 class OmitMeError(Exception):
+    """
+    raise this to retroactively refuse to be serialized as an attribute or dictionary key
+    """
     pass
 
 

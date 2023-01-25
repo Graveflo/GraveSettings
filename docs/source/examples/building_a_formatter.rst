@@ -1,14 +1,14 @@
 Custom Formatter
 ======================
 
-Lets use the python package :py:mod:configparser to build a custom formatter. This package is meant for "ini like" files but we will re-purpose it to make a custom format.
+Lets use the python package :py:mod:`configparser` to build a custom formatter. This package is meant for "ini like" files but we will re-purpose it to make a custom format.
 
-The first thing we have to do is decide which types are going to be "primitive" and which types are going to be "special". It looks to me like :py:mod:configparser doesnt have many default types, just strings and mappings. We'll expand on this.
+The first thing we have to do is decide which types are going to be "primitive" and which types are going to be "special". It looks to me like :py:mod:`configparser` doesnt have many default types, just strings and mappings. We'll expand on this.
 
-Settings the Spec
+Making the Spec
 --------------------
 
-I've decided that I want string to work as close to how they do natively with the default setup in :py:mod:configparser except I want to be able to specify some extra types. I want ``bool(True)`` to automatically be converted to a python boolean and similar logic for ``int(0)`` and ``float(1.0)`` etc. To specify a string literal of the same text it would just look like this ``'bool(True)'`` and similarly any literal encapsulated in unescaped quotes will just be interpreted as a literal string.
+I've decided that I want string to work as close to how they do natively with the default setup in :py:mod:`configparser` except I want to be able to specify some extra types. I want ``bool(True)`` to automatically be converted to a python boolean and similar logic for ``int(0)`` and ``float(1.0)`` etc. To specify a string literal of the same text it would just look like this ``'bool(True)'`` and similarly any literal encapsulated in unescaped quotes will just be interpreted as a literal string.
 
 We'll compare the Spec we make here to the json spec since it has a bit more going on with it. The json spec uses the default values so this is just the first couple lines of the abstract-ish :py:class:`~grave_settings.formatter_settings.FormatterSpec`.
 
@@ -146,7 +146,7 @@ Custom Serializer
 
 .. note::
 
-  Do not confuse the handler attribute of this ``CustomSerializer`` as the Handler that is is accessible from :py:class:`~grave_settings.formatter_settings.FormatterContext` through it's property ``handler``, truly belonging to :py:class:`~grave_settings.framestack_context.FrameStackContext`. The handler on ``CustomSerializer`` is part of the serialization process that decides a method handler for input types before they are passed through the user object Handler
+  Do not confuse the handler attribute of this ``CustomSerializer`` as the Handler that is is accessible from :py:class:`~grave_settings.formatter_settings.FormatterContext` through it's property ``handler``, truly belonging to :py:class:`~grave_settings.framestack_context.FrameStackContext`. The handler on ``CustomSerializer`` is used like a fancy switch statement to decide which methods handle certain types. In some cases the handlers attached use the Handler on :py:class:`~grave_settings.framestack_context.FrameStackContext` in their method bodies.
 
 .. admonition:: Note [1]
 

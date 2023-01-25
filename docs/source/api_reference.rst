@@ -1,9 +1,6 @@
 API Reference
 ================
 
-blahblhaha
-
-
 .. toctree::
     :caption: Modules
     :glob:

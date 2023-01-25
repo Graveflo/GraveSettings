@@ -1,8 +1,6 @@
 API Documentation
 ==================
 
-blahblhaha
-
 
 .. toctree::
    :caption: Modules

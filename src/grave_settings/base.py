@@ -169,11 +169,6 @@ class SlotSettings(IASettings):
     def __contains__(self, item):
         return hasattr(self, item)
 
-    def __setattr__(self, key, value):
-        super(SlotSettings, self).__setattr__(key, value)
-        if key in self.get_settings_keys():
-            self.invalidate()
-
     def __setitem__(self, key, value):
         it_t = type(key)
         if it_t == list or it_t == tuple:
@@ -211,7 +206,7 @@ class SlotSettings(IASettings):
         return len(self.get_settings_keys())
 
     def generate_key_value_pairs(self) -> Generator[tuple[object, object], None, None]:
-        return ((s, self[s]) for s in self.get_settings_keys())
+        return ((s, getattr(self, s)) for s in self.get_settings_keys())
 
     def to_dict(self, context: FormatterContext, **kwargs) -> dict:
         return dict(self.generate_key_value_pairs())

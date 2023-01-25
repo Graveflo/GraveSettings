@@ -188,7 +188,10 @@ class ConfigFile(Serializable):
         return context
 
     def handle_deserialize_LogFileLink(self, deserializer: DeSerializer, obj: LogFileLink, **kwargs):
-        obj.config.file_path = obj.file_path.absolute()
+        if obj.file_path is not None:
+            obj.config.file_path = obj.file_path.absolute()
+        else:
+            obj.config.file_path = obj.rel_path.absolute()
         data_obj = obj.config.get_load_data_obj()
         self.add_log_file_link(obj)
         return data_obj
