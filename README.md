@@ -13,6 +13,12 @@ Pre-defined formats:
 
 Red the [documenation](https://ilikescaviar.github.io/GraveSettings/) for examples and important considerations.
 
+## Install
+
+```
+pip install grave-settings
+```
+
 ## Features
 
 - Save / Import types to reconstruct object hierarchies
