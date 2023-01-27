@@ -39,6 +39,7 @@ class TestOrderedHandler(TestCase):
         with self.assertRaises(TrackException):
             oh.handle(5)
 
+
 class TestOrderedMethodHanlder(TestCase):
     def get_handler(self) -> OrderedMethodHandler:
         return OrderedMethodHandler()
