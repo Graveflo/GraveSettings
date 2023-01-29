@@ -159,7 +159,6 @@ class OrderedMethodHandler(OrderedHandler):
         return self.handle_node(pass_self, instance, *args, **kwargs)
 
 
-
 MHS = Callable[[object, T, ...], T]
 
 
