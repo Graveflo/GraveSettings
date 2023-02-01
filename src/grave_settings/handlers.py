@@ -164,9 +164,9 @@ MHS = Callable[[object, T, ...], T]
 
 class MroHandler(Handler):
     def __init__(self, *args, **kwargs):
-        super(MroHandler, self).__init__(*args, **kwargs)
         self.type_bank: dict[Type, MHS] = {}
         self.cache: dict[Type, tuple[MHS]] = {}
+        super(MroHandler, self).__init__(*args, **kwargs)
 
     def update(self, handler: Handler):
         super(MroHandler, self).update(handler)
@@ -187,8 +187,6 @@ class MroHandler(Handler):
             return self.cache[key]
         else:
             bs = tuple(self.type_bank[tt] for tt in reversed(key.__mro__) if tt in self.type_bank)
-            if len(bs) <= 0:
-                bs = (self.default_handler,)
             self.cache[key] = bs
             return bs
 
