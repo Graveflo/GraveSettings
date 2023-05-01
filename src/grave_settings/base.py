@@ -71,34 +71,10 @@ class Settings(IASettings):
         return self.sd.copy()
 
 
-#rem_slot_fixed = set()
-
-
 class SlotSettings(IASettings):
     _slot_rems = None
     __slots__ = tuple()
     SETTINGS_KEYS = None
-
-    # @classmethod
-    # def __new__(cls, *args, **kwargs):
-    #     if cls not in rem_slot_fixed:
-    #         found_slot_rems = False
-    #
-    #
-    #         slrm = set()
-    #         for tt in generate_hierarchy_to_base(SlotSettings, cls):
-    #             if hasattr(tt, '_slot_rems') and tt._slot_rems is not None:
-    #                 found_slot_rems = True
-    #                 slrm.update(tt._slot_rems)
-    #
-    #         if found_slot_rems:
-    #             cls._slot_rems = tuple(slrm)
-    #             cls.get_settings_keys = cls.get_settings_keys_rems
-    #         else:
-    #             cls.get_settings_keys = cls.get_settings_keys_base_slots
-    #         rem_slot_fixed.add(cls)
-    #
-    #    return super(SlotSettings, cls).__new__(cls)
 
     def __init__(self):
         cls = self.__class__

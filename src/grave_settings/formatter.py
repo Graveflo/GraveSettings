@@ -460,9 +460,10 @@ class DeSerializer(Processor):
 
         if class_id is not None:
             if ducks and (version_info is not None) and hasattr(type_obj, 'check_convert_update'):
-                if ti := type_obj.check_convert_update(instance, self.context.load_type, version_info):
-                    instance = ti
-                    self.notify_settings_converted(class_id)
+                with self.semantics:  # TODO: The version info messes up SecurityException semantics (more needed)
+                    if ti := type_obj.check_convert_update(instance, self.context.load_type, version_info):
+                        instance = ti
+                        self.notify_settings_converted(class_id)
             ret = self.context.handler.handle_node(type_obj, instance, self.context, **kwargs)
             if method_name := self.semantics[NotifyFinalizedMethodName]:
                 self.context.finalize.subscribe(getattr(ret, method_name.val))

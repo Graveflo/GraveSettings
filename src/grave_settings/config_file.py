@@ -12,6 +12,7 @@ from typing import Self, Any, Type
 
 from observer_hooks import EventCapturer
 
+from grave_settings.conversion_manager import get_descendent_class_formats
 from grave_settings.utilities import format_class_str
 from grave_settings.abstract import IASettings, Serializable
 from grave_settings.formatter_settings import FormatterContext
@@ -19,7 +20,7 @@ from grave_settings.formatters.toml import TomlFormatter
 from grave_settings.formatters.json import JsonFormatter
 from grave_settings.formatter import Formatter, DeSerializer, Serializer
 from grave_settings.handlers import OrderedHandler
-from grave_settings.semantics import ClassStringPassFunction, Semantics, Semantic
+from grave_settings.semantics import ClassStringPassFunction, Semantics, Semantic, SecurityException
 
 
 class PassLogFilePath(Semantic[str]):
@@ -62,6 +63,10 @@ class ConfigFile(Serializable):
 
     def __init__(self, file_path: Path, data: IASettings | Any | Type | None = None,
                  formatter: None | Formatter | str = None, auto_save=False, read_only=False):
+        if formatter is None:
+            formatter = file_path.suffix
+            if formatter.startswith('.'):
+                formatter = formatter[1:]
         if type(formatter) == str:
             formatter = self.FORMATTER_STR_DICT[formatter]
         self.file_path = file_path.resolve().absolute()
@@ -183,8 +188,16 @@ class ConfigFile(Serializable):
 
     def get_deserialization_context(self):
         context = self.formatter.get_deserialization_context()
+        found_init = False
+        def descriptive_error(class_string: str):
+            if class_string in format_class_str(self.data):
+                return True
+            elif found_init:
+                if class_string in get_descendent_class_formats(self.data):  # TODO: This is not functional
+                    return True
+            raise SecurityException(f'{class_string} does not match correct class string {format_class_str(self.data)}')
         if isinstance(self.data, type):
-            context.add_frame_semantics(ClassStringPassFunction(lambda x: x == format_class_str(self.data)))
+            context.add_frame_semantics(ClassStringPassFunction(descriptive_error))
         return context
 
     def handle_deserialize_LogFileLink(self, deserializer: DeSerializer, obj: LogFileLink, **kwargs):
