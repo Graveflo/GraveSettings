@@ -159,7 +159,6 @@ class OrderedMethodHandler(OrderedHandler):
         return self.handle_node(pass_self, instance, *args, **kwargs)
 
 
-
 MHS = Callable[[object, T, ...], T]
 
 
@@ -168,7 +167,6 @@ class MroHandler(Handler):
         super(MroHandler, self).__init__(*args, **kwargs)
         self.type_bank: dict[Type, MHS] = self.type_bank
         self.cache: dict[Type, tuple[MHS]] = {}
-
     def update(self, handler: Handler):
         super(MroHandler, self).update(handler)
         self.cache = {}

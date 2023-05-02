@@ -10,6 +10,8 @@ import datetime
 from enum import Enum, auto
 from functools import partial
 from unittest import TestCase, main
+
+from grave_settings.base import SlotSettings
 from grave_settings.formatter_settings import FormatterContext, FormatterSpec
 from grave_settings.default_handlers import SerializationHandler, DeSerializationHandler, NotSerializableException
 from grave_settings.framestack_context import FrameStackContext
@@ -123,7 +125,18 @@ class TestHandler(TestCase):
         self.assert_make_remake(Fraction(1, 10))
 
     def test_complex(self):
-        self.assert_make_remake(complex(5,3))
+        self.assert_make_remake(complex(5, 3))
+
+    def test_ia_settings(self):
+        class Something(SlotSettings):
+            def init_settings(self, **kwargs) -> None:
+                raise ValueError()
+        globals()['Something'] = Something
+        try:
+            s = Something(initialize_settings=False)
+            self.assert_make_remake(s)
+        finally:
+            globals().pop('Something')
 
 
 if __name__ == '__main__':

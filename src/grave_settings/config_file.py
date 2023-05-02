@@ -13,7 +13,7 @@ from typing import Self, Any, Type
 from observer_hooks import EventCapturer
 
 from grave_settings.conversion_manager import get_descendent_class_formats
-from grave_settings.utilities import format_class_str
+from grave_settings.utilities import format_class_str, generate_type_hierarchy_to_base
 from grave_settings.abstract import IASettings, Serializable
 from grave_settings.formatter_settings import FormatterContext
 from grave_settings.formatters.toml import TomlFormatter
@@ -57,26 +57,41 @@ class LogFileLink(Serializable):
 
 class ConfigFile(Serializable):
     FORMATTER_STR_DICT = {
-        'json': JsonFormatter(),
-        'toml': TomlFormatter()
+        'json': JsonFormatter,
+        'toml': TomlFormatter
     }
+    FORMATTER_PREFERRED_EXT: dict[type, str] = {
+        JsonFormatter: 'json',
+        TomlFormatter: 'toml'
+    }  # Might seem redundant but FORMATTER_STR_DICT values might not be types
 
     def __init__(self, file_path: Path, data: IASettings | Any | Type | None = None,
                  formatter: None | Formatter | str = None, auto_save=False, read_only=False):
         if formatter is None:
-            formatter = file_path.suffix
+            formatter = file_path.suffix.lower()
             if formatter.startswith('.'):
                 formatter = formatter[1:]
         if type(formatter) == str:
-            formatter = self.FORMATTER_STR_DICT[formatter]
+            formatter = self.guess_formatter_from_str(formatter)()
         self.file_path = file_path.resolve().absolute()
         self.data = data
-        self.auto_save = auto_save
+        self.save_on_invalidate = auto_save
         self.formatter = formatter
         self.changes_made = not isinstance(data, IASettings)
+        self.track_changes = self.changes_made
         self.read_only = read_only
         self.sub_configs: dict[Any, LogFileLink] = {}
         self.sub_config_paths: dict[Path, Any] = {}
+
+    @classmethod
+    def guess_file_type(cls, formatter: Formatter):
+        for t in generate_type_hierarchy_to_base(object, formatter.__class__):
+            if t in cls.FORMATTER_PREFERRED_EXT:
+                return cls.FORMATTER_PREFERRED_EXT[t]
+
+    @classmethod
+    def guess_formatter_from_str(cls, short_name: str):
+        return cls.FORMATTER_STR_DICT[short_name]
 
     def add_config_dependency(self, other: 'ConfigFile', relative_path=True):
         if not other.is_loaded():
@@ -106,10 +121,10 @@ class ConfigFile(Serializable):
 
     def settings_invalidated(self):
         self.changes_made = True
-        if self.auto_save:
+        if self.save_on_invalidate:
             self.save()
 
-    def validate_file_path(self, path: Path, must_exist=False):
+    def validate_file_path(self, path: Path, must_exist=False, test_if_file=True):
         if must_exist:
             if not path.exists():
                 raise ValueError(f'Path does not exist: {path}')
@@ -118,7 +133,7 @@ class ConfigFile(Serializable):
         if not self.read_only:
             if path.exists() and (not os.access(path, os.W_OK)):
                 raise ValueError(f'Do not have permission to write to: {path}')
-        if path.exists() and (not path.is_file()):
+        if test_if_file and path.exists() and (not path.is_file()):
             raise ValueError(f'File path is invalid: {path}')
 
     def save(self, path: Path = None, formatter: None | Formatter = None, force=True, validate_path=True):
@@ -127,7 +142,7 @@ class ConfigFile(Serializable):
         if path is None:
             path = self.file_path
             vf = self.changes_made
-        elif (not force) and self.changes_made and hasattr(self.data, 'invalidate'):
+        elif (not force) and (not self.changes_made) and self.track_changes:
             return
         else:
             vf = False
@@ -138,7 +153,7 @@ class ConfigFile(Serializable):
         if formatter is None:
             raise ValueError('No formatter supplied')
         serializer = self.formatter.get_serializer(self.data, self.get_serialization_context())
-        serializer.handler.type_bank[object] = self.handle_serialize_IASettings
+        serializer.handler.type_bank[object] = self.handle_serialize_object
         #serializer.handler.add_handler(IASettings, self.handle_serialize_IASettings)
         formatter.write_to_file(self.data, str(self.file_path), serializer=serializer)
         self.changes_made = vf
@@ -150,7 +165,7 @@ class ConfigFile(Serializable):
     def get_serialization_context(self):
         return self.formatter.get_serialization_context()
 
-    def handle_serialize_IASettings(self, serializer: Serializer, obj: IASettings, **kwargs):
+    def handle_serialize_object(self, serializer: Serializer, obj: IASettings, **kwargs):
         if obj in self.sub_configs:
             link = self.sub_configs[obj]
             link.config.save()
@@ -176,8 +191,6 @@ class ConfigFile(Serializable):
             self.data = formatter.read_from_file(str(path), deserializer=deserializer)
         if len(capture) > 0:
             self.backup_settings_file()
-        if isinstance(self.data, IASettings):
-            self.data.file_path = self.file_path
         self.changes_made = False
 
     @classmethod
