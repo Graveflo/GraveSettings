@@ -67,13 +67,15 @@ class ConfigFile(Serializable):
 
     def __init__(self, file_path: Path, data: IASettings | Any | Type | None = None,
                  formatter: None | Formatter | str = None, auto_save=False, read_only=False):
-        if formatter is None:
-            formatter = file_path.suffix.lower()
-            if formatter.startswith('.'):
-                formatter = formatter[1:]
+        if file_path is not None:
+            if formatter is None:
+                formatter = file_path.suffix.lower()
+                if formatter.startswith('.'):
+                    formatter = formatter[1:]
+            file_path = file_path.resolve().absolute()
         if type(formatter) == str:
             formatter = self.guess_formatter_from_str(formatter)()
-        self.file_path = file_path.resolve().absolute()
+        self.file_path = file_path
         self.data = data
         self.save_on_invalidate = auto_save
         self.formatter = formatter
@@ -82,6 +84,9 @@ class ConfigFile(Serializable):
         self.read_only = read_only
         self.sub_configs: dict[Any, LogFileLink] = {}
         self.sub_config_paths: dict[Path, Any] = {}
+
+    def set_file_path(self, path: Path):
+        self.file_path = path
 
     @classmethod
     def guess_file_type(cls, formatter: Formatter):
@@ -125,6 +130,8 @@ class ConfigFile(Serializable):
             self.save()
 
     def validate_file_path(self, path: Path, must_exist=False, test_if_file=True):
+        if self.file_path is None:
+            raise ValueError('File path not specified')
         if must_exist:
             if not path.exists():
                 raise ValueError(f'Path does not exist: {path}')
@@ -238,7 +245,7 @@ class ConfigFile(Serializable):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if not self.read_only:
+        if self.file_path is not None and not self.read_only:
             self.save()
 
     def get_load_data_obj(self):
