@@ -1,11 +1,11 @@
 from unittest import TestCase, main
 from typing import Type
-from grave_settings.base import SlotSettings
+from grave_settings.base import SlotSettings, assemble_settings_keys_from_base
 
 
 class TestSlotSettingsSettingsKeysResolution(TestCase):
     def get_tuple(self, cls: Type):
-        return SlotSettings.assemble_settings_keys_from_base(cls)
+        return assemble_settings_keys_from_base(cls)
 
     def test_empty(self):
         class Set(SlotSettings):
@@ -141,7 +141,6 @@ class TestSlotSettingsSettingsKeysResolution(TestCase):
             __slots__ = 'a',
             SETTINGS_KEYS = 'a',
 
-
         class Set(Foo):
             __slots__ = 'b', 'c'
             _slot_rems = 'c',
@@ -149,6 +148,7 @@ class TestSlotSettingsSettingsKeysResolution(TestCase):
         keys = self.get_tuple(Foo)
         self.assertSequenceEqual(keys, ('a', ))
         keys = self.get_tuple(Set)
+        self.assertSequenceEqual(Set.SETTINGS_KEYS, ('a', 'b'))
         self.assertSequenceEqual(keys, ('a', 'b'))
 
     def test_settings_keys_overrides_slot_rems(self):
@@ -159,6 +159,14 @@ class TestSlotSettingsSettingsKeysResolution(TestCase):
 
         keys = self.get_tuple(Set)
         self.assertSequenceEqual(keys, ('b', 'c'))
+
+    def test_slot_settings_pure_has_no_dict(self):
+        # it has happened to me before that I had messed something up and forgot to add __slots__ to some class
+        # this will just make sure I didnt do something stupid
+        class Something(SlotSettings):
+            __slots__ = tuple()
+
+        self.assertNotIn('__dict__', dir(Something()))
 
 
 class TestSlotSettingsSettingsKeysResolutionObject(TestSlotSettingsSettingsKeysResolution):
@@ -178,7 +186,7 @@ class TestSlotSettingsSettingsKeysResolutionObject(TestSlotSettingsSettingsKeysR
         keys = self.get_tuple(Set)
         self.assertSequenceEqual(keys, ('c', ))
         self.assertSequenceEqual(Set.SETTINGS_KEYS, ('c', ))
-        self.assertEqual(Foo.SETTINGS_KEYS, None)
+        self.assertEqual(Foo.SETTINGS_KEYS, tuple())
 
 
 if __name__ == '__main__':

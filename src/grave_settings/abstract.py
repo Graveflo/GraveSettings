@@ -94,11 +94,11 @@ class VersionedSerializable(Serializable):
 
 
 def make_kill_converter(cls: Type[VersionedSerializable]) -> Callable[[dict], dict]:
-    return lambda _: cls().to_dict(explicit=True)
+    return lambda *_: cls().to_dict(None)
 
 
 class IASettings(VersionedSerializable, MutableMapping):
-    __slots__ = 'parent', '_invalidate', 'file_path'
+    __slots__ = 'parent', '_invalidate'
 
     def __init__(self, *args, initialize_settings=True, **kwargs):
         self.parent: IASettings | None = None

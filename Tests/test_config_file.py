@@ -120,12 +120,6 @@ class TestConfigFile(IntegrationTestCaseBase):
         with self.assertRaises(ProcessingException):
             c.load()
 
-    def test_loading_write_file_path(self):
-        self.write_object_to_file(Dummy(a=1, b=1))
-        c = self.get_config_file(TEST_FILE_PATH, Dummy, formatter=JsonFormatter())
-        c.load()
-        self.assertEqual(c.data.file_path, TEST_FILE_PATH.resolve())
-
     def test_no_conversion_no_config_trigger(self):
         self.write_object_to_file(Dummy(a=1, b=1))
         c = self.get_config_file(TEST_FILE_PATH, Dummy, formatter=JsonFormatter())

@@ -1,5 +1,3 @@
-import json
-from typing import Self
 from unittest import TestCase
 
 from grave_settings.handlers import OrderedHandler
@@ -22,7 +20,7 @@ class EmptyFormatter(Formatter):
 class Dummy(SlotSettings):
     __slots__ = 'a', 'b'
 
-    def __init__(self, a=None, b=None):
+    def __init__(self, a=None, b=None, **kwargs):
         super().__init__()
         self.a = a
         self.b = b

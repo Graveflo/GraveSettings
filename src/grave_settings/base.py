@@ -5,6 +5,7 @@
 @author: ☙ Ryan McConnell ❧
 """
 from typing import Mapping, Generator, Type
+from abc import ABCMeta
 
 from ordered_set import OrderedSet
 from grave_settings.utilities import unwrap_slots_to_base, ext_str_slots
@@ -71,69 +72,50 @@ class Settings(IASettings):
         return self.sd.copy()
 
 
-#rem_slot_fixed = set()
+def assemble_settings_keys_from_base(cls: Type, msub=IASettings) -> tuple:
+    try:
+        ret = object.__getattribute__(cls, 'SETTINGS_KEYS')
+        if ret is not None:  # cached
+            return ret
+    except AttributeError:
+        pass
+    keys = OrderedSet()
+    try:
+        keys.update(object.__getattribute__(cls, '__slots__'))
+    except AttributeError:
+        pass
+    for tt in cls.__bases__:
+        if tt is not msub and issubclass(tt, msub):
+            ins = OrderedSet(assemble_settings_keys_from_base(tt))
+            ins.update(keys)
+            keys = ins
+    try:
+        _slot_rems = object.__getattribute__(cls, '_slot_rems')
+        if _slot_rems is not None:
+            return tuple(k for k in keys if k not in _slot_rems)
+    except AttributeError:
+        pass
+    return tuple(keys)
 
 
-class SlotSettings(IASettings):
+class slotsettings_meta(ABCMeta):
+    def __new__(cls, clsname, bases, attrs):
+        if '__slots__' not in attrs:
+            attrs['__slots__'] = tuple()
+        tt = super().__new__(cls, clsname, bases, attrs)
+        if hasattr(tt, 'assemble_settings_keys_from_base'):
+            settings_keys = tt.assemble_settings_keys_from_base(tt)
+        else:
+            settings_keys = assemble_settings_keys_from_base(tt)
+        setattr(tt, 'SETTINGS_KEYS', settings_keys)
+        setattr(tt, '__metaclass__', slotsettings_meta)
+        return tt
+
+
+class SlotSettings(IASettings, metaclass=slotsettings_meta):
     _slot_rems = None
     __slots__ = tuple()
     SETTINGS_KEYS = None
-
-    # @classmethod
-    # def __new__(cls, *args, **kwargs):
-    #     if cls not in rem_slot_fixed:
-    #         found_slot_rems = False
-    #
-    #
-    #         slrm = set()
-    #         for tt in generate_hierarchy_to_base(SlotSettings, cls):
-    #             if hasattr(tt, '_slot_rems') and tt._slot_rems is not None:
-    #                 found_slot_rems = True
-    #                 slrm.update(tt._slot_rems)
-    #
-    #         if found_slot_rems:
-    #             cls._slot_rems = tuple(slrm)
-    #             cls.get_settings_keys = cls.get_settings_keys_rems
-    #         else:
-    #             cls.get_settings_keys = cls.get_settings_keys_base_slots
-    #         rem_slot_fixed.add(cls)
-    #
-    #    return super(SlotSettings, cls).__new__(cls)
-
-    def __init__(self):
-        cls = self.__class__
-        try:
-            object.__getattribute__(cls, 'SETTINGS_KEYS')
-        except AttributeError:
-            # this whole process is inefficient, but it only happens once so, eh
-            cls.SETTINGS_KEYS = OrderedSet(cls.assemble_settings_keys_from_base(cls))
-        super().__init__()
-
-    @staticmethod
-    def assemble_settings_keys_from_base(cls: Type) -> tuple:
-        try:
-            ret = object.__getattribute__(cls, 'SETTINGS_KEYS')
-            if ret is not None:  # cached
-                return ret
-        except AttributeError:
-            pass
-        keys = OrderedSet()
-        try:
-            keys.update(object.__getattribute__(cls, '__slots__'))
-        except AttributeError:
-            pass
-        for tt in cls.__bases__:
-            if hasattr(tt, 'assemble_settings_keys_from_base'):
-                ins = OrderedSet(tt.assemble_settings_keys_from_base(tt))
-                ins.update(keys)
-                keys = ins
-        try:
-            _slot_rems = object.__getattribute__(cls, '_slot_rems')
-            if _slot_rems is not None:
-                return tuple(k for k in keys if k not in _slot_rems)
-        except AttributeError:
-            pass
-        return tuple(keys)
 
     @classmethod
     def get_versioning_endpoint(cls) -> Type[VersionedSerializable]:

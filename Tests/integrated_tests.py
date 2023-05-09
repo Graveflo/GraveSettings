@@ -9,7 +9,7 @@ from datetime import timedelta, datetime, date
 from enum import Enum, auto
 from unittest import TestCase, main
 
-from ram_util.modules import format_class_str
+from grave_settings.utilities import format_class_str
 from grave_settings.formatter_settings import PreservedReference, Temporary, NoRef, FormatterContext
 from integration_tests_base import Dummy, IntegrationTestCaseBase
 from grave_settings.abstract import Serializable
@@ -62,7 +62,7 @@ class DefaultHandlerObj(Dummy):
     __slots__ = ('type_keys', 'some_dict', 'literal_type', 'tuple', 'datetime', 'some_enum', 'serializable',
                  'pyobject')
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         self.type_keys = {
             timedelta: timedelta(hours=1, seconds=10, microseconds=100),

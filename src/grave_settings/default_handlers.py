@@ -19,15 +19,15 @@ from grave_settings.utilities import get_type_hints, format_class_str, load_type
 
 from grave_settings.formatter_settings import Temporary, PreservedReference, FormatterContext, NoRef
 from grave_settings.handlers import OrderedHandler
-from grave_settings.abstract import Serializable
+from grave_settings.abstract import Serializable, IASettings
 from grave_settings.framestack_context import FrameStackContext
 from grave_settings.helper_objects import KeySerializableDict
 from grave_settings.semantics import *
 
 
-def force_instantiate(type_obj: Type[T]) -> T:
+def force_instantiate(type_obj: Type[T], *args, **kwargs) -> T:
     try:
-        return type_obj()
+        return type_obj(*args, **kwargs)
     except TypeError:
         return type_obj.__new__(type_obj)
 
@@ -229,6 +229,7 @@ class DeSerializationHandler(OrderedHandler):
             FunctionType: self.handle_type,
             MethodType: self.handle_method,
             Serializable: self.handle_serializable,
+            IASettings: self.handle_iasettings,
             KeySerializableDict: self.handle_KeySerializableDict,
             date: self.handle_date,
             datetime: self.handle_datetime,
@@ -307,6 +308,12 @@ class DeSerializationHandler(OrderedHandler):
     @staticmethod
     def handle_serializable(t_object: Type[Serializable], json_obj: dict, context: FormatterContext, **kwargs) -> Serializable:
         settings_obj = force_instantiate(t_object)
+        settings_obj.from_dict(json_obj, context, **kwargs)
+        return settings_obj
+
+    @staticmethod
+    def handle_iasettings(t_object: Type[IASettings], json_obj: dict, context: FormatterContext, **kwargs):
+        settings_obj = force_instantiate(t_object, initialize_settings=False)
         settings_obj.from_dict(json_obj, context, **kwargs)
         return settings_obj
 

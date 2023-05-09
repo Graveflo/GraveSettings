@@ -22,6 +22,21 @@ def basic_converter(json_obj: dict, mapping: dict) -> dict:
     return new_json_obj
 
 
+def get_object_versioning_endpoint(t_obj: Type | object):
+    if hasattr(t_obj, 'get_versioning_endpoint'):
+        return t_obj.get_versioning_endpoint()
+    else:
+        return object
+
+
+def get_descendent_class_formats(t_obj: Type | object, end_point=None) -> set[Type]:
+    if end_point is None:
+        end_point = get_object_versioning_endpoint(t_obj)
+    if not isinstance(t_obj, type):  # meta-classes force use of isinstance for Type[type] checking
+        t_obj = t_obj.__class__
+    return {format_class_str(c) for c in generate_type_hierarchy_to_base(end_point, t_obj)}
+
+
 class ConversionManager:
     __slots__ = 'converters', 'converted'
 
