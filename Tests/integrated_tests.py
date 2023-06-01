@@ -162,8 +162,8 @@ class TestSerialization(Scenarios):
         formatter = self.get_formatter(serialization=True)
         obj = formatter.serialize(self.get_basic_versioned(version='1.0'))
         self.assertDictEqual(obj, {
-            formatter.spec.version_id: {'integrated_tests.DummyVersioned': '1.0'},
-            formatter.spec.class_id: 'integrated_tests.DummyVersioned',
+            formatter.spec.version_id: {f'{__name__}.DummyVersioned': '1.0'},
+            formatter.spec.class_id: f'{__name__}.DummyVersioned',
             'a': 90,
             'b': 'this is a string'
         })

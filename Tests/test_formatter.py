@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, main
 
 from grave_settings.framestack_context import FrameStackContext
 from grave_settings.formatter import Formatter
@@ -35,3 +35,6 @@ class TestSemantics(IntegrationTestCaseBase):
             self.assertIsNot(remade.a, remade.b)
         finally:
             globals().pop('NonSerializableDummy')
+
+if __name__ == '__main__':
+    main()

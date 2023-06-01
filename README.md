@@ -103,11 +103,13 @@ __class__ = "__main__.MyObject"
 integer = 1
 string = "b"
 
-[color]
-__class__ = "__main__.Color"
-b = 255
-g = 255
-r = 255
+[function]
+__class__ = "types.FunctionType"
+state = "builtins.print"
+
+[type_object]
+__class__ = "builtins.type"
+state = "builtins.int"
 
 [[dates]]
 __class__ = "datetime.date"
@@ -124,6 +126,12 @@ state = [
     2,
     2,
 ]
+
+[color]
+__class__ = "__main__.Color"
+r = 255
+g = 255
+b = 255
 ```
 
 Now if we take this string and deserialize it with the same (or equivalent) formatter:
