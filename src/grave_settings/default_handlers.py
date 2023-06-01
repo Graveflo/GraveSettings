@@ -10,7 +10,7 @@ from types import NoneType, MethodType
 from datetime import timedelta, datetime, date, timezone, tzinfo
 from enum import Enum
 from typing import Mapping, Union, get_args
-from types import FunctionType
+from types import FunctionType, BuiltinFunctionType
 from functools import partial
 from zoneinfo import ZoneInfo
 
@@ -47,6 +47,7 @@ class SerializationHandler(OrderedHandler):
             Mapping: self.handle_Mapping,
             FunctionType: self.handle_function_type,
             MethodType: self.handle_method,
+            BuiltinFunctionType: self.handle_function_type,
             PreservedReference: self.handle_PreservedReference,
             Serializable: self.handle_serializable,
             date: self.handle_date,

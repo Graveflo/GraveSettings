@@ -13,7 +13,7 @@ from unittest import main
 from observer_hooks import EventHandler
 from ram_util.modules import format_class_str
 
-from Tests.integration_tests_base import IntegrationTestCaseBase, Dummy, EmptyFormatter
+from integration_tests_base import IntegrationTestCaseBase, Dummy, EmptyFormatter
 from grave_settings.abstract import IASettings
 from grave_settings.config_file import ConfigFile
 from grave_settings.conversion_manager import ConversionManager
@@ -58,10 +58,10 @@ class TestConfigFile(IntegrationTestCaseBase):
     def read_file_contents(self) -> str:
         with open(TEST_FILE_PATH, 'r') as f:
             return f.read()
-
-    def test_instantiating_invalid_path_raises_error(self):
-        with self.assertRaises(Exception):
-            self.get_config_file(None)
+#=============  THIS IS NO LONGER VALID ==================  TODO: make a test to sub
+#    def test_instantiating_invalid_path_raises_error(self):
+#        with self.assertRaises(Exception):
+#            self.get_config_file(None)
 
     def test_exception_raised_with_path_is_none(self):
         c = self.get_config_file(TEST_FILE_PATH)

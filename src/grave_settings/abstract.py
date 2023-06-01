@@ -38,8 +38,8 @@ class Serializable:
         pass
 
     def to_dict(self, context: FormatterContext, **kwargs) -> dict:
-        zgen = ((i, getattr(self, i)) for i in dir(self))
-        return dict(i for i in zgen if not (callable(i[1]) or i[0].startswith('__')))
+        #zgen = ((i, getattr(self, i)) for i in dir(self))
+        return self.__dict__
 
     def from_dict(self, state_obj: dict, context: FormatterContext, **kwargs):
         for k, v in state_obj.items():
