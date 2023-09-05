@@ -65,21 +65,15 @@ class SerializationHandler(OrderedHandler):
 
     @staticmethod
     def handle_path(key: Path, *args, **kwargs):
-        rel_path = None
         is_abs = key.is_absolute()
         if is_abs:
             abs_path = str(key)
-            if key.is_relative_to(os.getcwd()):
-                rel_path = str(key.relative_to(os.getcwd()))
         else:
             abs_path = str(key.absolute())
-            rel_path = str(key)
         d = {
             'path': abs_path,
             'abs': is_abs
         }
-        if rel_path is not None:
-            d['rel_path'] = rel_path
         return d
 
     @staticmethod

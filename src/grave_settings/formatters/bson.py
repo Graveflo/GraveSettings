@@ -7,7 +7,7 @@ from grave_settings.formatter_settings import FormatterContext
 
 class BsonFormatter(Formatter):
     FORMAT_SETTINGS = Formatter.FORMAT_SETTINGS.copy()
-    FORMAT_SETTINGS.type_primitives |= bson.ObjectId
+    FORMAT_SETTINGS.type_primitives |= bson.ObjectId | bytes
 
     def serialized_obj_to_buffer(self, ser_obj: dict, context: FormatterContext) -> str:
         return bson.dumps(ser_obj)
